@@ -1,4 +1,4 @@
-export class Encoder {
+export default class Encoder {
     static encode(obj) {
         if (obj === undefined || typeof obj === 'function') {
             throw new Error('Cannot encode undefined or functions');

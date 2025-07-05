@@ -1,4 +1,4 @@
-export class TimerLogic {
+export default class TimerLogic {
     constructor() {
         this.time = 0;
         this.isRunning = false;
@@ -23,16 +23,12 @@ export class TimerLogic {
         this.intervalId = NaN;
     }
 
-    /**
-     * @param {number} seconds
-     */
+
     async timeAdd(seconds) {
         this.time += seconds * 1000;
     }
 
-    /**
-     * @param {number} seconds
-     */
+
     async timeSubtract(seconds) {
         const reduction = seconds * 1000;
         this.time = Math.max(0, this.time - reduction);

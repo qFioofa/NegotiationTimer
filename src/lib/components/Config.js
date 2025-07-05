@@ -1,20 +1,22 @@
 class ConfigFields {
     constructor() {
+
     }
 
     default() {
+        return ConfigFields();
     }
 }
 
-export class Config extends ConfigFields {
+export default class Config extends ConfigFields {
     constructor() {
         super();
         this._settings = {};
-        this._defaultSettings = {};
+        this._defaultSettings = super.default();
     }
 
     default() {
-        this._settings = {...this._defaultSettings};
+        this._settings = { ...this._defaultSettings };
         return this;
     }
 
@@ -42,7 +44,7 @@ export class Config extends ConfigFields {
     }
 
     setDefaults(defaults) {
-        this._defaultSettings = {...defaults};
+        this._defaultSettings = { ...defaults };
         return this;
     }
 
