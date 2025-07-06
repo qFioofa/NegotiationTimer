@@ -42,6 +42,12 @@
 </div>
 
 <style>
+	:global(body) {
+		margin: 0;
+		font-family: 'Segoe UI', sans-serif;
+		background: rgb(0, 0, 0);
+	}
+
 	.players-wrapper {
 		display: flex;
 		justify-content: space-between;
@@ -49,9 +55,8 @@
 		width: 100%;
 		max-width: 1024px;
 		margin: 0 auto;
-		padding: 2vh 2vw;
 		position: relative;
-		background: #000;
+		background: transparent;
 		border-radius: 0.75rem;
 		box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
 		color: white;
@@ -65,17 +70,18 @@
 	}
 
 	.number {
-		font-size: 10vh;
+		font-size: 40vh;
 		font-weight: 900;
 		color: #ff6600;
 		text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
 		margin-bottom: 1rem;
+		user-select: none;
 	}
 
 	.name-input {
 		width: 4rem;
 		height: 4rem;
-		border-radius: 50%;
+		border-radius: 20%;
 		text-align: center;
 		font-size: 1.1rem;
 		color: white;
@@ -94,13 +100,13 @@
 	.name-input:hover {
 		width: 16ch;
 		border-radius: 2rem;
-		text-align: left;
+		text-align: center;
 		padding-left: 1.2rem;
 		cursor: text;
 	}
 
 	.name-input:not(:placeholder-shown) {
-		text-align: left;
+		text-align: center;
 		border-radius: 2rem;
 		padding-left: 1.2rem;
 	}
