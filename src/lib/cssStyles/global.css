@@ -1,0 +1,48 @@
+html[class^="theme-"] {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:root {
+	--transition: all 0.3s ease;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	background-color: var(--bg);
+	color: var(--fg);
+	font-family: 'Segoe UI', sans-serif;
+	transition: var(--transition);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+	background-color: var(--accent);
+	color: var(--fg);
+	border: none;
+	padding: 0.6rem 1.2rem;
+	border-radius: 0.6rem;
+	transition: var(--transition);
+}
+
+button:hover {
+	background-color: var(--accent-light);
+}
+
+input {
+	background-color: var(--input-bg);
+	color: var(--input-fg);
+	border: 1px solid var(--accent-light);
+	border-radius: 0.6rem;
+	padding: 0.6rem 1rem;
+	transition: var(--transition);
+}

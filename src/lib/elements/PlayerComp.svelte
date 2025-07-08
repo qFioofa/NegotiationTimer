@@ -42,12 +42,6 @@
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		font-family: 'Segoe UI', sans-serif;
-		background: rgb(0, 0, 0);
-	}
-
 	.players-wrapper {
 		display: flex;
 		justify-content: space-between;
@@ -55,11 +49,13 @@
 		width: 100%;
 		max-width: 1024px;
 		margin: 0 auto;
-		position: relative;
-		background: transparent;
-		border-radius: 0.75rem;
-		box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
-		color: white;
+		padding: 2rem;
+		background: var(--bg);
+		border-radius: 1rem;
+		box-shadow: 0 0 30px var(--shadow);
+		backdrop-filter: blur(12px);
+		color: var(--fg);
+		border: 1px solid var(--accent);
 	}
 
 	.player {
@@ -70,51 +66,50 @@
 	}
 
 	.number {
-		font-size: 40vh;
+		font-size: 36vh;
 		font-weight: 900;
-		color: #ff6600;
-		text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
-		margin-bottom: 1rem;
+		color: var(--accent);
+		text-shadow: 0 0 12px var(--shadow);
+		margin-bottom: 1.2rem;
 		user-select: none;
+		line-height: 1;
 	}
 
 	.name-input {
-		width: 4rem;
-		height: 4rem;
+		width: 7rem;
+		height: 5rem;
 		border-radius: 20%;
 		text-align: center;
-		font-size: 1.1rem;
-		color: white;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(6px);
+		font-size: 1.2rem;
+		color: var(--input-fg);
+		background: var(--input-bg);
+		border: 2px solid var(--bg);
+		backdrop-filter: blur(8px);
 		transition: all 0.3s ease;
 		padding: 0 1rem;
 		cursor: pointer;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		box-shadow: 0 0 10px var(--shadow);
 	}
 
 	.name-input:focus,
-	.name-input:hover {
-		width: 16ch;
-		border-radius: 2rem;
-		text-align: center;
-		padding-left: 1.2rem;
-		cursor: text;
-	}
-
+	.name-input:hover,
 	.name-input:not(:placeholder-shown) {
-		text-align: center;
+		width: 18ch;
 		border-radius: 2rem;
-		padding-left: 1.2rem;
+		padding-left: 1rem;
+		cursor: text;
+		background: var(--input-bg);
+		box-shadow: 0 0 16px var(--shadow);
 	}
 
 	.vs-divider {
-		font-size: 2.5rem;
-		font-weight: 700;
-		color: #888;
+		font-size: 3rem;
+		font-weight: 800;
+		color: var(--accent-light);
+		text-shadow: 0 0 4px var(--shadow);
 		user-select: none;
 		width: 10%;
 		text-align: center;
@@ -134,7 +129,11 @@
 		.vs-divider {
 			width: auto;
 			order: -1;
-			font-size: 2rem;
+			font-size: 2.2rem;
+		}
+
+		.number {
+			font-size: 26vh;
 		}
 	}
 </style>

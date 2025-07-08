@@ -1,7 +1,7 @@
 <script>
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
-	import { onMount } from 'svelte';
+	import { tweened } from "svelte/motion";
+	import { cubicOut } from "svelte/easing";
+	import { onMount } from "svelte";
 
 	let isMenuOpen = false;
 	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
@@ -36,17 +36,14 @@
 	}
 
 	onMount(() => {
-		window.addEventListener('mousemove', updateTriggerOpacity);
+		window.addEventListener("mousemove", updateTriggerOpacity);
 		return () => {
-			window.removeEventListener('mousemove', updateTriggerOpacity);
+			window.removeEventListener("mousemove", updateTriggerOpacity);
 		};
 	});
 </script>
 
-<div
-	class="overlay"
-	class:visible={isMenuOpen}
-/>
+<div class="overlay" class:visible={isMenuOpen} />
 
 <div
 	bind:this={triggerRef}
@@ -55,7 +52,7 @@
 	on:mouseleave={handleTriggerLeave}
 	style="opacity: {$triggerOpacity}"
 >
-	📂 Меню
+	Меню
 </div>
 
 <div
@@ -68,19 +65,15 @@
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-	}
-
 	.overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(6px);
+		background: var(--bg);
+		backdrop-filter: blur(8px);
 		z-index: 998;
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.3s;
+		transition: opacity 0.3s ease;
 	}
 	.overlay.visible {
 		opacity: 1;
@@ -94,19 +87,19 @@
 		transform: translateX(-50%);
 		width: 66vw;
 		max-width: 600px;
-		height: 36px;
-		background: rgba(30, 30, 45, 0.95);
-		backdrop-filter: blur(10px);
-		color: white;
+		height: 42px;
+		background: var(--bg);
+		backdrop-filter: blur(14px);
+		color: var(--accent-light);
 		font-weight: 600;
 		text-align: center;
-		line-height: 36px;
+		line-height: 42px;
 		cursor: pointer;
 		z-index: 1001;
-		box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
-		transition: opacity 0.2s ease;
+		box-shadow: 0 -4px 12px var(--shadow);
+		transition: opacity 0.25s ease;
 		user-select: none;
-		opacity: 0;
+		border-radius: 12px 12px 0 0;
 	}
 
 	.menu-panel {
@@ -117,10 +110,11 @@
 		width: 66vw;
 		max-width: 600px;
 		height: 33vh;
-		background: rgba(30, 30, 45, 0.95);
-		backdrop-filter: blur(20px);
-		border-radius: 16px 16px 0 0;
-		box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+		background: var(--bg);
+		backdrop-filter: blur(25px);
+		border-radius: 20px 20px 0 0;
+		border-top: 3px solid var(--accent);
+		box-shadow: 0 -10px 50px var(--shadow);
 		z-index: 1000;
 		opacity: 0;
 		pointer-events: none;
@@ -134,13 +128,13 @@
 	}
 
 	.panel-title {
-		color: white;
-		font-size: 1.5rem;
-		margin: 20px;
+		font-size: 1.8rem;
 		text-align: center;
-		background: linear-gradient(45deg, #ff6a00, #ee0979);
+		margin: 1.5rem 0;
+		background: linear-gradient(45deg, var(--accent), var(--accent-light));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
+		font-weight: bold;
 	}
 </style>

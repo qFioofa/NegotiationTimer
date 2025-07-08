@@ -1,23 +1,23 @@
 <script>
-	import { onMount } from 'svelte';
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
-	import MenuItem from './MenuItem.svelte';
+	import { onMount } from "svelte";
+	import { tweened } from "svelte/motion";
+	import { cubicOut } from "svelte/easing";
+	import MenuItem from "./MenuItem.svelte";
 
 	let menuOpen = false;
 	let opacity = tweened(0, { duration: 150, easing: cubicOut });
 	let menuBtn;
 
 	const items = [
-		{ icon: '🏠', text: 'Главная', badge: 'NEW' },
-		{ icon: '⚙️', text: 'Профиль' },
-		{ icon: '💬', text: 'Сообщения', badge: '12' },
+		{ icon: "🏠", text: "Главная", badge: "NEW" },
+		{ icon: "⚙️", text: "Профиль" },
+		{ icon: "💬", text: "Сообщения", badge: "12" },
 	];
 
 	onMount(() => {
-		if (typeof window === 'undefined') return;
+		if (typeof window === "undefined") return;
 
-		const onMouseMove = (e) => {
+		const onMouseMove = e => {
 			if (!menuBtn) return;
 
 			const rect = menuBtn.getBoundingClientRect();
@@ -29,8 +29,8 @@
 			opacity.set(val);
 		};
 
-		document.addEventListener('mousemove', onMouseMove);
-		return () => document.removeEventListener('mousemove', onMouseMove);
+		document.addEventListener("mousemove", onMouseMove);
+		return () => document.removeEventListener("mousemove", onMouseMove);
 	});
 </script>
 
@@ -65,12 +65,6 @@
 </div>
 
 <style>
-	:global(body) {
-		margin: 0;
-		font-family: 'Segoe UI', sans-serif;
-		background: #f7f7f7;
-	}
-
 	.menu-container {
 		position: fixed;
 		top: 2rem;
@@ -79,53 +73,60 @@
 	}
 
 	.menu-button {
-		width: 4.75rem;
-		height: 4.75rem;
+		width: 5rem;
+		height: 5rem;
 		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.5);
-		backdrop-filter: blur(10px);
-		border: 2px solid rgba(255, 150, 50, 0.3);
-		box-shadow: 0 0 25px rgba(255, 150, 50, 0.15);
-		cursor: pointer;
+		background: var(--bg);
+		backdrop-filter: blur(12px);
+		border: 2px solid var(--accent);
+		box-shadow: 0 0 25px var(--shadow);
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		transition: transform 0.3s ease, border-color 0.3s ease;
+		transition:
+			transform 0.3s ease,
+			box-shadow 0.3s ease;
+		cursor: pointer;
 	}
+
 	.menu-button:hover {
-		transform: scale(1.1);
-		border-color: rgba(255, 150, 50, 0.8);
-		box-shadow: 0 0 35px rgba(255, 150, 50, 0.4);
+		transform: scale(1.08);
+		box-shadow: 0 0 35px var(--shadow);
 	}
+
 	.menu-line {
-		width: 2.5rem;
-		height: 0.3rem;
-		background: #333;
+		width: 2.4rem;
+		height: 0.25rem;
+		background: var(--accent);
 		margin: 0.3rem 0;
-		border-radius: 2px;
-		transition: transform 0.3s, opacity 0.3s;
+		border-radius: 3px;
+		transition: all 0.3s ease;
 	}
+
 	.menu-open .menu-line:nth-child(1) {
-		transform: translateY(0.7rem) rotate(45deg);
+		transform: translateY(0.6rem) rotate(45deg);
 	}
 	.menu-open .menu-line:nth-child(2) {
 		opacity: 0;
 	}
 	.menu-open .menu-line:nth-child(3) {
-		transform: translateY(-0.7rem) rotate(-45deg);
+		transform: translateY(-0.6rem) rotate(-45deg);
 	}
 
 	.overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.4);
+		background: var(--bg);
 		backdrop-filter: blur(5px);
 		opacity: 0;
 		visibility: hidden;
-		transition: opacity 0.3s ease, visibility 0.3s ease;
+		transition:
+			opacity 0.3s ease,
+			visibility 0.3s ease;
 		z-index: 900;
 	}
+
 	.overlay.visible {
 		opacity: 1;
 		visibility: visible;
@@ -137,28 +138,30 @@
 		right: -30rem;
 		width: 30rem;
 		height: 100vh;
-		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(12px);
-		box-shadow: -6px 0 40px rgba(0, 0, 0, 0.2);
-		transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
+		background: var(--bg);
+		backdrop-filter: blur(16px);
+		box-shadow: -6px 0 60px var(--shadow);
+		transition: transform 0.5s ease;
 		display: flex;
 		flex-direction: column;
 		z-index: 950;
 		transform: translateX(0);
-		border-left: 1px solid #ddd;
+		border-left: 1px solid var(--accent);
 	}
+
 	.menu-panel.open {
 		transform: translateX(-30rem);
 	}
 
 	.menu-header {
 		padding: 2.5rem 2rem;
-		border-bottom: 1px solid #eee;
+		border-bottom: 1px solid var(--accent);
 	}
+
 	.menu-title {
-		font-size: 2.5rem;
-		font-weight: 600;
-		color: #ff6600;
+		font-size: 2.4rem;
+		font-weight: bold;
+		color: var(--input-fg);
 		letter-spacing: 1px;
 	}
 
@@ -167,21 +170,16 @@
 		overflow-y: auto;
 		padding: 2rem;
 		scrollbar-width: thin;
-		scrollbar-color: #ffa366 transparent;
+		scrollbar-color: var(--accent-light) transparent;
 	}
+
 	.menu-content::-webkit-scrollbar {
-		width: 10px;
+		width: 8px;
 	}
-	.menu-content::-webkit-scrollbar-track {
-		background: transparent;
-	}
+
 	.menu-content::-webkit-scrollbar-thumb {
-		background-color: rgba(255, 130, 30, 0.5);
+		background-color: var(--accent-light);
 		border-radius: 6px;
-		border: 2px solid white;
-	}
-	.menu-content::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(255, 130, 30, 0.8);
 	}
 
 	.menu-items {
