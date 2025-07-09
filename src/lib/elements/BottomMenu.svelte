@@ -76,7 +76,7 @@
 		transition: opacity 0.3s ease;
 	}
 	.overlay.visible {
-		opacity: 1;
+		opacity: 0.8;
 		pointer-events: auto;
 	}
 
@@ -91,6 +91,7 @@
 		background: var(--bg);
 		backdrop-filter: blur(14px);
 		color: var(--accent-light);
+		border: 1px solid var(--accent);
 		font-weight: 600;
 		text-align: center;
 		line-height: 42px;
@@ -113,8 +114,8 @@
 		background: var(--bg);
 		backdrop-filter: blur(25px);
 		border-radius: 20px 20px 0 0;
-		border-top: 3px solid var(--accent);
-		box-shadow: 0 -10px 50px var(--shadow);
+		border: 3px solid var(--accent);
+		box-shadow: 0 0px 50px var(--shadow);
 		z-index: 1000;
 		opacity: 0;
 		pointer-events: none;

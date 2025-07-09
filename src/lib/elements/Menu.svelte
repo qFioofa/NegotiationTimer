@@ -107,9 +107,11 @@
 	.menu-open .menu-line:nth-child(1) {
 		transform: translateY(0.6rem) rotate(45deg);
 	}
+
 	.menu-open .menu-line:nth-child(2) {
 		opacity: 0;
 	}
+
 	.menu-open .menu-line:nth-child(3) {
 		transform: translateY(-0.6rem) rotate(-45deg);
 	}
@@ -128,7 +130,7 @@
 	}
 
 	.overlay.visible {
-		opacity: 1;
+		opacity: 0.8;
 		visibility: visible;
 	}
 
