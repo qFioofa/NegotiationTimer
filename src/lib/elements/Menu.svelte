@@ -5,13 +5,39 @@
 	import MenuItem from "./MenuItem.svelte";
 
 	let menuOpen = false;
-	let opacity = tweened(0, { duration: 150, easing: cubicOut });
+	let opacity = tweened(0, { duration: 50, easing: cubicOut });
 	let menuBtn;
 
 	const items = [
-		{ icon: "🏠", text: "Главная", badge: "NEW" },
-		{ icon: "⚙️", text: "Профиль" },
-		{ icon: "💬", text: "Сообщения", badge: "12" },
+		{
+			icon: "🖥",
+			title: "Черный экран",
+			tooltipText: "При завершении времени появляется черный экран о завершении",
+			isToggled: true,
+			onToggle: val => console.log(`{this}`, val),
+		},
+		{
+			icon: "🛠",
+			title: "Выдвигать панель",
+			tooltipText: "Автоматически выдвигать панель, когда мышка внизу экрана",
+			isToggled: true,
+			onToggle: val => console.log("Тоггл настроек:", val),
+		},
+		{
+			icon: "⏸️",
+			title: "Автопауза",
+			tooltipText: "Автоматически ставить на паузу, когда панель открыта",
+			isToggled: true,
+			onToggle: val => console.log("Тоггл настроек:", val),
+		},
+		{
+			icon: "🎨",
+			title: "Тема",
+			tooltipText: "Выберите визуальную тему",
+			options: ["green", "brown", "red", "blue", "cyan", "pink", "grey"],
+			selectedOption: "green",
+			onOptionSelect: opt => console.log("Выбрана тема:", opt),
+		},
 	];
 
 	onMount(() => {
@@ -58,7 +84,9 @@
 	<div class="menu-content">
 		<ul class="menu-items">
 			{#each items as item}
-				<MenuItem {...item} />
+				<li>
+					<MenuItem {...item} />
+				</li>
 			{/each}
 		</ul>
 	</div>
@@ -156,7 +184,7 @@
 	}
 
 	.menu-header {
-		padding: 2.5rem 2rem;
+		padding: 1.5rem 2rem 1rem;
 		border-bottom: 1px solid var(--accent);
 	}
 
@@ -188,5 +216,8 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
 	}
 </style>

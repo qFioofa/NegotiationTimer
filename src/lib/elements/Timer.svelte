@@ -51,7 +51,7 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: calc(50% + 6rem);
+		top: calc(66.6% + 6rem);
 		z-index: 10;
 		pointer-events: auto;
 	}

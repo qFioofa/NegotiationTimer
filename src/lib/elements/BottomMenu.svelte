@@ -9,19 +9,17 @@
 	let triggerRef;
 
 	function updateTriggerOpacity(e) {
-		if (!triggerRef) return;
+		if (!triggerRef || isMenuOpen) return;
 
 		const rect = triggerRef.getBoundingClientRect();
 		const centerX = rect.left + rect.width / 2;
-		const centerY = rect.top + rect.height / 2;
+		const horizontalDistance = Math.abs(e.clientX - centerX);
+		const threshold = window.innerWidth * 0.25;
 
-		const verticalDistance = Math.abs(e.clientY - centerY);
-		const threshold = window.innerHeight * 0.25;
-
-		if (verticalDistance > threshold) {
+		if (horizontalDistance > threshold) {
 			triggerOpacity.set(0);
 		} else {
-			const alpha = 1 - verticalDistance / threshold;
+			const alpha = 1 - horizontalDistance / threshold;
 			triggerOpacity.set(alpha);
 		}
 	}
@@ -48,6 +46,7 @@
 <div
 	bind:this={triggerRef}
 	class="menu-trigger"
+	class:disabled={isMenuOpen}
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
 	style="opacity: {$triggerOpacity}"
@@ -75,6 +74,7 @@
 		pointer-events: none;
 		transition: opacity 0.3s ease;
 	}
+
 	.overlay.visible {
 		opacity: 0.8;
 		pointer-events: auto;
@@ -82,38 +82,47 @@
 
 	.menu-trigger {
 		position: fixed;
-		bottom: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 66vw;
-		max-width: 600px;
-		height: 42px;
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		width: 42px;
+		height: 30vh;
 		background: var(--bg);
 		backdrop-filter: blur(14px);
 		color: var(--accent-light);
 		border: 1px solid var(--accent);
 		font-weight: 600;
 		text-align: center;
-		line-height: 42px;
+		writing-mode: vertical-rl;
+		text-orientation: mixed;
 		cursor: pointer;
 		z-index: 1001;
-		box-shadow: 0 -4px 12px var(--shadow);
+		box-shadow: 4px 0 12px var(--shadow);
 		transition: opacity 0.25s ease;
 		user-select: none;
-		border-radius: 12px 12px 0 0;
+		border-radius: 0 12px 12px 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: auto;
+	}
+
+	.menu-trigger.disabled {
+		pointer-events: none;
+		opacity: 0;
 	}
 
 	.menu-panel {
 		position: fixed;
-		bottom: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 66vw;
-		max-width: 600px;
-		height: 33vh;
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		width: 30vw;
+		max-width: 320px;
+		height: 66vh;
 		background: var(--bg);
 		backdrop-filter: blur(25px);
-		border-radius: 20px 20px 0 0;
+		border-radius: 0 20px 20px 0;
 		border: 3px solid var(--accent);
 		box-shadow: 0 0px 50px var(--shadow);
 		z-index: 1000;
@@ -131,7 +140,7 @@
 	.panel-title {
 		font-size: 1.8rem;
 		text-align: center;
-		margin: 1.5rem 0;
+		margin: 1.5rem;
 		background: linear-gradient(45deg, var(--accent), var(--accent-light));
 		-webkit-background-clip: text;
 		background-clip: text;
