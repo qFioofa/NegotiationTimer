@@ -2,6 +2,7 @@
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
 	import { onMount } from "svelte";
+	import { parameters } from "$lib/stores/parameters";
 
 	let isMenuOpen = false;
 	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
@@ -46,10 +47,12 @@
 <div
 	bind:this={triggerRef}
 	class="menu-trigger"
-	class:disabled={isMenuOpen}
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
-	style="opacity: {$triggerOpacity}"
+	style="
+		opacity: {$triggerOpacity};
+		pointer-events: {$triggerOpacity > 0.05 ? 'auto' : 'none'};
+	"
 >
 	Меню
 </div>
@@ -105,11 +108,6 @@
 		align-items: center;
 		justify-content: center;
 		pointer-events: auto;
-	}
-
-	.menu-trigger.disabled {
-		pointer-events: none;
-		opacity: 0;
 	}
 
 	.menu-panel {

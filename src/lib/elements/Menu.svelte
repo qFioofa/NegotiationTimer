@@ -61,20 +61,25 @@
 </script>
 
 <div class="menu-container">
-	<div
+	<button
 		bind:this={menuBtn}
 		class="menu-button {menuOpen ? 'menu-open' : ''}"
 		style="opacity: {$opacity}"
 		on:click={() => (menuOpen = !menuOpen)}
+		aria-label={menuOpen ? "Close menu" : "Open menu"}
 	>
-		<div class="menu-line" />
-		<div class="menu-line" />
-		<div class="menu-line" />
-	</div>
+		<div class="menu-line"></div>
+		<div class="menu-line"></div>
+		<div class="menu-line"></div>
+	</button>
 </div>
 
 {#if menuOpen}
-	<div class="overlay visible" on:click={() => (menuOpen = false)} />
+	<button
+		class="overlay visible"
+		on:click={() => (menuOpen = false)}
+		aria-label="Close menu overlay"
+	></button>
 {/if}
 
 <div class="menu-panel {menuOpen ? 'open' : ''}">

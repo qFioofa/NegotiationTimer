@@ -1,13 +1,18 @@
 import StyleHandler from './StyleHandler';
 
 const themeManager = new StyleHandler();
+const themeArray = [
+    "green",
+    "brown",
+    "red",
+    "blue",
+    "cyan",
+    "pink",
+    "grey"
+]
 
-themeManager.registerTheme('green');
-themeManager.registerTheme('brown');
-themeManager.registerTheme('red');
-themeManager.registerTheme('blue');
-themeManager.registerTheme('cyan');
-themeManager.registerTheme('pink');
-themeManager.registerTheme('grey');
+themeArray.forEach(
+    item => themeManager.registerTheme(item)
+);
 
 export default themeManager;

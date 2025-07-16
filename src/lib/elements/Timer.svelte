@@ -38,9 +38,9 @@
 </script>
 
 <div class="timer-wrapper">
-	<div class="timer" on:click={toggleTimer}>
+	<button class="timer" on:click={toggleTimer}>
 		{displayTime}
-	</div>
+	</button>
 </div>
 
 <style>
