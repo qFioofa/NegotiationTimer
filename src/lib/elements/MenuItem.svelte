@@ -8,13 +8,6 @@
 	export let selectedOption = null;
 	export let onOptionSelect = null;
 
-	let isClicked = false;
-
-	function handleClick() {
-		isClicked = true;
-		setTimeout(() => (isClicked = false), 300);
-	}
-
 	function toggleSwitch() {
 		if (onToggle) onToggle(!isToggled);
 	}
@@ -25,7 +18,7 @@
 </script>
 
 {#if title}
-	<li class="menu-item" on:click={handleClick} class:clicked={isClicked}>
+	<div class="menu-item">
 		{#if icon}
 			<div class="item-icon">{icon}</div>
 		{/if}
@@ -33,20 +26,29 @@
 		<div class="item-content">
 			<div class="item-title">
 				<span>{title}</span>
+
 				{#if tooltipText}
 					<div class="tooltip-wrapper">
-						<span class="info-icon">?</span>
-						<div class="tooltip">{tooltipText}</div>
+						<span class="info-icon" tabindex="0" aria-label="Показать подсказку" role="button"
+							>?</span
+						>
+						<div class="tooltip" role="tooltip">{tooltipText}</div>
 					</div>
 				{/if}
 			</div>
 
 			{#if typeof isToggled === "boolean"}
-				<div class="toggle-wrapper" on:click|stopPropagation={toggleSwitch}>
+				<div class="toggle-wrapper">
 					<span class:label-active={!isToggled}>Выкл</span>
-					<div class="toggle" class:toggle-on={isToggled}>
+					<button
+						class="toggle"
+						class:toggle-on={isToggled}
+						aria-label={isToggled ? "Отключить" : "Включить"}
+						type="button"
+						on:click|stopPropagation={toggleSwitch}
+					>
 						<div class="circle"></div>
-					</div>
+					</button>
 					<span class:label-active={isToggled}>Вкл</span>
 				</div>
 			{/if}
@@ -54,18 +56,20 @@
 			{#if options && options.length}
 				<div class="option-list">
 					{#each options as option}
-						<div
+						<button
+							type="button"
 							class:option={true}
 							class:active={option === selectedOption}
 							on:click|stopPropagation={() => selectOption(option)}
+							aria-label={`Выбрать ${option}`}
 						>
 							{option}
-						</div>
+						</button>
 					{/each}
 				</div>
 			{/if}
 		</div>
-	</li>
+	</div>
 {/if}
 
 <style>
@@ -81,14 +85,11 @@
 		align-items: flex-start;
 		position: relative;
 		gap: 1rem;
+		display: flexbox;
 	}
 
 	.menu-item:hover {
 		box-shadow: 0 0 20px var(--shadow);
-	}
-
-	.menu-item.clicked {
-		box-shadow: 0 0 30px var(--shadow);
 	}
 
 	.item-icon {
@@ -108,6 +109,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		position: relative;
 	}
 
 	.item-title {
@@ -117,6 +119,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		position: relative;
 	}
 
 	.tooltip-wrapper {
@@ -135,27 +138,33 @@
 		align-items: center;
 		justify-content: center;
 		cursor: help;
+		position: relative;
+		z-index: 1001;
 	}
 
 	.tooltip {
 		opacity: 0;
 		visibility: hidden;
 		position: absolute;
+		bottom: 140%;
+		left: 50%;
+		transform: translateX(-50%);
 		background: var(--tooltip-bg, #222);
 		color: var(--tooltip-fg, #fff);
 		padding: 6px 10px;
 		border-radius: 8px;
 		font-size: 1.2rem;
-		top: 120%;
-		left: 50%;
-		transform: translateX(-50%);
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 		transition: opacity 0.2s ease;
-		white-space: nowrap;
-		z-index: 10;
+		z-index: 1000;
+		max-width: 300px;
+		white-space: normal;
+		text-align: center;
+		pointer-events: none;
 	}
 
-	.tooltip-wrapper:hover .tooltip {
+	.tooltip-wrapper:hover .tooltip,
+	.tooltip-wrapper:focus-within .tooltip {
 		opacity: 1;
 		visibility: visible;
 	}
@@ -167,6 +176,7 @@
 		font-size: 1.2rem;
 		color: var(--fg-muted, #888);
 		user-select: none;
+		z-index: 100;
 	}
 
 	.label-active {

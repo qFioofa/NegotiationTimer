@@ -2,7 +2,16 @@
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
 	import { onMount } from "svelte";
-	import { parameters } from "$lib/stores/parameters";
+	import { isPaused, setPause } from "$lib/components/Pause";
+	import Pause from "./Pause.svelte";
+	import BottomMenuItem from "./BottomMenuItem.svelte";
+
+	function dummyApply(val) {
+		console.log("Применить:", val);
+	}
+	function dummyBind() {
+		console.log("Ожидание ввода бинда...");
+	}
 
 	let isMenuOpen = false;
 	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
@@ -26,11 +35,13 @@
 	}
 
 	function handleTriggerEnter() {
+		setPause(true);
 		isMenuOpen = true;
 		triggerOpacity.set(1);
 	}
 
 	function handleTriggerLeave() {
+		setPause(false);
 		isMenuOpen = false;
 	}
 
@@ -41,6 +52,8 @@
 		};
 	});
 </script>
+
+<Pause />
 
 <div class="overlay" class:visible={isMenuOpen} />
 
@@ -63,7 +76,47 @@
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
 >
-	<h2 class="panel-title">Панель</h2>
+	<div class="scroll-wrapper">
+		<h2 class="panel-title">Панель</h2>
+
+		<BottomMenuItem
+			title="Добавить/убавить время"
+			description="Нажимайте + или − для изменения"
+			type="adjust"
+			value="00:30"
+			onIncrease={() => dummyApply("+00:30")}
+			onDecrease={() => dummyApply("-00:30")}
+			icon="⏸️"
+		/>
+
+		<BottomMenuItem
+			title="Установить конкретное время"
+			description="Время на таймере заменится на введённое"
+			type="input"
+			placeholder="02:00"
+			value="02:00"
+			onApply={dummyApply}
+			icon="⏸️"
+		/>
+
+		<BottomMenuItem
+			title="Сделать решафл"
+			description="Назначьте клавишу для перемешивания"
+			type="bind"
+			bindKey="R"
+			onBindSet={dummyBind}
+			icon="⏸️"
+		/>
+
+		<BottomMenuItem
+			title="Пауза"
+			description="Назначьте клавишу для паузы"
+			type="bind"
+			bindKey="P"
+			onBindSet={dummyBind}
+			icon="⏸️"
+		/>
+	</div>
 </div>
 
 <style>
@@ -116,7 +169,7 @@
 		left: 0;
 		transform: translateY(-50%);
 		width: 30vw;
-		max-width: 320px;
+		max-width: 50vw;
 		height: 66vh;
 		background: var(--bg);
 		backdrop-filter: blur(25px);
@@ -135,14 +188,36 @@
 		pointer-events: auto;
 	}
 
+	.scroll-wrapper {
+		max-height: 100%;
+		overflow-y: auto;
+		padding-right: 8px;
+		scrollbar-width: thin;
+		scrollbar-color: var(--accent) transparent;
+	}
+
+	.scroll-wrapper::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.scroll-wrapper::-webkit-scrollbar-thumb {
+		background-color: var(--accent);
+		border-radius: 4px;
+	}
+
+	.scroll-wrapper::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
 	.panel-title {
-		font-size: 1.8rem;
-		text-align: center;
-		margin: 1.5rem;
+		font-size: 4rem;
+		text-align: left;
+		margin: 2rem;
 		background: linear-gradient(45deg, var(--accent), var(--accent-light));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
 		font-weight: bold;
+		user-select: none;
 	}
 </style>

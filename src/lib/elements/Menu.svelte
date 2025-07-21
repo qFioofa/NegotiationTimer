@@ -84,14 +84,12 @@
 
 <div class="menu-panel {menuOpen ? 'open' : ''}">
 	<div class="menu-header">
-		<h2 class="menu-title">Меню</h2>
+		<h2 class="menu-title">Меню настроек</h2>
 	</div>
 	<div class="menu-content">
 		<ul class="menu-items">
 			{#each items as item}
-				<li>
-					<MenuItem {...item} />
-				</li>
+				<MenuItem {...item} />
 			{/each}
 		</ul>
 	</div>
@@ -191,13 +189,16 @@
 	.menu-header {
 		padding: 1.5rem 2rem 1rem;
 		border-bottom: 1px solid var(--accent);
+		user-select: none;
 	}
 
 	.menu-title {
+		color: var(--accent);
 		font-size: 2.4rem;
 		font-weight: bold;
 		color: var(--input-fg);
 		letter-spacing: 1px;
+		user-select: none;
 	}
 
 	.menu-content {
@@ -206,6 +207,7 @@
 		padding: 2rem;
 		scrollbar-width: thin;
 		scrollbar-color: var(--accent-light) transparent;
+		user-select: none;
 	}
 
 	.menu-content::-webkit-scrollbar {
@@ -224,5 +226,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
+		user-select: none;
 	}
 </style>

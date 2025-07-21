@@ -1,9 +1,23 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
 	import TimerLogic from "$lib/components/TimerLogic";
+	import { isPaused } from "$lib/components/Pause";
 
 	let timer = new TimerLogic();
 	let displayTime = "00:00";
+	let wasRunningBeforePause = false;
+
+	$: if ($isPaused) {
+		if (timer.isRunning) {
+			wasRunningBeforePause = true;
+			timer.pause();
+		}
+	} else {
+		if (wasRunningBeforePause) {
+			timer.launch();
+			wasRunningBeforePause = false;
+		}
+	}
 
 	const formatTime = (ms: number): string => {
 		const totalSec = Math.floor(ms / 1000);
