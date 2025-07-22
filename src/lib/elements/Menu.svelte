@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
+	import { isPaused, setPause } from "$lib/components/Pause";
 	import MenuItem from "./MenuItem.svelte";
 
 	let menuOpen = false;
@@ -40,20 +41,25 @@
 		},
 	];
 
+	function handleOpen() {
+		menuOpen = !menuOpen;
+		setPause(menuOpen);
+	}
+
+	const onMouseMove = e => {
+		if (!menuBtn) return;
+
+		const rect = menuBtn.getBoundingClientRect();
+		const dx = e.clientX - (rect.left + rect.width / 2);
+		const dy = e.clientY - (rect.top + rect.height / 2);
+		const dist = Math.hypot(dx, dy);
+		const max = window.innerWidth / 4;
+		const val = Math.max(0, 1 - dist / max);
+		opacity.set(val);
+	};
+
 	onMount(() => {
 		if (typeof window === "undefined") return;
-
-		const onMouseMove = e => {
-			if (!menuBtn) return;
-
-			const rect = menuBtn.getBoundingClientRect();
-			const dx = e.clientX - (rect.left + rect.width / 2);
-			const dy = e.clientY - (rect.top + rect.height / 2);
-			const dist = Math.hypot(dx, dy);
-			const max = window.innerWidth / 4;
-			const val = Math.max(0, 1 - dist / max);
-			opacity.set(val);
-		};
 
 		document.addEventListener("mousemove", onMouseMove);
 		return () => document.removeEventListener("mousemove", onMouseMove);
@@ -65,7 +71,7 @@
 		bind:this={menuBtn}
 		class="menu-button {menuOpen ? 'menu-open' : ''}"
 		style="opacity: {$opacity}"
-		on:click={() => (menuOpen = !menuOpen)}
+		on:click={handleOpen}
 		aria-label={menuOpen ? "Close menu" : "Open menu"}
 	>
 		<div class="menu-line"></div>
@@ -100,7 +106,7 @@
 		position: fixed;
 		top: 2rem;
 		right: 2rem;
-		z-index: 1000;
+		z-index: 1001;
 	}
 
 	.menu-button {
@@ -119,6 +125,7 @@
 			transform 0.3s ease,
 			box-shadow 0.3s ease;
 		cursor: pointer;
+		z-index: 1001;
 	}
 
 	.menu-button:hover {
@@ -177,9 +184,10 @@
 		transition: transform 0.5s ease;
 		display: flex;
 		flex-direction: column;
-		z-index: 950;
+		z-index: 1001;
 		transform: translateX(0);
 		border-left: 1px solid var(--accent);
+		z-index: 1000;
 	}
 
 	.menu-panel.open {

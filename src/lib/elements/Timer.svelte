@@ -1,59 +1,36 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
-	import TimerLogic from "$lib/components/TimerLogic";
+	import { onMount } from "svelte";
 	import { isPaused } from "$lib/components/Pause";
+	import {
+		displayTime,
+		isRunning,
+		toggleTimer,
+		startTimer,
+		initTimer,
+	} from "$lib/stores/parameters";
 
-	let timer = new TimerLogic();
-	let displayTime = "00:00";
 	let wasRunningBeforePause = false;
 
 	$: if ($isPaused) {
-		if (timer.isRunning) {
+		if ($isRunning) {
 			wasRunningBeforePause = true;
-			timer.pause();
+			toggleTimer();
 		}
 	} else {
 		if (wasRunningBeforePause) {
-			timer.launch();
+			startTimer();
 			wasRunningBeforePause = false;
 		}
 	}
 
-	const formatTime = (ms: number): string => {
-		const totalSec = Math.floor(ms / 1000);
-		const min = Math.floor(totalSec / 60)
-			.toString()
-			.padStart(2, "0");
-		const sec = (totalSec % 60).toString().padStart(2, "0");
-		return `${min}:${sec}`;
-	};
-
-	const updateDisplay = () => {
-		displayTime = formatTime(timer.toMs());
-	};
-
-	let interval: ReturnType<typeof setInterval>;
-
 	onMount(() => {
-		timer.timeAdd(240);
-		updateDisplay();
-
-		interval = setInterval(updateDisplay, 500);
+		initTimer();
 	});
-
-	onDestroy(() => {
-		clearInterval(interval);
-		timer.pause();
-	});
-
-	function toggleTimer() {
-		timer.isRunning ? timer.pause() : timer.launch();
-	}
 </script>
 
 <div class="timer-wrapper">
 	<button class="timer" on:click={toggleTimer}>
-		{displayTime}
+		{$displayTime}
 	</button>
 </div>
 

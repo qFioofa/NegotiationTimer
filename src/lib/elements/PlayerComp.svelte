@@ -1,12 +1,20 @@
 <script>
 	import { onMount } from "svelte";
+	import ElementShuffler from "$lib/components/Shuffle";
+	import { parameters } from "$lib/stores/parameters";
 
 	export let player1Name = "";
 	export let player2Name = "";
 
+	let number1, number2;
 	let input1Ref, input2Ref;
 	let ghost1Ref, ghost2Ref;
 	let wrapperRef;
+	let shuffler;
+
+	function ShufflePlayers() {
+		shuffler.launch();
+	}
 
 	function updatePlayer1Name(e) {
 		player1Name = e.target.value.slice(0, 40);
@@ -33,13 +41,19 @@
 	}
 
 	onMount(() => {
+		shuffler = new ElementShuffler([number1, number2]);
+		parameters.set({
+			number1,
+			number2,
+			ShufflePlayers,
+		});
 		updateWidths();
 	});
 </script>
 
 <div class="players-wrapper" bind:this={wrapperRef}>
 	<div class="player left">
-		<div class="number">1</div>
+		<div class="number" bind:this={number1}>1</div>
 		<input
 			class="name-input"
 			type="text"
@@ -53,7 +67,7 @@
 	</div>
 
 	<div class="player right">
-		<div class="number">2</div>
+		<div class="number" bind:this={number2}>2</div>
 		<input
 			class="name-input"
 			type="text"
@@ -133,16 +147,6 @@
 		padding: 0 1rem;
 	}
 
-	.vs-divider {
-		font-size: 10rem;
-		font-weight: 800;
-		color: var(--accent-light);
-		text-shadow: 0 0 4px var(--shadow);
-		user-select: none;
-		width: 10%;
-		text-align: center;
-	}
-
 	@media (max-width: 768px) {
 		.players-wrapper {
 			flex-direction: column;
@@ -153,12 +157,6 @@
 
 		.player {
 			width: 100%;
-		}
-
-		.vs-divider {
-			width: auto;
-			order: -1;
-			font-size: 2.2rem;
 		}
 
 		.number {

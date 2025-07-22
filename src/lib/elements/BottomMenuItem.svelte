@@ -5,37 +5,60 @@
 	export let title = "";
 	export let description = "";
 	export let type = "input";
-	export let placeholder = "";
-	export let value = "";
+	export let value = "00:00";
 	export let onApply = () => {};
-	export let onBindSet = () => {};
+	export let onBindTrigger = () => {};
 	export let onIncrement = () => {};
 	export let onDecrement = () => {};
 	export let icon = null;
 
 	let bindKey = null;
 	let listening = false;
-	let inputRef;
-
-	function formatTimeInput(val) {
-		let digits = val.replace(/[^0-9]/g, "");
-		if (digits.length > 4) digits = digits.slice(0, 4);
-		if (digits.length <= 2) return `00:${digits.padStart(2, "0")}`;
-		return `${digits.slice(0, -2).padStart(2, "0")}:${digits.slice(-2)}`;
-	}
-
-	function handleKeydown(event) {
-		if (!listening) return;
-		bindKey = event.key;
-		listening = false;
-		window.removeEventListener("keydown", handleKeydown);
-	}
+	let error = "";
 
 	function startListening() {
 		listening = true;
-		bindKey = null;
-		window.addEventListener("keydown", handleKeydown);
-		onBindSet();
+		window.addEventListener("keydown", handleListening);
+	}
+
+	function handleListening(event) {
+		if (!listening) return;
+		bindKey = event.key;
+		listening = false;
+		window.removeEventListener("keydown", handleListening);
+	}
+
+	function bindHandler(event) {
+		if (event.key === bindKey) {
+			onBindTrigger();
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener("keydown", bindHandler);
+	});
+
+	function validateTimeFormat(val) {
+		const regex = /^([0-5][0-9]):([0-5][0-9])$/;
+		if (!regex.test(val)) return false;
+		const [, mm, ss] = val.match(regex);
+		return mm >= 0 && mm <= 59 && ss >= 0 && ss <= 59;
+	}
+
+	function onInputChange(e) {
+		let val = e.target.value;
+		val = val.replace(/[^0-9]/g, "");
+		if (val.length > 2) {
+			val = val.slice(0, 2) + ":" + val.slice(2, 4);
+		}
+		val = val.slice(0, 5);
+		value = val;
+
+		if (!validateTimeFormat(value)) {
+			error = "Введите время в формате MM:SS, где минуты и секунды от 00 до 59";
+		} else {
+			error = "";
+		}
 	}
 </script>
 
@@ -53,32 +76,55 @@
 	{#if type === "input"}
 		<div class="input-group">
 			<input
-				bind:this={inputRef}
 				type="text"
 				bind:value
-				{placeholder}
-				on:input={() => (value = formatTimeInput(value))}
+				on:input={onInputChange}
+				placeholder="MM:SS"
+				maxlength="5"
+				required
 			/>
-			<button on:click={() => onApply(value)}><Check size={16} /></button>
+			<button disabled={error !== ""} on:click={() => onApply(value)}>
+				<Check size={16} />
+			</button>
 		</div>
+		{#if error}
+			<div class="error">{error}</div>
+		{/if}
 	{:else if type === "adjust"}
 		<div class="adjust-group">
-			<button on:click={onDecrement}><Minus size={16} /></button>
-			<input bind:this={inputRef} type="text" bind:value readonly />
-			<button on:click={onIncrement}><Plus size={16} /></button>
+			<button disabled={error !== ""} on:click={() => onDecrement(value)}
+				><Minus size={16} /></button
+			>
+			<input
+				type="text"
+				bind:value
+				on:input={onInputChange}
+				placeholder="MM:SS"
+				maxlength="5"
+				required
+			/>
+			<button disabled={error !== ""} on:click={() => onIncrement(value)}
+				><Plus size={16} /></button
+			>
 		</div>
+		{#if error}
+			<div class="error">{error}</div>
+		{/if}
 	{:else if type === "bind"}
 		<div class="bind-group">
-			<button class="bind-button" on:click={startListening}>
-				<Keyboard size={14} />
-				{#if bindKey}
-					Клавиша: {bindKey}
-				{:else if listening}
-					Нажмите клавишу...
-				{:else}
-					Установить клавишу
-				{/if}
-			</button>
+			<div class="bind-input-wrapper">
+				<button class="bind-button" on:click={startListening}>
+					<Keyboard size={14} />
+					{#if bindKey}
+						Клавиша: {bindKey}
+					{:else if listening}
+						Нажмите клавишу...
+					{:else}
+						Установить клавишу
+					{/if}
+				</button>
+				<button class="apply-button" on:click={() => onApply(value)}>Применить</button>
+			</div>
 		</div>
 	{/if}
 </div>
@@ -118,7 +164,7 @@
 		align-items: center;
 	}
 
-	input {
+	input[type="text"] {
 		flex: 1;
 		padding: 0.4rem 0.8rem;
 		font-size: 1rem;
@@ -127,12 +173,14 @@
 		background: var(--input-bg);
 		color: var(--fg);
 		text-align: center;
+		font-family: monospace;
 	}
 
 	button {
 		background: var(--accent);
 		color: var(--input-bg);
 		border: none;
+		margin: 5px;
 		border-radius: 8px;
 		padding: 0.4rem 0.8rem;
 		cursor: pointer;
@@ -143,10 +191,34 @@
 		font-size: 0.9rem;
 	}
 
+	.error {
+		color: var(--error-text);
+		font-size: 0.9rem;
+		margin-left: 5px;
+	}
+
+	.bind-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.bind-input-wrapper {
+		display: flex;
+		gap: 0.4rem;
+		align-items: center;
+	}
+
 	.bind-button {
+		flex: 1;
 		font-size: 0.85rem;
 		background: var(--bg-secondary);
 		color: var(--fg);
 		border: 1px solid var(--accent);
+		justify-content: center;
+	}
+
+	.apply-button {
+		min-width: 80px;
 	}
 </style>

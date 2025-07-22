@@ -1,22 +1,25 @@
 <script>
+	import { onMount } from "svelte";
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
-	import { onMount } from "svelte";
-	import { isPaused, setPause } from "$lib/components/Pause";
+	import { isPaused, setPause, togglePause } from "$lib/components/Pause";
 	import Pause from "./Pause.svelte";
 	import BottomMenuItem from "./BottomMenuItem.svelte";
-
-	function dummyApply(val) {
-		console.log("Применить:", val);
-	}
-	function dummyBind() {
-		console.log("Ожидание ввода бинда...");
-	}
+	import { parameters, timeAdd, timeSubtract, toMs } from "$lib/stores/parameters";
 
 	let isMenuOpen = false;
 	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
 
 	let triggerRef;
+
+	function mmssToMs(str) {
+		const parts = str.split(":");
+		if (parts.length !== 2) return 0;
+		const mm = parseInt(parts[0], 10);
+		const ss = parseInt(parts[1], 10);
+		if (isNaN(mm) || isNaN(ss)) return 0;
+		return mm * 60 + ss;
+	}
 
 	function updateTriggerOpacity(e) {
 		if (!triggerRef || isMenuOpen) return;
@@ -45,6 +48,11 @@
 		isMenuOpen = false;
 	}
 
+	function handleShuffle() {
+		const { ShufflePlayers } = $parameters;
+		if (ShufflePlayers) ShufflePlayers();
+	}
+
 	onMount(() => {
 		window.addEventListener("mousemove", updateTriggerOpacity);
 		return () => {
@@ -55,17 +63,21 @@
 
 <Pause />
 
-<div class="overlay" class:visible={isMenuOpen} />
+<div class="overlay" class:visible={isMenuOpen}></div>
 
 <div
 	bind:this={triggerRef}
 	class="menu-trigger"
+	role="button"
+	tabindex="0"
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
+	on:focus={handleTriggerEnter}
+	on:blur={handleTriggerLeave}
 	style="
-		opacity: {$triggerOpacity};
-		pointer-events: {$triggerOpacity > 0.05 ? 'auto' : 'none'};
-	"
+        opacity: {$triggerOpacity};
+        pointer-events: {$triggerOpacity > 0.05 ? 'auto' : 'none'};
+    "
 >
 	Меню
 </div>
@@ -73,39 +85,56 @@
 <div
 	class="menu-panel"
 	class:open={isMenuOpen}
+	role="menu"
+	aria-orientation="vertical"
+	aria-labelledby="panel-title"
+	tabindex="-1"
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
 >
 	<div class="scroll-wrapper">
-		<h2 class="panel-title">Панель</h2>
+		<h2 id="panel-title" class="panel-title">Панель</h2>
 
 		<BottomMenuItem
-			title="Добавить/убавить время"
-			description="Нажимайте + или − для изменения"
-			type="adjust"
-			value="00:30"
-			onIncrease={() => dummyApply("+00:30")}
-			onDecrease={() => dummyApply("-00:30")}
-			icon="⏸️"
+			title="Сделать жеребьевку"
+			description="Назначьте клавишу для перемешивания"
+			type="bind"
+			bindKey="R"
+			onApply={handleShuffle}
+			onBindTrigger={handleShuffle}
+			icon="🔀"
+			role="menuitem"
 		/>
 
 		<BottomMenuItem
 			title="Установить конкретное время"
 			description="Время на таймере заменится на введённое"
 			type="input"
-			placeholder="02:00"
-			value="02:00"
-			onApply={dummyApply}
-			icon="⏸️"
+			value="04:00"
+			onApply={val => {
+				const ms = mmssToMs(val);
+				timeSubtract(toMs());
+				timeAdd(ms);
+			}}
+			icon="🕒"
+			role="menuitem"
 		/>
 
 		<BottomMenuItem
-			title="Сделать решафл"
-			description="Назначьте клавишу для перемешивания"
-			type="bind"
-			bindKey="R"
-			onBindSet={dummyBind}
-			icon="⏸️"
+			title="Добавить/убавить время"
+			description="Нажимайте + или − для изменения"
+			type="adjust"
+			value="00:30"
+			onIncrement={val => {
+				const ms = mmssToMs(val);
+				timeAdd(ms);
+			}}
+			onDecrement={val => {
+				const ms = mmssToMs(val);
+				timeSubtract(ms);
+			}}
+			icon="🕒"
+			role="menuitem"
 		/>
 
 		<BottomMenuItem
@@ -113,8 +142,10 @@
 			description="Назначьте клавишу для паузы"
 			type="bind"
 			bindKey="P"
-			onBindSet={dummyBind}
+			onApply={togglePause}
+			onBindTrigger={togglePause}
 			icon="⏸️"
+			role="menuitem"
 		/>
 	</div>
 </div>
