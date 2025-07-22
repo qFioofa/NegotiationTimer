@@ -10,6 +10,7 @@ export default class StyleHandler {
 
     setTheme(name) {
         if (!this.themes.has(name)) return;
+        if (typeof document === 'undefined') return;
 
         const className = this.themes.get(name);
         this.removeAllThemeClasses();
@@ -18,6 +19,8 @@ export default class StyleHandler {
     }
 
     removeAllThemeClasses() {
+        if (typeof document === 'undefined') return;
+
         for (const className of this.themes.values()) {
             document.documentElement.classList.remove(className);
         }

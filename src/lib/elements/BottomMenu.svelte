@@ -5,11 +5,13 @@
 	import { isPaused, setPause, togglePause } from "$lib/components/Pause";
 	import Pause from "./Pause.svelte";
 	import BottomMenuItem from "./BottomMenuItem.svelte";
-	import { parameters, timeAdd, timeSubtract, toMs } from "$lib/stores/parameters";
+	import { parameters, timeAdd, timeSubtract, toMs, GlobalConfig } from "$lib/stores/parameters";
 
 	let isMenuOpen = false;
-	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
+	let isTriggerHovered = false;
+	let isPanelHovered = false;
 
+	const triggerOpacity = tweened(0, { duration: 150, easing: cubicOut });
 	let triggerRef;
 
 	function mmssToMs(str) {
@@ -23,7 +25,6 @@
 
 	function updateTriggerOpacity(e) {
 		if (!triggerRef || isMenuOpen) return;
-
 		const rect = triggerRef.getBoundingClientRect();
 		const centerX = rect.left + rect.width / 2;
 		const horizontalDistance = Math.abs(e.clientX - centerX);
@@ -37,15 +38,44 @@
 		}
 	}
 
-	function handleTriggerEnter() {
-		setPause(true);
-		isMenuOpen = true;
+	function handleClick() {
+		if (!GlobalConfig.get("panelAutoOpen")) {
+			isMenuOpen = !isMenuOpen;
+			if (GlobalConfig.get("panelAutoPause")) setPause(isMenuOpen);
+		} else {
+			isMenuOpen = true;
+		}
 		triggerOpacity.set(1);
 	}
 
+	function handleTriggerEnter() {
+		isTriggerHovered = true;
+		triggerOpacity.set(1);
+		if (GlobalConfig.get("panelAutoOpen")) {
+			isMenuOpen = true;
+			if (GlobalConfig.get("panelAutoPause")) setPause(true);
+		}
+	}
+
 	function handleTriggerLeave() {
-		setPause(false);
-		isMenuOpen = false;
+		isTriggerHovered = false;
+		setTimeout(checkHoverState, 50);
+	}
+
+	function handlePanelEnter() {
+		isPanelHovered = true;
+	}
+
+	function handlePanelLeave() {
+		isPanelHovered = false;
+		setTimeout(checkHoverState, 50);
+	}
+
+	function checkHoverState() {
+		if (!isTriggerHovered && !isPanelHovered && GlobalConfig.get("panelAutoOpen")) {
+			isMenuOpen = false;
+			if (GlobalConfig.get("panelAutoPause")) setPause(false);
+		}
 	}
 
 	function handleShuffle() {
@@ -65,22 +95,22 @@
 
 <div class="overlay" class:visible={isMenuOpen}></div>
 
-<div
+<button
 	bind:this={triggerRef}
 	class="menu-trigger"
-	role="button"
 	tabindex="0"
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
 	on:focus={handleTriggerEnter}
 	on:blur={handleTriggerLeave}
+	on:click={handleClick}
 	style="
         opacity: {$triggerOpacity};
         pointer-events: {$triggerOpacity > 0.05 ? 'auto' : 'none'};
     "
 >
 	Меню
-</div>
+</button>
 
 <div
 	class="menu-panel"
@@ -89,8 +119,8 @@
 	aria-orientation="vertical"
 	aria-labelledby="panel-title"
 	tabindex="-1"
-	on:mouseenter={handleTriggerEnter}
-	on:mouseleave={handleTriggerLeave}
+	on:mouseenter={handlePanelEnter}
+	on:mouseleave={handlePanelLeave}
 >
 	<div class="scroll-wrapper">
 		<h2 id="panel-title" class="panel-title">Панель</h2>
@@ -99,7 +129,7 @@
 			title="Сделать жеребьевку"
 			description="Назначьте клавишу для перемешивания"
 			type="bind"
-			bindKey="R"
+			bindKey={GlobalConfig.get("shuffleKey")}
 			onApply={handleShuffle}
 			onBindTrigger={handleShuffle}
 			icon="🔀"
@@ -110,7 +140,7 @@
 			title="Установить конкретное время"
 			description="Время на таймере заменится на введённое"
 			type="input"
-			value="04:00"
+			value={GlobalConfig.get("setTime")}
 			onApply={val => {
 				const ms = mmssToMs(val);
 				timeSubtract(toMs());
@@ -124,7 +154,7 @@
 			title="Добавить/убавить время"
 			description="Нажимайте + или − для изменения"
 			type="adjust"
-			value="00:30"
+			value={GlobalConfig.get("timeAddSubStep")}
 			onIncrement={val => {
 				const ms = mmssToMs(val);
 				timeAdd(ms);
@@ -141,7 +171,7 @@
 			title="Пауза"
 			description="Назначьте клавишу для паузы"
 			type="bind"
-			bindKey="P"
+			bindKey={GlobalConfig.get("pauseKey")}
 			onApply={togglePause}
 			onBindTrigger={togglePause}
 			icon="⏸️"

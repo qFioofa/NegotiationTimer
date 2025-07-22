@@ -1,18 +1,36 @@
-class ConfigFields {
-    constructor() {
-
-    }
-
-    default() {
-        return ConfigFields();
-    }
-}
-
-export default class Config extends ConfigFields {
-    constructor() {
-        super();
+export default class Config {
+    constructor(defaultConfig = {}) {
+        this._storageKey = 'appConfig';
+        this._defaultSettings = { ...defaultConfig };
         this._settings = {};
-        this._defaultSettings = super.default();
+
+        if (typeof window !== 'undefined') {
+            this._loadFromStorage();
+            this._attachAutoSave();
+        } else {
+            this._settings = { ...this._defaultSettings };
+        }
+    }
+
+    _loadFromStorage() {
+        try {
+            const saved = localStorage.getItem(this._storageKey);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                this._settings = { ...this._defaultSettings, ...parsed };
+            } else {
+                this.default();
+            }
+        } catch (error) {
+            console.error('Failed to load configuration:', error);
+            this.default();
+        }
+    }
+
+    _attachAutoSave() {
+        window.addEventListener('beforeunload', () => {
+            this.save();
+        });
     }
 
     default() {
@@ -21,17 +39,15 @@ export default class Config extends ConfigFields {
     }
 
     save() {
+        if (typeof window === 'undefined') return false;
+
         try {
-            localStorage.setItem('appConfig', JSON.stringify(this._settings));
+            localStorage.setItem(this._storageKey, JSON.stringify(this._settings));
             return true;
         } catch (error) {
             console.error('Failed to save configuration:', error);
             return false;
         }
-    }
-
-    apply() {
-        return this;
     }
 
     get(key) {
@@ -43,19 +59,10 @@ export default class Config extends ConfigFields {
         return this;
     }
 
-    setDefaults(defaults) {
-        this._defaultSettings = { ...defaults };
-        return this;
-    }
-
     load() {
-        try {
-            const saved = localStorage.getItem('appConfig');
-            if (saved) this._settings = JSON.parse(saved);
-            return this;
-        } catch (error) {
-            console.error('Failed to load configuration:', error);
-            return this.default();
+        if (typeof window !== 'undefined') {
+            this._loadFromStorage();
         }
+        return this;
     }
 }

@@ -1,5 +1,9 @@
 import { writable, derived } from 'svelte/store';
 import TimerLogic from '$lib/components/TimerLogic';
+import Config from '$lib/components/Config';
+import { dConfig } from './defaultConfig';
+
+export const GlobalConfig = new Config(dConfig);
 
 export const parameters = writable({
     player1Element: null,
@@ -8,7 +12,6 @@ export const parameters = writable({
 });
 
 export const timerInstance = new TimerLogic();
-
 export const timeMs = writable(0);
 export const isRunning = writable(false);
 
@@ -27,8 +30,9 @@ timerInstance.addRunningListener(running => {
     isRunning.set(running);
 });
 
-export function initTimer(initialSeconds = 240) {
-    timerInstance.timeAdd(initialSeconds);
+export function initTimer() {
+    const seconds = GlobalConfig.get('timerDuration') || 240;
+    timerInstance.timeAdd(seconds);
 }
 
 export const {
@@ -45,7 +49,8 @@ export function startTimer() {
     timerInstance.launch();
 }
 
-export function resetTimer(seconds = 240) {
+export function resetTimer() {
+    const seconds = GlobalConfig.get('timerDuration') || 60;
     timerInstance.pause();
     timerInstance.timeSubtract(timerInstance.toMs() / 1000);
     timerInstance.timeAdd(seconds);

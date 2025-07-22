@@ -3,47 +3,31 @@
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
 	import { isPaused, setPause } from "$lib/components/Pause";
+	import { GlobalConfig } from "$lib/stores/parameters";
+	import themeManager from "$lib/cssStyles/themeHanager";
 	import MenuItem from "./MenuItem.svelte";
 
 	let menuOpen = false;
 	let opacity = tweened(0, { duration: 50, easing: cubicOut });
 	let menuBtn;
 
-	const items = [
-		{
-			icon: "🖥",
-			title: "Черный экран",
-			tooltipText: "При завершении времени появляется черный экран о завершении",
-			isToggled: true,
-			onToggle: val => console.log(`{this}`, val),
-		},
-		{
-			icon: "🛠",
-			title: "Выдвигать панель",
-			tooltipText: "Автоматически выдвигать панель, когда мышка внизу экрана",
-			isToggled: true,
-			onToggle: val => console.log("Тоггл настроек:", val),
-		},
-		{
-			icon: "⏸️",
-			title: "Автопауза",
-			tooltipText: "Автоматически ставить на паузу, когда панель открыта",
-			isToggled: true,
-			onToggle: val => console.log("Тоггл настроек:", val),
-		},
-		{
-			icon: "🎨",
-			title: "Тема",
-			tooltipText: "Выберите визуальную тему",
-			options: ["green", "brown", "red", "blue", "cyan", "pink", "grey"],
-			selectedOption: "green",
-			onOptionSelect: opt => console.log("Выбрана тема:", opt),
-		},
-	];
+	let timerBlackOut = GlobalConfig.get("timerBlackOut");
+	let panelAutoOpen = GlobalConfig.get("panelAutoOpen");
+	let panelAutoPause = GlobalConfig.get("panelAutoPause");
+	let menuAutoPause = GlobalConfig.get("menuAutoPause");
+	let afterSound = GlobalConfig.get("afterSound");
+	let theme = GlobalConfig.get("theme");
+
+	$: GlobalConfig.set("timerBlackOut", timerBlackOut);
+	$: GlobalConfig.set("panelAutoOpen", panelAutoOpen);
+	$: GlobalConfig.set("panelAutoPause", panelAutoPause);
+	$: GlobalConfig.set("menuAutoPause", menuAutoPause);
+	$: GlobalConfig.set("afterSound", afterSound);
+	$: GlobalConfig.set("theme", theme);
 
 	function handleOpen() {
 		menuOpen = !menuOpen;
-		setPause(menuOpen);
+		if (GlobalConfig.get("menuAutoPause")) setPause(menuOpen);
 	}
 
 	const onMouseMove = e => {
@@ -94,9 +78,52 @@
 	</div>
 	<div class="menu-content">
 		<ul class="menu-items">
-			{#each items as item}
-				<MenuItem {...item} />
-			{/each}
+			<MenuItem
+				icon="🖥"
+				title="Черный экран"
+				tooltipText="При завершении времени появляется черный экран"
+				bind:isToggled={timerBlackOut}
+			/>
+
+			<MenuItem
+				icon="🛠"
+				title="Выдвигать панель"
+				tooltipText="Автоматически выдвигать панель, когда мышка на иконке панели"
+				bind:isToggled={panelAutoOpen}
+			/>
+
+			<MenuItem
+				icon="⏸️"
+				title="Автопауза: панель"
+				tooltipText="Автоматически ставить на паузу, когда панель открыта"
+				bind:isToggled={panelAutoPause}
+			/>
+
+			<MenuItem
+				icon="⏸️"
+				title="Автопауза: меню"
+				tooltipText="Автоматически ставить на паузу, когда меню открыто"
+				bind:isToggled={menuAutoPause}
+			/>
+
+			<MenuItem
+				icon="🎵"
+				title="Звук"
+				tooltipText="Воспроизводит звук по завершении времени"
+				bind:isToggled={afterSound}
+			/>
+
+			<MenuItem
+				icon="🎨"
+				title="Тема"
+				tooltipText="Выберите визуальную тему"
+				options={themeManager.getAvailableThemes()}
+				bind:selectedOption={theme}
+				onOptionSelect={opt => {
+					theme = opt;
+					themeManager.setTheme(opt);
+				}}
+			/>
 		</ul>
 	</div>
 </div>

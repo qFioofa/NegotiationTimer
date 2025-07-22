@@ -5,9 +5,10 @@
 	import PlayerComp from "$lib/elements/PlayerComp.svelte";
 	import Timer from "$lib/elements/Timer.svelte";
 	import themeManager from "$lib/cssStyles/themeHanager";
+	import { GlobalConfig } from "$lib/stores/parameters";
 
 	onMount(() => {
-		themeManager.setTheme("green");
+		themeManager.setTheme(GlobalConfig.get("theme"));
 	});
 </script>
 

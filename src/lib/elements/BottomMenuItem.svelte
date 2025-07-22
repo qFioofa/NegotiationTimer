@@ -29,9 +29,7 @@
 	}
 
 	function bindHandler(event) {
-		if (event.key === bindKey) {
-			onBindTrigger();
-		}
+		if (event.key === bindKey) onBindTrigger();
 	}
 
 	onMount(() => {
@@ -39,35 +37,21 @@
 	});
 
 	function validateTimeFormat(val) {
-		const regex = /^([0-5][0-9]):([0-5][0-9])$/;
-		if (!regex.test(val)) return false;
-		const [, mm, ss] = val.match(regex);
-		return mm >= 0 && mm <= 59 && ss >= 0 && ss <= 59;
+		return /^([0-5][0-9]):([0-5][0-9])$/.test(val);
 	}
 
 	function onInputChange(e) {
-		let val = e.target.value;
-		val = val.replace(/[^0-9]/g, "");
-		if (val.length > 2) {
-			val = val.slice(0, 2) + ":" + val.slice(2, 4);
-		}
-		val = val.slice(0, 5);
+		let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+		if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2);
 		value = val;
-
-		if (!validateTimeFormat(value)) {
-			error = "Введите время в формате MM:SS, где минуты и секунды от 00 до 59";
-		} else {
-			error = "";
-		}
+		error = validateTimeFormat(value) ? "" : "Введите время в формате MM:SS";
 	}
 </script>
 
 <div class="bottom-menu-item">
 	<div class="top">
 		<h3>
-			{#if icon}
-				<div class="item-icon">{icon}</div>
-			{/if}
+			{#if icon}<div class="item-icon">{icon}</div>{/if}
 			{title}
 		</h3>
 		<p>{description}</p>
@@ -83,18 +67,12 @@
 				maxlength="5"
 				required
 			/>
-			<button disabled={error !== ""} on:click={() => onApply(value)}>
-				<Check size={16} />
-			</button>
+			<button disabled={error} on:click={() => onApply(value)}><Check size={16} /></button>
 		</div>
-		{#if error}
-			<div class="error">{error}</div>
-		{/if}
+		{#if error}<div class="error">{error}</div>{/if}
 	{:else if type === "adjust"}
 		<div class="adjust-group">
-			<button disabled={error !== ""} on:click={() => onDecrement(value)}
-				><Minus size={16} /></button
-			>
+			<button disabled={error} on:click={() => onDecrement(value)}><Minus size={16} /></button>
 			<input
 				type="text"
 				bind:value
@@ -103,25 +81,17 @@
 				maxlength="5"
 				required
 			/>
-			<button disabled={error !== ""} on:click={() => onIncrement(value)}
-				><Plus size={16} /></button
-			>
+			<button disabled={error} on:click={() => onIncrement(value)}><Plus size={16} /></button>
 		</div>
-		{#if error}
-			<div class="error">{error}</div>
-		{/if}
+		{#if error}<div class="error">{error}</div>{/if}
 	{:else if type === "bind"}
 		<div class="bind-group">
 			<div class="bind-input-wrapper">
 				<button class="bind-button" on:click={startListening}>
 					<Keyboard size={14} />
-					{#if bindKey}
-						Клавиша: {bindKey}
-					{:else if listening}
-						Нажмите клавишу...
-					{:else}
-						Установить клавишу
-					{/if}
+					{#if bindKey}Клавиша: {bindKey}
+					{:else if listening}Нажмите клавишу...
+					{:else}Установить клавишу{/if}
 				</button>
 				<button class="apply-button" on:click={() => onApply(value)}>Применить</button>
 			</div>
@@ -149,12 +119,14 @@
 		display: flex;
 		align-items: center;
 		gap: 0.4rem;
+		user-select: none;
 	}
 
 	.top p {
 		margin: 5px;
 		color: var(--fg-muted);
 		font-size: 1.1rem;
+		user-select: none;
 	}
 
 	.input-group,
@@ -162,6 +134,7 @@
 		display: flex;
 		gap: 0.4rem;
 		align-items: center;
+		user-select: none;
 	}
 
 	input[type="text"] {

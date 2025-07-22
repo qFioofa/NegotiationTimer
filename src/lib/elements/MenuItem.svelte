@@ -2,17 +2,19 @@
 	export let icon = null;
 	export let title = null;
 	export let tooltipText = null;
-	export let isToggled = null;
 	export let onToggle = null;
+	export let onOptionSelect = null;
 	export let options = null;
 	export let selectedOption = null;
-	export let onOptionSelect = null;
+	export let isToggled = undefined;
 
 	function toggleSwitch() {
-		if (onToggle) onToggle(!isToggled);
+		isToggled = !isToggled;
+		if (onToggle) onToggle(isToggled);
 	}
 
 	function selectOption(option) {
+		selectedOption = option;
 		if (onOptionSelect) onOptionSelect(option);
 	}
 </script>
@@ -26,13 +28,10 @@
 		<div class="item-content">
 			<div class="item-title">
 				<span>{title}</span>
-
 				{#if tooltipText}
 					<div class="tooltip-wrapper">
-						<span class="info-icon" tabindex="0" aria-label="Показать подсказку" role="button"
-							>?</span
-						>
-						<div class="tooltip" role="tooltip">{tooltipText}</div>
+						<span class="info-icon" tabindex="0" role="button">?</span>
+						<div class="tooltip">{tooltipText}</div>
 					</div>
 				{/if}
 			</div>
@@ -43,12 +42,13 @@
 					<button
 						class="toggle"
 						class:toggle-on={isToggled}
-						aria-label={isToggled ? "Отключить" : "Включить"}
 						type="button"
+						aria-label={isToggled ? "Отключить" : "Включить"}
 						on:click|stopPropagation={toggleSwitch}
 					>
 						<div class="circle"></div>
 					</button>
+
 					<span class:label-active={isToggled}>Вкл</span>
 				</div>
 			{/if}
@@ -58,10 +58,9 @@
 					{#each options as option}
 						<button
 							type="button"
-							class:option={true}
+							class:option
 							class:active={option === selectedOption}
 							on:click|stopPropagation={() => selectOption(option)}
-							aria-label={`Выбрать ${option}`}
 						>
 							{option}
 						</button>
@@ -83,9 +82,7 @@
 		transition: all 0.3s ease;
 		display: flex;
 		align-items: flex-start;
-		position: relative;
 		gap: 1rem;
-		display: flexbox;
 	}
 
 	.menu-item:hover {
@@ -109,7 +106,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		position: relative;
 	}
 
 	.item-title {
@@ -119,7 +115,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		position: relative;
 	}
 
 	.tooltip-wrapper {
@@ -139,7 +134,7 @@
 		justify-content: center;
 		cursor: help;
 		position: relative;
-		z-index: 1001;
+		z-index: 1;
 	}
 
 	.tooltip {
@@ -158,7 +153,6 @@
 		transition: opacity 0.2s ease;
 		z-index: 1000;
 		max-width: 300px;
-		white-space: normal;
 		text-align: center;
 		pointer-events: none;
 	}
@@ -176,7 +170,6 @@
 		font-size: 1.2rem;
 		color: var(--fg-muted, #888);
 		user-select: none;
-		z-index: 100;
 	}
 
 	.label-active {
