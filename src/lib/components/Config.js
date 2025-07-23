@@ -59,6 +59,10 @@ export default class Config {
         return this;
     }
 
+    setConfig(cfg) {
+        this._settings = cfg;
+    }
+
     load() {
         if (typeof window !== 'undefined') {
             this._loadFromStorage();

@@ -1,15 +1,19 @@
-<script lang="ts">
+<script>
 	import { onMount } from "svelte";
 	import { isPaused } from "$lib/components/Pause";
+	import BlackOut from "./BlackOut.svelte";
 	import {
 		displayTime,
 		isRunning,
 		toggleTimer,
 		startTimer,
 		initTimer,
+		timeMs,
+		isBlackout,
 	} from "$lib/stores/parameters";
 
 	let wasRunningBeforePause = false;
+	let wasStartedOnce = false;
 
 	$: if ($isPaused) {
 		if ($isRunning) {
@@ -23,10 +27,20 @@
 		}
 	}
 
+	$: if ($isRunning) {
+		wasStartedOnce = true;
+	}
+
+	$: if (wasStartedOnce && $timeMs === 0 && $isRunning === false) {
+		isBlackout.set(true);
+	}
+
 	onMount(() => {
 		initTimer();
 	});
 </script>
+
+<BlackOut blackoutTitle="Время вышло!" configKey="audioTimerEnd" />
 
 <div class="timer-wrapper">
 	<button class="timer" on:click={toggleTimer}>

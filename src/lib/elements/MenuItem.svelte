@@ -1,4 +1,6 @@
 <script>
+	import { tick } from "svelte";
+
 	export let icon = null;
 	export let title = null;
 	export let tooltipText = null;
@@ -8,6 +10,17 @@
 	export let selectedOption = null;
 	export let isToggled = undefined;
 
+	export let mode = null;
+	export let onClick = null;
+	export let onHoldComplete = null;
+	export let holdDuration = 3000;
+
+	let holdProgress = 0;
+	let holding = false;
+	let holdTimeout;
+	let progressInterval;
+	let holdText = "";
+
 	function toggleSwitch() {
 		isToggled = !isToggled;
 		if (onToggle) onToggle(isToggled);
@@ -16,6 +29,44 @@
 	function selectOption(option) {
 		selectedOption = option;
 		if (onOptionSelect) onOptionSelect(option);
+	}
+
+	function handleClick() {
+		if (onClick) onClick();
+	}
+
+	async function handleHoldStart() {
+		holding = true;
+		holdProgress = 0;
+		holdText = "Зажимай...";
+
+		progressInterval = setInterval(async () => {
+			holdProgress += 100 / (holdDuration / 100);
+			if (holdProgress >= 100) {
+				holdProgress = 100;
+				holdText = "Готово!";
+				clearInterval(progressInterval);
+
+				await tick();
+				setTimeout(() => {
+					if (onHoldComplete) onHoldComplete();
+					clearHold();
+				}, 1500);
+			}
+			await tick();
+		}, 100);
+	}
+
+	function handleHoldCancel() {
+		clearHold();
+	}
+
+	function clearHold() {
+		clearTimeout(holdTimeout);
+		clearInterval(progressInterval);
+		holding = false;
+		holdProgress = 0;
+		holdText = "";
 	}
 </script>
 
@@ -42,13 +93,11 @@
 					<button
 						class="toggle"
 						class:toggle-on={isToggled}
-						type="button"
 						aria-label={isToggled ? "Отключить" : "Включить"}
-						on:click|stopPropagation={toggleSwitch}
+						on:click={toggleSwitch}
 					>
 						<div class="circle"></div>
 					</button>
-
 					<span class:label-active={isToggled}>Вкл</span>
 				</div>
 			{/if}
@@ -57,15 +106,38 @@
 				<div class="option-list">
 					{#each options as option}
 						<button
-							type="button"
 							class:option
 							class:active={option === selectedOption}
-							on:click|stopPropagation={() => selectOption(option)}
+							on:click={() => selectOption(option)}
 						>
 							{option}
 						</button>
 					{/each}
 				</div>
+			{/if}
+
+			{#if mode === "hold"}
+				<div
+					class="progress-bar"
+					role="button"
+					tabindex="0"
+					on:mousedown={handleHoldStart}
+					on:mouseup={handleHoldCancel}
+					on:mouseleave={handleHoldCancel}
+				>
+					<div class="bar" style="width: {holdProgress}%"></div>
+					<span class="bar-text">
+						{#if holdText}
+							{holdText}
+						{:else}
+							Зажми {Math.ceil(holdDuration / 1000)} сек
+						{/if}
+					</span>
+				</div>
+			{/if}
+
+			{#if mode === "click"}
+				<button class="option active" on:click={handleClick}> Нажми </button>
 			{/if}
 		</div>
 	</div>
@@ -231,5 +303,40 @@
 		color: var(--input-bg);
 		font-weight: bold;
 		box-shadow: 0 0 10px var(--shadow);
+	}
+
+	.progress-bar {
+		width: 100%;
+		height: 5vh;
+		position: relative;
+		background: var(--input-bg);
+		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+	}
+
+	.progress-bar .bar {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 0%;
+		background: var(--accent);
+		transition: width 0.1s linear;
+		z-index: 1;
+	}
+
+	.bar-text {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		font-size: 1.3rem;
+		color: white;
+		user-select: none;
+		pointer-events: none;
+		font-weight: 500;
 	}
 </style>

@@ -3,7 +3,10 @@
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
 	import { isPaused, setPause } from "$lib/components/Pause";
-	import { GlobalConfig } from "$lib/stores/parameters";
+	import { GlobalConfig, setIntroGuideVisiable } from "$lib/stores/parameters";
+	import { dConfig } from "$lib/stores/defaultConfig";
+	import MenuItemMedia from "./MenuItemMedia.svelte";
+	import IntroGuide from "./IntroGuide.svelte";
 	import themeManager from "$lib/cssStyles/themeHanager";
 	import MenuItem from "./MenuItem.svelte";
 
@@ -15,6 +18,8 @@
 	let panelAutoOpen = GlobalConfig.get("panelAutoOpen");
 	let panelAutoPause = GlobalConfig.get("panelAutoPause");
 	let menuAutoPause = GlobalConfig.get("menuAutoPause");
+	let usingBackroundImage = GlobalConfig.get("usingBackroundImage");
+	let playerBackground = GlobalConfig.get("playerBackground");
 	let afterSound = GlobalConfig.get("afterSound");
 	let theme = GlobalConfig.get("theme");
 
@@ -22,6 +27,8 @@
 	$: GlobalConfig.set("panelAutoOpen", panelAutoOpen);
 	$: GlobalConfig.set("panelAutoPause", panelAutoPause);
 	$: GlobalConfig.set("menuAutoPause", menuAutoPause);
+	$: GlobalConfig.set("usingBackroundImage", usingBackroundImage);
+	$: GlobalConfig.set("playerBackground", playerBackground);
 	$: GlobalConfig.set("afterSound", afterSound);
 	$: GlobalConfig.set("theme", theme);
 
@@ -49,6 +56,8 @@
 		return () => document.removeEventListener("mousemove", onMouseMove);
 	});
 </script>
+
+<IntroGuide visible={false} />
 
 <div class="menu-container">
 	<button
@@ -114,6 +123,28 @@
 			/>
 
 			<MenuItem
+				icon="🖼️"
+				title="Фон игроков"
+				tooltipText="Использовать задний фон для игроков"
+				bind:isToggled={playerBackground}
+			/>
+
+			<MenuItem
+				icon="🖼️"
+				title="Свой задний фон"
+				tooltipText="Использовать свой загружанный задний фон."
+				bind:isToggled={usingBackroundImage}
+			/>
+
+			<MenuItemMedia
+				title="Фоновое изображение"
+				icon="🖼️"
+				tooltipText="Изображение, которое будет использоваться в фоне."
+				supportedTypes={["image/png", "image/jpeg", "image/webp"]}
+				configKey="backgroundImage"
+			/>
+
+			<MenuItem
 				icon="🎨"
 				title="Тема"
 				tooltipText="Выберите визуальную тему"
@@ -123,6 +154,34 @@
 					theme = opt;
 					themeManager.setTheme(opt);
 				}}
+			/>
+
+			<MenuItemMedia
+				icon="🔊"
+				title="Аудио: загрузить файл"
+				fieldName="audioTimerEnd"
+				supportedTypes={["audio/mpeg", "audio/ogg", "audio/mp3"]}
+				tooltipText="Загрузи вступительный звук. Поддержка: mp3, wav, ogg"
+			/>
+
+			<MenuItem
+				icon="💾"
+				title="Сбросить настройки"
+				mode="hold"
+				tooltipText="Сбрасывает текущие настройки и выставлояет стандартные."
+				holdDuration={3000}
+				onHoldComplete={() => {
+					GlobalConfig.setConfig(dConfig);
+					location.reload();
+				}}
+			/>
+
+			<MenuItem
+				icon="📍"
+				title="Открыть гайд"
+				mode="click"
+				tooltipText="Открывает гайд по использованию сайта"
+				onClick={() => setIntroGuideVisiable(true)}
 			/>
 		</ul>
 	</div>

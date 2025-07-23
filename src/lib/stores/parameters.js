@@ -31,7 +31,7 @@ timerInstance.addRunningListener(running => {
 });
 
 export function initTimer() {
-    const seconds = GlobalConfig.get('timerDuration') || 240;
+    const seconds = GlobalConfig.get('timerDuration') || 60;
     timerInstance.timeAdd(seconds);
 }
 
@@ -55,3 +55,11 @@ export function resetTimer() {
     timerInstance.timeSubtract(timerInstance.toMs() / 1000);
     timerInstance.timeAdd(seconds);
 }
+
+
+export const IntroGuideVisiable = writable(GlobalConfig.get("introGuide"))
+export function setIntroGuideVisiable(value) {
+    IntroGuideVisiable.set(value);
+}
+
+export const isBlackout = writable(false);

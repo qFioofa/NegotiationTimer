@@ -1,7 +1,8 @@
 <script>
+	import { derived } from "svelte/store";
 	import { onMount } from "svelte";
 	import ElementShuffler from "$lib/components/Shuffle";
-	import { parameters } from "$lib/stores/parameters";
+	import { parameters, GlobalConfig } from "$lib/stores/parameters";
 
 	export let player1Name = "";
 	export let player2Name = "";
@@ -11,6 +12,8 @@
 	let ghost1Ref, ghost2Ref;
 	let wrapperRef;
 	let shuffler;
+
+	let playerBackground = GlobalConfig.get("playerBackground");
 
 	function ShufflePlayers() {
 		shuffler.launch();
@@ -42,16 +45,12 @@
 
 	onMount(() => {
 		shuffler = new ElementShuffler([number1, number2]);
-		parameters.set({
-			number1,
-			number2,
-			ShufflePlayers,
-		});
+		parameters.set({ number1, number2, ShufflePlayers });
 		updateWidths();
 	});
 </script>
 
-<div class="players-wrapper" bind:this={wrapperRef}>
+<div class="players-wrapper {playerBackground ? '' : 'transparent'}" bind:this={wrapperRef}>
 	<div class="player left">
 		<div class="number" bind:this={number1}>1</div>
 		<input
@@ -91,12 +90,17 @@
 		background: var(--bg);
 		border-radius: 1rem;
 		box-shadow: 0 0 30px var(--shadow);
-		backdrop-filter: blur(12px);
 		color: var(--fg);
 		border: 1px solid var(--accent);
 		transition: width 0.3s ease;
 		width: 60.4%;
 		max-width: 73.4%;
+	}
+
+	.transparent {
+		background: transparent !important;
+		border: none !important;
+		box-shadow: none !important;
 	}
 
 	.player {

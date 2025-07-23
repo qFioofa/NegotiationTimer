@@ -13,5 +13,11 @@ export const dConfig = {
     timerBlackOut: true,
     timerEndSound: true,
 
-    afterSound: true
+    afterSound: true,
+    introGuide: true,
+    audioTimerEnd: null,
+
+    playerBackground: true,
+    usingBackroundImage: false,
+    backgroundImage: null
 }
