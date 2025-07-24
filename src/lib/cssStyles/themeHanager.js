@@ -1,4 +1,4 @@
-import StyleHandler from './StyleHandler';
+import StyleHandler from './styleHandler';
 
 const themeManager = new StyleHandler();
 const themeArray = [

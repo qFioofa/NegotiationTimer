@@ -1,20 +1,18 @@
-FROM node:20 AS builder
+FROM node:20
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
+COPY svelte.config.js ./
+COPY tsconfig.json ./
+COPY vite.config.ts ./
 
-RUN npm install
+RUN npm ci
+
+COPY src/ src/
+
 RUN npm run build
-
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app /app
-
-RUN npm install --omit=dev
 
 EXPOSE 4173
 
-CMD ["npm", "run", "preview"]
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]

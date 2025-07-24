@@ -36,11 +36,77 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+build
 
 # Dependency directories
 node_modules/
 jspm_packages/
+# Этап сборки (Builder Stage)
+FROM node:20 AS builder
 
+WORKDIR /app
+
+# Копируем файлы конфигурации и зависимости для эффективного кэширования слоев
+COPY package*.json ./
+COPY svelte.config.js ./
+COPY vite.config.js ./
+
+# Устанавливаем все зависимости, включая devDependencies, необходимые для сборки
+RUN npm ci
+
+# Копируем весь исходный код приложения
+COPY . .
+
+# Запускаем сборку проекта
+# Эта команда использует адаптер (@sveltejs/adapter-node) для генерации production-билда
+RUN npm run build
+
+
+# Финальный этап (Production Stage)
+FROM node:20-alpine
+
+LABEL maintainer="qFioofa"
+LABEL description="Negotiation Timers App"
+
+WORKDIR /app
+
+# Копируем package файлы для установки runtime зависимостей
+# Копируем только package-lock.json и package.json для установки зависимостей
+COPY package*.json ./
+
+# Копируем svelte.config.js, если он нужен для запуска (например, для чтения опций адаптера)
+COPY svelte.config.js ./
+
+# Копируем результат сборки (.svelte-kit/output) из этапа builder
+# Адаптер adapter-node помещает результат в .svelte-kit/output
+COPY --from=builder /app/.svelte-kit ./.svelte-kit
+
+# Устанавливаем только production зависимости в финальном образе
+# Это уменьшает размер образа и исключает devDependencies
+# Используем --omit=dev и --ignore-scripts, чтобы избежать запуска prepare-скриптов,
+# которые могут требовать devDependencies (например, svelte-kit)
+RUN npm ci --omit=dev --ignore-scripts
+
+# Открываем порт, который использует приложение.
+# adapter-node по умолчанию использует порт 3000.
+# Убедимся, что мы используем этот порт.
+EXPOSE 3000
+
+# Определяем переменные окружения по умолчанию
+# NODE_ENV=production обычно устанавливается автоматически через npm ci --omit=dev,
+# но явное указание не повредит.
+# Устанавливаем порт по умолчанию. Он может быть переопределен через docker-compose.yml или docker run -e.
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Команда запуска приложения
+# adapter-node генерирует сервер в .svelte-kit/output/server/index.js
+# Этот сервер учитывает переменную окружения PORT.
+CMD ["node", ".svelte-kit/output/server/index.js"]
+
+# Альтернативно, можно использовать npm run preview, но нужно убедиться,
+# что скрипт preview в package.json использует правильный порт.
+# CMD ["npm", "run", "preview"] # Требует, чтобы PORT был передан или установлен в скрипте
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   sveltekit:
     build: .
@@ -6,3 +7,4 @@ services:
       - "4173:4173"
     environment:
       - NODE_ENV=production
+      - PORT=4173
