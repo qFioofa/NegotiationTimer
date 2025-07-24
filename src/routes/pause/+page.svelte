@@ -1,4 +1,7 @@
-<script lang="ts">
+<script>
+	if (import.meta.env.MODE === "production") {
+		throw redirect(404, "/");
+	}
 	import { isPaused, togglePause } from "$lib/components/Pause";
 	import Pause from "$lib/elements/Pause.svelte";
 </script>

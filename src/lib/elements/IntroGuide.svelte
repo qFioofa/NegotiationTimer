@@ -21,17 +21,59 @@
 			</div>
 
 			<div class="intro-content">
-				<p>Это интерактивный таймер для боёв, турниров и кастомных матчей.</p>
-				<p>Вы можете:</p>
+				<h3>NegotiationTimer</h3>
+				<p><b>Таймер для проведения соревнований по переговорам и конфликтам.</b></p>
+
+				<h4>📦 Функционал</h4>
 				<ul>
-					<li>Установить время и настроить параметры</li>
-					<li>Использовать горячие клавиши для управления</li>
-					<li>Выбрать игроков и кастомизировать цвета</li>
-					<li>Открыть дополнительное меню снизу и сбоку</li>
+					<li>Жеребьёвка</li>
+					<li>Установка конкретного времени</li>
+					<li>Добавление / убавление времени</li>
+					<li>Пауза</li>
 				</ul>
-				<p>Все настройки сохраняются автоматически!</p>
+
+				<h4>⚙️ Основные функции</h4>
+				<ul>
+					<li><b>Автопауза: меню / панель</b></li>
+					<li><b>Черный экран</b> при завершении таймера</li>
+					<li><b>Звук окончания</b></li>
+					<li><b>Фон игроков и пользовательский фон</b></li>
+					<li><b>Загрузка аудио / фона</b></li>
+					<li><b>Копировать / загрузить конфиг</b></li>
+					<li><b>Сброс настроек</b></li>
+					<li><b>Тема оформления</b></li>
+				</ul>
+
+				<h4>🧾 Стандартные настройки</h4>
+				<ul>
+					<li><b>Стандартное время:</b> <code>60</code> секунд</li>
+					<li><b>Установленное время:</b> <code>'01:00'</code></li>
+					<li><b>Шаг времени +/-:</b> <code>'00:15'</code></li>
+					<li><b>Клавиша жеребьёвки:</b> <code>'R'</code></li>
+					<li><b>Клавиша паузы:</b> <code>'Space'</code></li>
+					<li><b>Тема:</b> <code>'green'</code></li>
+					<li><b>Автопауза (панель):</b> <code>true</code></li>
+					<li><b>Автооткрытие панели:</b> <code>true</code></li>
+					<li><b>Автопауза (меню):</b> <code>true</code></li>
+					<li><b>Черный экран по окончании:</b> <code>true</code></li>
+					<li><b>Звук окончания:</b> <code>true</code></li>
+					<li><b>Дополнительный звук:</b> <code>true</code></li>
+					<li><b>Показать гайд при запуске:</b> <code>true</code></li>
+					<li><b>Звук таймера (польз.):</b> <i>не задан</i></li>
+					<li><b>Фон игроков:</b> <code>true</code></li>
+					<li><b>Пользовательский фон:</b> <code>false</code></li>
+					<li><b>Фоновое изображение:</b> <i>не задано</i></li>
+				</ul>
+
+				<h4>📍 Советы и примечания</h4>
+				<ul>
+					<li>Используйте горячие клавиши для ускоренного управления</li>
+					<li>Настройки сохраняются автоматически</li>
+					<li>Фон и звуки требуют перезагрузки для применения</li>
+				</ul>
 				<p>Хорошей игры 👊</p>
 			</div>
+
 			<div class="intro-actions">
 				<button class="secondary" on:click={closeForever}>Не показывать снова</button>
 				<button on:click={close}>Закрыть</button>
@@ -56,43 +98,38 @@
 		background: var(--bg);
 		border: 1px solid var(--accent);
 		border-radius: 16px;
-		padding: 2rem;
-		width: 480px;
+		padding: 2.5rem;
+		width: 640px;
 		max-width: 90vw;
-		max-height: 80vh;
+		max-height: 85vh;
 		display: flex;
 		flex-direction: column;
-		gap: 1.2rem;
+		gap: 1.6rem;
 		box-shadow: 0 0 24px rgba(0, 0, 0, 0.3);
 		overflow: hidden;
 	}
 
-	.intro-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
 	.intro-header h2 {
 		color: var(--accent);
-		font-size: 1.6rem;
+		font-size: 2rem;
 		margin: 0;
 	}
 
 	.intro-actions {
 		display: flex;
-		gap: 0.5rem;
+		justify-content: flex-end;
+		gap: 1rem;
 	}
 
 	button {
 		background: var(--accent);
 		color: var(--input-bg);
 		border: none;
-		padding: 0.4rem 0.8rem;
-		border-radius: 8px;
+		padding: 0.6rem 1.2rem;
+		border-radius: 10px;
 		cursor: pointer;
 		font-weight: bold;
-		font-size: 0.9rem;
+		font-size: 1rem;
 		transition: background 0.2s;
 	}
 
@@ -108,16 +145,28 @@
 		padding-right: 0.5rem;
 		color: var(--fg);
 		flex: 1;
+		font-size: 1.05rem;
+		line-height: 1.6;
 	}
 
-	.intro-content p,
-	.intro-content li {
-		margin: 0.3rem 0;
-		font-size: 1rem;
-		line-height: 1.4;
+	.intro-content h3 {
+		font-size: 1.5rem;
+		margin-bottom: 0.4rem;
+		color: var(--accent);
+	}
+
+	.intro-content h4 {
+		margin-top: 1.2rem;
+		font-size: 1.2rem;
+		color: var(--accent-light);
 	}
 
 	.intro-content ul {
-		padding-left: 1.4rem;
+		margin: 0.5rem 0 1rem 1.2rem;
+		padding-left: 1rem;
+	}
+
+	.intro-content li {
+		margin: 0.3rem 0;
 	}
 </style>

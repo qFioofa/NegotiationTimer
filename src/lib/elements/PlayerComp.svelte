@@ -1,6 +1,5 @@
 <script>
-	import { derived } from "svelte/store";
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import ElementShuffler from "$lib/components/Shuffle";
 	import { parameters, GlobalConfig } from "$lib/stores/parameters";
 
@@ -45,7 +44,7 @@
 
 	onMount(() => {
 		shuffler = new ElementShuffler([number1, number2]);
-		parameters.set({ number1, number2, ShufflePlayers });
+		parameters.set({ ShufflePlayers });
 		updateWidths();
 	});
 </script>

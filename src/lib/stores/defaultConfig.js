@@ -2,8 +2,8 @@ export const dConfig = {
     timerDuration: 60,
     setTime: '01:00',
     timeAddSubStep: '00:15',
-    shuffleKey: 'R',
-    pauseKey: 'Space',
+    shuffleKey: 'r',
+    pauseKey: ' ',
     theme: 'green',
 
     panelAutoPause: true,

@@ -5,11 +5,15 @@
 	import { onDestroy } from "svelte";
 
 	let blackoutTitle = "Время вышло!";
-	let audio = null;
-	let configKey;
+	let configKey = "audioTimerEnd";
+	let audio;
 
 	$: if ($isBlackout && GlobalConfig.get("timerBlackOut")) {
-		const url = GlobalConfig.get(configKey);
+		loadBlackoutAudio();
+	}
+
+	async function loadBlackoutAudio() {
+		const url = await GlobalConfig.getMedia(configKey);
 		if (url) {
 			if (audio) {
 				audio.pause();

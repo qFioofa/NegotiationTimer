@@ -25,11 +25,21 @@ export default class Encoder {
                 return value;
             })
         };
-        return JSON.stringify(data);
+
+        const jsonString = JSON.stringify(data);
+        return btoa(unescape(encodeURIComponent(jsonString)));
     }
 
     static decode(str) {
-        const parsed = JSON.parse(str);
+        let decodedString;
+
+        try {
+            decodedString = decodeURIComponent(escape(atob(str)));
+        } catch (e) {
+            decodedString = str;
+        }
+
+        const parsed = JSON.parse(decodedString);
         if (!parsed.__class || !parsed.__data) {
             return parsed;
         }

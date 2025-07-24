@@ -93,8 +93,6 @@
 
 <Pause />
 
-<div class="overlay" class:visible={isMenuOpen}></div>
-
 <button
 	bind:this={triggerRef}
 	class="menu-trigger"
@@ -129,7 +127,7 @@
 			title="Сделать жеребьевку"
 			description="Назначьте клавишу для перемешивания"
 			type="bind"
-			bindKey={GlobalConfig.get("shuffleKey")}
+			configKey="shuffleKey"
 			onApply={handleShuffle}
 			onBindTrigger={handleShuffle}
 			icon="🔀"
@@ -137,6 +135,8 @@
 		/>
 
 		<BottomMenuItem
+			icon="🕒"
+			role="menuitem"
 			title="Установить конкретное время"
 			description="Время на таймере заменится на введённое"
 			type="input"
@@ -146,11 +146,11 @@
 				timeSubtract(toMs());
 				timeAdd(ms);
 			}}
-			icon="🕒"
-			role="menuitem"
 		/>
 
 		<BottomMenuItem
+			icon="🕒"
+			role="menuitem"
 			title="Добавить/убавить время"
 			description="Нажимайте + или − для изменения"
 			type="adjust"
@@ -163,15 +163,13 @@
 				const ms = mmssToMs(val);
 				timeSubtract(ms);
 			}}
-			icon="🕒"
-			role="menuitem"
 		/>
 
 		<BottomMenuItem
 			title="Пауза"
 			description="Назначьте клавишу для паузы"
 			type="bind"
-			bindKey={GlobalConfig.get("pauseKey")}
+			configKey="pauseKey"
 			onApply={togglePause}
 			onBindTrigger={togglePause}
 			icon="⏸️"
@@ -181,22 +179,6 @@
 </div>
 
 <style>
-	.overlay {
-		position: fixed;
-		inset: 0;
-		background: var(--bg);
-		backdrop-filter: blur(8px);
-		z-index: 998;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.3s ease;
-	}
-
-	.overlay.visible {
-		opacity: 0.8;
-		pointer-events: auto;
-	}
-
 	.menu-trigger {
 		position: fixed;
 		top: 50%;

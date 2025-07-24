@@ -1,10 +1,11 @@
 export default class TimerLogic {
-    constructor() {
-        this.time = 0;
+    constructor(isInverted = false) {
+        this.time = isInverted ? 0 : 0;
         this.isRunning = false;
         this.intervalId = null;
         this.updateCallbacks = [];
         this.runningCallbacks = [];
+        this.isInverted = isInverted;
 
         this.launch = this.launch.bind(this);
         this.pause = this.pause.bind(this);
@@ -37,17 +38,27 @@ export default class TimerLogic {
     }
 
     launch() {
-        if (this.isRunning || this.time <= 0) return;
+        if (this.isRunning) return;
+        if (!this.isInverted && this.time <= 0) return;
 
         this.isRunning = true;
         this.notifyRunningChange();
 
         this.intervalId = setInterval(() => {
-            this.time = Math.max(0, this.time - 1000);
-            this.notifyUpdate();
+            if (this.isInverted) {
+                this.time = Math.min(this.time + 1000, 3599000);
+                this.notifyUpdate();
 
-            if (this.time === 0) {
-                this.pause();
+                if (this.time >= 3599000) {
+                    this.pause();
+                }
+            } else {
+                this.time = Math.max(0, this.time - 1000);
+                this.notifyUpdate();
+
+                if (this.time === 0) {
+                    this.pause();
+                }
             }
         }, 1000);
     }
@@ -71,17 +82,23 @@ export default class TimerLogic {
 
     timeAdd(seconds) {
         this.time += seconds * 1000;
+        if (!this.isInverted) {
+            this.time = Math.min(this.time, 3599000);
+        }
         this.notifyUpdate();
     }
 
     timeSubtract(seconds) {
-        const reduction = seconds * 1000;
-        this.time = Math.max(0, this.time - reduction);
-        this.notifyUpdate();
-
-        if (this.isRunning && this.time === 0) {
-            this.pause();
+        if (this.isInverted) {
+            this.time = Math.max(0, this.time - seconds * 1000);
+        } else {
+            const reduction = seconds * 1000;
+            this.time = Math.max(0, this.time - reduction);
+            if (this.isRunning && this.time === 0) {
+                this.pause();
+            }
         }
+        this.notifyUpdate();
     }
 
     toMs() {

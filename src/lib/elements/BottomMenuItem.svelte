@@ -1,7 +1,9 @@
 <script>
 	import { onMount } from "svelte";
 	import { Check, Plus, Minus, Keyboard } from "lucide-svelte";
+	import { GlobalConfig } from "$lib/stores/parameters";
 
+	export let icon;
 	export let title = "";
 	export let description = "";
 	export let type = "input";
@@ -10,9 +12,9 @@
 	export let onBindTrigger = () => {};
 	export let onIncrement = () => {};
 	export let onDecrement = () => {};
-	export let icon = null;
+	export let configKey;
 
-	let bindKey = null;
+	let bindKey;
 	let listening = false;
 	let error = "";
 
@@ -24,6 +26,7 @@
 	function handleListening(event) {
 		if (!listening) return;
 		bindKey = event.key;
+		GlobalConfig.set(configKey, bindKey);
 		listening = false;
 		window.removeEventListener("keydown", handleListening);
 	}
@@ -46,6 +49,10 @@
 		value = val;
 		error = validateTimeFormat(value) ? "" : "Введите время в формате MM:SS";
 	}
+
+	onMount(() => {
+		bindKey = GlobalConfig.get(configKey);
+	});
 </script>
 
 <div class="bottom-menu-item">

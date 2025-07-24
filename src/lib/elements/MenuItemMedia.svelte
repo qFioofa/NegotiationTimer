@@ -14,15 +14,26 @@
 	let audio = null;
 	let isPlaying = false;
 	let fileType = null;
+
 	let error = writable("");
+	let loading = writable(false);
+	let loaded = writable(false);
 
 	function handleFileUpload(event) {
 		error.set("");
+		loading.set(true);
+		loaded.set(false);
+
 		const file = event.target.files[0];
-		if (!file) return;
+		if (!file) {
+			error.set("Файл не выбран.");
+			loading.set(false);
+			return;
+		}
 
 		if (!supportedTypes.includes(file.type)) {
 			error.set("Неподдерживаемый формат файла.");
+			loading.set(false);
 			return;
 		}
 
@@ -31,7 +42,10 @@
 			fileUrl = reader.result;
 			fileName = file.name;
 			fileType = file.type;
-			GlobalConfig.set(configKey, fileUrl);
+			GlobalConfig.setMedia(configKey, fileUrl);
+			GlobalConfig.save();
+			loading.set(false);
+			loaded.set(true);
 
 			if (fileType.startsWith("audio/")) {
 				if (audio) {
@@ -42,9 +56,13 @@
 				audio = new Audio(fileUrl);
 			}
 		};
+
 		reader.onerror = () => {
 			error.set("Ошибка при чтении файла.");
+			loading.set(false);
+			loaded.set(false);
 		};
+
 		reader.readAsDataURL(file);
 	}
 
@@ -58,19 +76,19 @@
 		} else {
 			audio.play();
 			isPlaying = true;
-
 			audio.onended = () => {
 				isPlaying = false;
 			};
 		}
 	}
 
-	onMount(() => {
-		const saved = GlobalConfig.get(configKey);
+	onMount(async () => {
+		const saved = await GlobalConfig.getMedia(configKey);
 		if (saved) {
 			fileUrl = saved;
 			fileType = detectFileTypeFromBase64(saved);
 			fileName = "Загруженный файл";
+			loaded.set(true);
 
 			if (fileType.startsWith("audio/")) {
 				audio = new Audio(saved);
@@ -109,6 +127,11 @@
 					accept={supportedTypes.join(",")}
 					on:change={handleFileUpload}
 				/>
+				{#if $loading}
+					<div class="status loading">Загрузка...</div>
+				{:else if $loaded}
+					<div class="status success">Файл загружен и сохранён</div>
+				{/if}
 
 				{#if $error}
 					<div class="error">{$error}</div>
@@ -287,5 +310,19 @@
 		color: var(--error-text);
 		font-size: 1.2rem;
 		margin-top: 0.5rem;
+	}
+
+	.status {
+		font-size: 1.2rem;
+		margin-top: 0.4rem;
+		font-weight: 500;
+	}
+
+	.status.loading {
+		color: var(--accent);
+	}
+
+	.status.success {
+		color: green;
 	}
 </style>

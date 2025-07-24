@@ -5,6 +5,7 @@
 	import { isPaused, setPause } from "$lib/components/Pause";
 	import { GlobalConfig, setIntroGuideVisiable } from "$lib/stores/parameters";
 	import { dConfig } from "$lib/stores/defaultConfig";
+	import MenuItemConfigCoder from "./MenuItemConfigCoder.svelte";
 	import MenuItemMedia from "./MenuItemMedia.svelte";
 	import IntroGuide from "./IntroGuide.svelte";
 	import themeManager from "$lib/cssStyles/themeHanager";
@@ -73,14 +74,6 @@
 	</button>
 </div>
 
-{#if menuOpen}
-	<button
-		class="overlay visible"
-		on:click={() => (menuOpen = false)}
-		aria-label="Close menu overlay"
-	></button>
-{/if}
-
 <div class="menu-panel {menuOpen ? 'open' : ''}">
 	<div class="menu-header">
 		<h2 class="menu-title">Меню настроек</h2>
@@ -125,22 +118,29 @@
 			<MenuItem
 				icon="🖼️"
 				title="Фон игроков"
-				tooltipText="Использовать задний фон для игроков"
+				tooltipText="Использовать задний фон для игроков (Требует перезагрузки страницы)"
 				bind:isToggled={playerBackground}
 			/>
 
 			<MenuItem
 				icon="🖼️"
 				title="Свой задний фон"
-				tooltipText="Использовать свой загружанный задний фон."
+				tooltipText="Использовать свой загружанный задний фон (Требует перезагрузки страницы)"
 				bind:isToggled={usingBackroundImage}
 			/>
 
 			<MenuItemMedia
-				title="Фоновое изображение"
-				icon="🖼️"
-				tooltipText="Изображение, которое будет использоваться в фоне."
-				supportedTypes={["image/png", "image/jpeg", "image/webp"]}
+				title="Фоновое медиа"
+				icon="🎥"
+				tooltipText="Изображение или видео, которое будет использоваться в фоне. Поддерживаются PNG, JPEG, WEBP, MP4, WebM и OGG."
+				supportedTypes={[
+					"image/png",
+					"image/jpeg",
+					"image/webp",
+					"video/mp4",
+					"video/webm",
+					"video/ogg",
+				]}
 				configKey="backgroundImage"
 			/>
 
@@ -159,9 +159,23 @@
 			<MenuItemMedia
 				icon="🔊"
 				title="Аудио: загрузить файл"
-				fieldName="audioTimerEnd"
+				configKey="audioTimerEnd"
 				supportedTypes={["audio/mpeg", "audio/ogg", "audio/mp3"]}
 				tooltipText="Загрузи вступительный звук. Поддержка: mp3, wav, ogg"
+			/>
+
+			<MenuItemConfigCoder
+				icon="📋"
+				title="Копировать конфиг"
+				mode="coder"
+				tooltipText="Копирует текуфий конфиг в виде строки"
+			/>
+
+			<MenuItemConfigCoder
+				icon="📥"
+				title="Загрузить конфиг"
+				mode="decoder"
+				tooltipText="Преобразовывает входную строку в конфиг"
 			/>
 
 			<MenuItem
@@ -170,8 +184,9 @@
 				mode="hold"
 				tooltipText="Сбрасывает текущие настройки и выставлояет стандартные."
 				holdDuration={3000}
-				onHoldComplete={() => {
-					GlobalConfig.setConfig(dConfig);
+				onHoldComplete={async () => {
+					await GlobalConfig.setConfig(dConfig);
+					await GlobalConfig.deleteAllMedia();
 					location.reload();
 				}}
 			/>
@@ -238,24 +253,6 @@
 
 	.menu-open .menu-line:nth-child(3) {
 		transform: translateY(-0.6rem) rotate(-45deg);
-	}
-
-	.overlay {
-		position: fixed;
-		inset: 0;
-		background: var(--bg);
-		backdrop-filter: blur(5px);
-		opacity: 0;
-		visibility: hidden;
-		transition:
-			opacity 0.3s ease,
-			visibility 0.3s ease;
-		z-index: 900;
-	}
-
-	.overlay.visible {
-		opacity: 0.8;
-		visibility: visible;
 	}
 
 	.menu-panel {

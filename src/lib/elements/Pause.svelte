@@ -1,11 +1,44 @@
 <script>
 	import { isPaused } from "$lib/components/Pause";
+	import {
+		upTimeMs,
+		upIsRunning,
+		startUpTimer,
+		stopUpTimer,
+		resetUpTimer,
+	} from "$lib/stores/parameters";
+
+	let displayUpTime = "00:00";
+
+	$: {
+		const totalSec = Math.floor($upTimeMs / 1000);
+		const min = Math.floor(totalSec / 60)
+			.toString()
+			.padStart(2, "0");
+		const sec = (totalSec % 60).toString().padStart(2, "0");
+		displayUpTime = `${min}:${sec}`;
+	}
+
+	$: if (!$isPaused) {
+		resetUpTimer();
+	}
+
+	function toggleUpTimer() {
+		if ($upIsRunning) {
+			stopUpTimer();
+		} else {
+			startUpTimer();
+		}
+	}
 </script>
 
 <div class="pause-overlay" class:active={$isPaused}>
 	{#if $isPaused}
 		<div class="pause-content">
 			<h1 class="pause-title">ПАУЗА</h1>
+			<button class="timer" on:click={toggleUpTimer}>
+				{displayUpTime}
+			</button>
 		</div>
 	{/if}
 </div>
@@ -44,5 +77,43 @@
 		text-shadow: 0 0 20px var(--accent);
 		margin-bottom: 2rem;
 		user-select: none;
+	}
+
+	.timer {
+		background: var(--bg);
+		border-radius: 2rem;
+		padding: 1.6rem 4rem;
+		font-size: 4.2rem;
+		font-weight: 700;
+		color: var(--accent-light);
+		border: 2px solid var(--accent);
+		backdrop-filter: blur(14px);
+		box-shadow:
+			0 0 20px var(--shadow),
+			inset 0 0 10px var(--shadow);
+		text-align: center;
+		user-select: none;
+		cursor: pointer;
+		transition:
+			transform 0.3s ease,
+			box-shadow 0.3s ease,
+			background 0.3s ease;
+		min-width: 16rem;
+		text-shadow: 0 0 8px var(--shadow);
+	}
+
+	.timer:hover {
+		transform: scale(1.08);
+		box-shadow:
+			0 0 35px var(--shadow),
+			inset 0 0 16px var(--shadow);
+	}
+
+	@media (max-width: 768px) {
+		.timer {
+			font-size: 3.2rem;
+			padding: 1.2rem 2.5rem;
+			min-width: 12rem;
+		}
 	}
 </style>

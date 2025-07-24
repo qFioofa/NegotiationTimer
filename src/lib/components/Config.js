@@ -50,17 +50,21 @@ export default class Config {
         }
     }
 
-    get(key) {
-        return this._settings[key];
-    }
-
     set(key, value) {
         this._settings[key] = value;
         return this;
     }
 
-    setConfig(cfg) {
-        this._settings = cfg;
+    async setConfig(cfg, mediaCfg) {
+        if (cfg) this._settings = cfg;
+
+        if (mediaCfg && typeof mediaCfg === 'object') {
+            try {
+                await this.setAllMedia(mediaCfg);
+            } catch (error) {
+                console.error('Ошибка при загрузке медиа-файлов в setConfig:', error);
+            }
+        }
     }
 
     load() {
@@ -69,4 +73,166 @@ export default class Config {
         }
         return this;
     }
+
+    getConfig() {
+        return this._settings;
+    }
+
+    get(key) {
+        return this._settings[key];
+    }
+
+    async getMedia(key) {
+        try {
+            const media = await this._loadMedia(key);
+            if (media) return media;
+        } catch (error) {
+            console.error(` "${key}":`, error);
+        }
+    }
+
+    async setMedia(key, fileBlob) {
+        try {
+            await this._saveMedia(key, fileBlob);
+            return true;
+        } catch (error) {
+            console.error(`Ошибка в загрузке медиа "${key}":`, error);
+            return false;
+        }
+    }
+
+    async deleteMedia(key) {
+        try {
+            await this._deleteMedia(key);
+            return true;
+        } catch (error) {
+            console.error(`Ошибка в удалении медиа "${key}":`, error);
+            return false;
+        }
+    }
+
+    async hasMedia(key) {
+        const media = await this._loadMedia(key);
+        return !!media;
+    }
+
+    _openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('AppMediaStore', 1);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('media')) {
+                    db.createObjectStore('media');
+                }
+            };
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async _saveMedia(key, blob) {
+        const db = await this._openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readwrite');
+            const store = tx.objectStore('media');
+            const request = store.put(blob, key);
+
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async _loadMedia(key) {
+        const db = await this._openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readonly');
+            const store = tx.objectStore('media');
+            const request = store.get(key);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async _deleteMedia(key) {
+        const db = await this._openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readwrite');
+            const store = tx.objectStore('media');
+            const request = store.delete(key);
+
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async getAllMedia() {
+        const db = await this._openDB();
+
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readonly');
+            const store = tx.objectStore('media');
+            const request = store.getAllKeys();
+
+            request.onsuccess = async () => {
+                const keys = request.result;
+                const result = {};
+
+                const valueTx = db.transaction('media', 'readonly');
+                const valueStore = valueTx.objectStore('media');
+
+                let pending = keys.length;
+                if (pending === 0) return resolve(result);
+
+                for (const key of keys) {
+                    const getReq = valueStore.get(key);
+                    getReq.onsuccess = () => {
+                        result[key] = getReq.result;
+                        if (--pending === 0) resolve(result);
+                    };
+                    getReq.onerror = () => {
+                        reject(getReq.error);
+                    };
+                }
+            };
+
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async setAllMedia(mediaMap) {
+        const db = await this._openDB();
+
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readwrite');
+            const store = tx.objectStore('media');
+
+            try {
+                for (const [key, blob] of Object.entries(mediaMap)) {
+                    store.put(blob, key);
+                }
+
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    async deleteAllMedia() {
+        const db = await this._openDB();
+
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('media', 'readwrite');
+            const store = tx.objectStore('media');
+            const clearRequest = store.clear();
+
+            clearRequest.onsuccess = () => resolve(true);
+            clearRequest.onerror = () => reject(clearRequest.error);
+        });
+    }
+
 }

@@ -1,4 +1,7 @@
 <script>
+	if (import.meta.env.MODE === "production") {
+		throw redirect(404, "/");
+	}
 	import { onMount } from "svelte";
 	import themeManager from "$lib/cssStyles/themeHanager";
 	import Timer from "$lib/elements/Timer.svelte";
