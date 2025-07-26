@@ -3,6 +3,7 @@ export default class Config {
         this._storageKey = 'appConfig';
         this._defaultSettings = { ...defaultConfig };
         this._settings = {};
+        this._subscribers = {};
 
         if (typeof window !== 'undefined') {
             this._loadFromStorage();
@@ -33,6 +34,25 @@ export default class Config {
         });
     }
 
+    subscribe(key, callback) {
+        if (!this._subscribers[key]) {
+            this._subscribers[key] = [];
+        }
+        this._subscribers[key].push(callback);
+    }
+
+    unsubscribe(key, callback) {
+        if (this._subscribers[key]) {
+            this._subscribers[key] = this._subscribers[key].filter(cb => cb !== callback);
+        }
+    }
+
+    _notify(key, value) {
+        if (this._subscribers[key]) {
+            this._subscribers[key].forEach(cb => cb(value));
+        }
+    }
+
     default() {
         this._settings = { ...this._defaultSettings };
         return this;
@@ -52,6 +72,7 @@ export default class Config {
 
     set(key, value) {
         this._settings[key] = value;
+        this._notify(key, value);
         return this;
     }
 
@@ -94,6 +115,7 @@ export default class Config {
     async setMedia(key, fileBlob) {
         try {
             await this._saveMedia(key, fileBlob);
+            this._notify(key, fileBlob);
             return true;
         } catch (error) {
             console.error(`Ошибка в загрузке медиа "${key}":`, error);
@@ -234,5 +256,4 @@ export default class Config {
             clearRequest.onerror = () => reject(clearRequest.error);
         });
     }
-
 }

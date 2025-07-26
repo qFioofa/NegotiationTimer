@@ -1,4 +1,5 @@
 <script>
+	import { timerDisplay } from "$lib/components/utils/TimerUtils";
 	import { isPaused } from "$lib/components/Pause";
 	import {
 		upTimeMs,
@@ -6,17 +7,12 @@
 		startUpTimer,
 		stopUpTimer,
 		resetUpTimer,
-	} from "$lib/stores/parameters";
+	} from "$lib/stores/timerUp";
 
 	let displayUpTime = "00:00";
 
 	$: {
-		const totalSec = Math.floor($upTimeMs / 1000);
-		const min = Math.floor(totalSec / 60)
-			.toString()
-			.padStart(2, "0");
-		const sec = (totalSec % 60).toString().padStart(2, "0");
-		displayUpTime = `${min}:${sec}`;
+		displayUpTime = timerDisplay($upTimeMs);
 	}
 
 	$: if (!$isPaused) {

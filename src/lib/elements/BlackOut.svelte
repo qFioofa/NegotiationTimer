@@ -1,11 +1,11 @@
 <script>
-	import { derived } from "svelte/store";
 	import { isBlackout, GlobalConfig } from "$lib/stores/parameters";
 	import { fade } from "svelte/transition";
 	import { onDestroy } from "svelte";
 
-	let blackoutTitle = "Время вышло!";
-	let configKey = "audioTimerEnd";
+	export let blackoutTitle = "Время вышло!";
+	export let exitTip = "Нажми чтобы закрыть";
+	export let configKey = "audioTimerEnd";
 	let audio;
 
 	$: if ($isBlackout && GlobalConfig.get("timerBlackOut")) {
@@ -20,6 +20,7 @@
 				audio.currentTime = 0;
 			}
 			audio = new Audio(url);
+			audio.loop = true;
 			audio.play();
 		}
 	}
@@ -44,6 +45,7 @@
 	<button class="blackout-overlay" on:click={hideBlackout} transition:fade>
 		<div class="blackout-content">
 			<h1 class="blackout-title">{blackoutTitle}</h1>
+			<p class="exit-tip">{exitTip}</p>
 		</div>
 	</button>
 {/if}
@@ -69,6 +71,15 @@
 
 	.blackout-title {
 		font-size: 4rem;
+		font-weight: 700;
+		text-shadow: var(--shadow);
+		margin-bottom: 2rem;
+		user-select: none;
+	}
+
+	.exit-tip {
+		color: var(--accent);
+		font-size: 1rem;
 		font-weight: 700;
 		text-shadow: var(--shadow);
 		margin-bottom: 2rem;

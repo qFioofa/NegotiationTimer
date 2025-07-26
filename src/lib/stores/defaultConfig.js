@@ -2,8 +2,10 @@ export const dConfig = {
     timerDuration: 60,
     setTime: '01:00',
     timeAddSubStep: '00:15',
-    shuffleKey: 'r',
-    pauseKey: ' ',
+
+    shuffleKey: 'KeyR',
+    pauseKey: 'Space',
+
     theme: 'green',
 
     panelAutoPause: true,
@@ -20,4 +22,4 @@ export const dConfig = {
     playerBackground: true,
     usingBackroundImage: false,
     backgroundImage: null
-}
+};

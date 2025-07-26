@@ -1,19 +1,19 @@
 <script>
-	import { onMount } from "svelte";
+	import { GlobalConfig, isBlackout } from "$lib/stores/parameters";
+	import { timerDisplay } from "$lib/components/utils/TimerUtils";
 	import { isPaused } from "$lib/components/Pause";
 	import BlackOut from "./BlackOut.svelte";
-	import {
-		displayTime,
-		isRunning,
-		toggleTimer,
-		startTimer,
-		initTimer,
-		timeMs,
-		isBlackout,
-	} from "$lib/stores/parameters";
+	import { onMount } from "svelte";
+	import { initTimer, isRunning, toggleTimer, startTimer, timeMs } from "$lib/stores/timerDown";
 
 	let wasRunningBeforePause = false;
 	let wasStartedOnce = false;
+
+	let displayTime = GlobalConfig.get("timerDuration") || "00:00";
+
+	$: {
+		displayTime = timerDisplay($timeMs);
+	}
 
 	$: if ($isPaused) {
 		if ($isRunning) {
@@ -44,7 +44,7 @@
 
 <div class="timer-wrapper">
 	<button class="timer" on:click={toggleTimer}>
-		{$displayTime}
+		{displayTime}
 	</button>
 </div>
 

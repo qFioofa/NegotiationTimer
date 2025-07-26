@@ -1,322 +1,179 @@
 <script>
-	import { onMount } from "svelte";
-	import { tweened } from "svelte/motion";
-	import { cubicOut } from "svelte/easing";
 	import { isPaused, setPause } from "$lib/components/Pause";
-	import { GlobalConfig, setIntroGuideVisiable } from "$lib/stores/parameters";
+	import { GlobalConfig, IntroGuideVisiable } from "$lib/stores/parameters";
 	import { dConfig } from "$lib/stores/defaultConfig";
-	import MenuItemConfigCoder from "./MenuItemConfigCoder.svelte";
-	import MenuItemMedia from "./MenuItemMedia.svelte";
 	import IntroGuide from "./IntroGuide.svelte";
 	import themeManager from "$lib/cssStyles/themeHanager";
-	import MenuItem from "./MenuItem.svelte";
+
+	import OpacityMouse from "./Wrappers/OpacityMouse.svelte";
+
+	import MenuTrigger from "./MenuItems/Wrappers/MenuTrigger.svelte";
+	import MenuOptionList from "./MenuItems/MenuOptionList.svelte";
+	import SideMenu from "./MenuItems/Wrappers/SideMenu.svelte";
+	import MenuDecoder from "./MenuItems/MenuDecoder.svelte";
+	import MenuToggle from "./MenuItems/MenuToggle.svelte";
+	import MenuCoder from "./MenuItems/MenuCoder.svelte";
+	import MenuMedia from "./MenuItems/MenuMedia.svelte";
+	import MenuClick from "./MenuItems/MenuClick.svelte";
+	import MenuHold from "./MenuItems/MenuHold.svelte";
 
 	let menuOpen = false;
-	let opacity = tweened(0, { duration: 50, easing: cubicOut });
-	let menuBtn;
-
-	let timerBlackOut = GlobalConfig.get("timerBlackOut");
-	let panelAutoOpen = GlobalConfig.get("panelAutoOpen");
-	let panelAutoPause = GlobalConfig.get("panelAutoPause");
-	let menuAutoPause = GlobalConfig.get("menuAutoPause");
-	let usingBackroundImage = GlobalConfig.get("usingBackroundImage");
-	let playerBackground = GlobalConfig.get("playerBackground");
-	let afterSound = GlobalConfig.get("afterSound");
-	let theme = GlobalConfig.get("theme");
-
-	$: GlobalConfig.set("timerBlackOut", timerBlackOut);
-	$: GlobalConfig.set("panelAutoOpen", panelAutoOpen);
-	$: GlobalConfig.set("panelAutoPause", panelAutoPause);
-	$: GlobalConfig.set("menuAutoPause", menuAutoPause);
-	$: GlobalConfig.set("usingBackroundImage", usingBackroundImage);
-	$: GlobalConfig.set("playerBackground", playerBackground);
-	$: GlobalConfig.set("afterSound", afterSound);
-	$: GlobalConfig.set("theme", theme);
+	let triggerRef;
 
 	function handleOpen() {
 		menuOpen = !menuOpen;
 		if (GlobalConfig.get("menuAutoPause")) setPause(menuOpen);
 	}
-
-	const onMouseMove = e => {
-		if (!menuBtn) return;
-
-		const rect = menuBtn.getBoundingClientRect();
-		const dx = e.clientX - (rect.left + rect.width / 2);
-		const dy = e.clientY - (rect.top + rect.height / 2);
-		const dist = Math.hypot(dx, dy);
-		const max = window.innerWidth / 4;
-		const val = Math.max(0, 1 - dist / max);
-		opacity.set(val);
-	};
-
-	onMount(() => {
-		if (typeof window === "undefined") return;
-
-		document.addEventListener("mousemove", onMouseMove);
-		return () => document.removeEventListener("mousemove", onMouseMove);
-	});
 </script>
 
 <IntroGuide visible={false} />
 
-<div class="menu-container">
-	<button
-		bind:this={menuBtn}
-		class="menu-button {menuOpen ? 'menu-open' : ''}"
-		style="opacity: {$opacity}"
-		on:click={handleOpen}
-		aria-label={menuOpen ? "Close menu" : "Open menu"}
-	>
-		<div class="menu-line"></div>
-		<div class="menu-line"></div>
-		<div class="menu-line"></div>
-	</button>
-</div>
+<OpacityMouse
+	bind:isOpen={menuOpen}
+	handleTriggerEnter={() => {}}
+	handleTriggerLeave={() => {}}
+	{handleOpen}
+	targetRef={triggerRef}
+>
+	<MenuTrigger bind:isOpen={menuOpen} bind:ref={triggerRef} {handleOpen} />
+</OpacityMouse>
 
-<div class="menu-panel {menuOpen ? 'open' : ''}">
-	<div class="menu-header">
-		<h2 class="menu-title">Меню настроек</h2>
-	</div>
-	<div class="menu-content">
-		<ul class="menu-items">
-			<MenuItem
-				icon="🖥"
-				title="Черный экран"
-				tooltipText="При завершении времени появляется черный экран"
-				bind:isToggled={timerBlackOut}
-			/>
+<SideMenu bind:isOpen={menuOpen} title="Меню настроек">
+	<MenuToggle
+		icon="🖥"
+		title="Черный экран"
+		tooltipText="При завершении времени появляется черный экран"
+		isToggled={GlobalConfig.get("timerBlackOut")}
+		onToggle={v => {
+			GlobalConfig.set("timerBlackOut", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="🛠"
-				title="Выдвигать панель"
-				tooltipText="Автоматически выдвигать панель, когда мышка на иконке панели"
-				bind:isToggled={panelAutoOpen}
-			/>
+	<MenuToggle
+		icon="🛠"
+		title="Выдвигать панель"
+		tooltipText="Автоматически выдвигать панель, когда мышка на иконке панели"
+		isToggled={GlobalConfig.get("panelAutoOpen")}
+		onToggle={v => {
+			GlobalConfig.set("panelAutoOpen", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="⏸️"
-				title="Автопауза: панель"
-				tooltipText="Автоматически ставить на паузу, когда панель открыта"
-				bind:isToggled={panelAutoPause}
-			/>
+	<MenuToggle
+		icon="⏸️"
+		title="Автопауза: панель"
+		tooltipText="Автоматически ставить на паузу, когда панель открыта"
+		isToggled={GlobalConfig.get("panelAutoPause")}
+		onToggle={v => {
+			GlobalConfig.set("panelAutoPause", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="⏸️"
-				title="Автопауза: меню"
-				tooltipText="Автоматически ставить на паузу, когда меню открыто"
-				bind:isToggled={menuAutoPause}
-			/>
+	<MenuToggle
+		icon="⏸️"
+		title="Автопауза: меню"
+		tooltipText="Автоматически ставить на паузу, когда меню открыто"
+		isToggled={GlobalConfig.get("menuAutoPause")}
+		onToggle={v => {
+			GlobalConfig.set("menuAutoPause", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="🎵"
-				title="Звук"
-				tooltipText="Воспроизводит звук по завершении времени"
-				bind:isToggled={afterSound}
-			/>
+	<MenuToggle
+		icon="🎵"
+		title="Звук"
+		tooltipText="Воспроизводит звук по завершении времени"
+		isToggled={GlobalConfig.get("afterSound")}
+		onToggle={v => {
+			GlobalConfig.set("afterSound", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="🖼️"
-				title="Фон игроков"
-				tooltipText="Использовать задний фон для игроков (Требует перезагрузки страницы)"
-				bind:isToggled={playerBackground}
-			/>
+	<MenuToggle
+		icon="🖼️"
+		title="Фон игроков"
+		tooltipText="Использовать задний фон для игроков (Требует перезагрузки страницы)"
+		isToggled={GlobalConfig.get("playerBackground")}
+		onToggle={v => {
+			GlobalConfig.set("playerBackground", v);
+		}}
+	/>
 
-			<MenuItem
-				icon="🖼️"
-				title="Свой задний фон"
-				tooltipText="Использовать свой загружанный задний фон (Требует перезагрузки страницы)"
-				bind:isToggled={usingBackroundImage}
-			/>
+	<MenuToggle
+		icon="🖼️"
+		title="Свой задний фон"
+		tooltipText="Использовать свой загружанный задний фон (Требует перезагрузки страницы)"
+		isToggled={GlobalConfig.get("usingBackroundImage")}
+		onToggle={v => {
+			GlobalConfig.set("usingBackroundImage", v);
+		}}
+	/>
 
-			<MenuItemMedia
-				title="Фоновое медиа"
-				icon="🎥"
-				tooltipText="Изображение или видео, которое будет использоваться в фоне. Поддерживаются PNG, JPEG, WEBP, MP4, WebM и OGG."
-				supportedTypes={[
-					"image/png",
-					"image/jpeg",
-					"image/webp",
-					"video/mp4",
-					"video/webm",
-					"video/ogg",
-				]}
-				configKey="backgroundImage"
-			/>
+	<MenuOptionList
+		icon="🎨"
+		title="Тема"
+		tooltipText="Выберите визуальную тему"
+		options={themeManager.getAvailableThemes()}
+		selectedOption={GlobalConfig.get("theme")}
+		onOptionSelect={opt => {
+			GlobalConfig.set("theme", opt);
+			themeManager.setTheme(opt);
+		}}
+	/>
 
-			<MenuItem
-				icon="🎨"
-				title="Тема"
-				tooltipText="Выберите визуальную тему"
-				options={themeManager.getAvailableThemes()}
-				bind:selectedOption={theme}
-				onOptionSelect={opt => {
-					theme = opt;
-					themeManager.setTheme(opt);
-				}}
-			/>
+	<MenuMedia
+		icon="🎥"
+		title="Фоновое медиа"
+		tooltipText="Изображение или видео, которое будет использоваться в фоне. Поддерживаются PNG, JPEG, WEBP, MP4, WebM и OGG."
+		supportedTypes={[
+			"image/png",
+			"image/jpeg",
+			"image/webp",
+			"video/mp4",
+			"video/webm",
+			"video/ogg",
+		]}
+		configKey="backgroundImage"
+	/>
 
-			<MenuItemMedia
-				icon="🔊"
-				title="Аудио: загрузить файл"
-				configKey="audioTimerEnd"
-				supportedTypes={["audio/mpeg", "audio/ogg", "audio/mp3"]}
-				tooltipText="Загрузи вступительный звук. Поддержка: mp3, wav, ogg"
-			/>
+	<MenuMedia
+		icon="🔊"
+		title="Аудио: загрузить файл"
+		tooltipText="Загрузи вступительный звук. Поддержка: mp3, wav, ogg"
+		supportedTypes={["audio/mpeg", "audio/ogg", "audio/mp3"]}
+		configKey="audioTimerEnd"
+	/>
 
-			<MenuItemConfigCoder
-				icon="📋"
-				title="Копировать конфиг"
-				mode="coder"
-				tooltipText="Копирует текуфий конфиг в виде строки"
-			/>
+	<MenuCoder
+		icon="📋"
+		title="Сохранить конфиг"
+		text="Скачать конфиг"
+		tooltipText="Скачивает .cfg файл со всей нужной информацией"
+	/>
 
-			<MenuItemConfigCoder
-				icon="📥"
-				title="Загрузить конфиг"
-				mode="decoder"
-				tooltipText="Преобразовывает входную строку в конфиг"
-			/>
+	<MenuDecoder
+		icon="📥"
+		title="Загрузить конфиг"
+		tooltipText="Преобразовывает входную строку в конфиг"
+	/>
 
-			<MenuItem
-				icon="💾"
-				title="Сбросить настройки"
-				mode="hold"
-				tooltipText="Сбрасывает текущие настройки и выставлояет стандартные."
-				holdDuration={3000}
-				onHoldComplete={async () => {
-					await GlobalConfig.setConfig(dConfig);
-					await GlobalConfig.deleteAllMedia();
-					location.reload();
-				}}
-			/>
+	<MenuHold
+		icon="💾"
+		title="Сбросить настройки"
+		tooltipText="Сбрасывает текущие настройки и выставлояет стандартные."
+		holdDuration={3000}
+		onHoldComplete={async () => {
+			await GlobalConfig.setConfig(dConfig);
+			await GlobalConfig.deleteAllMedia();
+			location.reload();
+		}}
+	/>
 
-			<MenuItem
-				icon="📍"
-				title="Открыть гайд"
-				mode="click"
-				tooltipText="Открывает гайд по использованию сайта"
-				onClick={() => setIntroGuideVisiable(true)}
-			/>
-		</ul>
-	</div>
-</div>
-
-<style>
-	.menu-container {
-		position: fixed;
-		top: 2rem;
-		right: 2rem;
-		z-index: 1001;
-	}
-
-	.menu-button {
-		width: 5rem;
-		height: 5rem;
-		border-radius: 50%;
-		background: var(--bg);
-		backdrop-filter: blur(12px);
-		border: 2px solid var(--accent);
-		box-shadow: 0 0 25px var(--shadow);
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		transition:
-			transform 0.3s ease,
-			box-shadow 0.3s ease;
-		cursor: pointer;
-		z-index: 1001;
-	}
-
-	.menu-button:hover {
-		transform: scale(1.08);
-		box-shadow: 0 0 35px var(--shadow);
-	}
-
-	.menu-line {
-		width: 2.4rem;
-		height: 0.25rem;
-		background: var(--accent);
-		margin: 0.3rem 0;
-		border-radius: 3px;
-		transition: all 0.3s ease;
-	}
-
-	.menu-open .menu-line:nth-child(1) {
-		transform: translateY(0.6rem) rotate(45deg);
-	}
-
-	.menu-open .menu-line:nth-child(2) {
-		opacity: 0;
-	}
-
-	.menu-open .menu-line:nth-child(3) {
-		transform: translateY(-0.6rem) rotate(-45deg);
-	}
-
-	.menu-panel {
-		position: fixed;
-		top: 0;
-		right: -30rem;
-		width: 30rem;
-		height: 100vh;
-		background: var(--bg);
-		backdrop-filter: blur(16px);
-		box-shadow: -6px 0 60px var(--shadow);
-		transition: transform 0.5s ease;
-		display: flex;
-		flex-direction: column;
-		z-index: 1001;
-		transform: translateX(0);
-		border-left: 1px solid var(--accent);
-		z-index: 1000;
-	}
-
-	.menu-panel.open {
-		transform: translateX(-30rem);
-	}
-
-	.menu-header {
-		padding: 1.5rem 2rem 1rem;
-		border-bottom: 1px solid var(--accent);
-		user-select: none;
-	}
-
-	.menu-title {
-		color: var(--accent);
-		font-size: 2.4rem;
-		font-weight: bold;
-		color: var(--input-fg);
-		letter-spacing: 1px;
-		user-select: none;
-	}
-
-	.menu-content {
-		flex: 1;
-		overflow-y: auto;
-		padding: 2rem;
-		scrollbar-width: thin;
-		scrollbar-color: var(--accent-light) transparent;
-		user-select: none;
-	}
-
-	.menu-content::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.menu-content::-webkit-scrollbar-thumb {
-		background-color: var(--accent-light);
-		border-radius: 6px;
-	}
-
-	.menu-items {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		user-select: none;
-	}
-</style>
+	<MenuClick
+		icon="📍"
+		title="Открыть гайд"
+		tooltipText="Открывает гайд по использованию сайта"
+		text="Нажми"
+		onClick={() => IntroGuideVisiable.set(true)}
+	/>
+</SideMenu>
