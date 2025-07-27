@@ -78,21 +78,16 @@
 		width: 100%;
 		height: 5vh;
 		position: relative;
-		background: var(--input-bg);
 		border-radius: 12px;
 		overflow: hidden;
-		box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
 	}
 
-	.progress-bar .bar {
+	.bar {
 		position: absolute;
 		left: 0;
 		top: 0;
 		height: 100%;
 		width: 0%;
-		background: var(--accent);
-		transition: width 0.1s linear;
-		z-index: 1;
 	}
 
 	.bar-text {
@@ -102,9 +97,38 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
-		font-size: 1.3rem;
-		color: white;
+	}
+
+	.progress-bar {
+		background: var(--input-bg);
+		box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+		cursor: pointer;
 		user-select: none;
-		font-weight: 500;
+	}
+
+	.bar {
+		background: var(--accent);
+	}
+
+	.bar-text {
+		color: var(--accent-light);
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	}
+
+	.bar-text {
+		font-size: 1.3rem;
+		font-family: var(--font-family-base);
+		font-weight: var(--font-weight-medium);
+		line-height: var(--line-height-base);
+		letter-spacing: var(--letter-spacing-normal);
+	}
+
+	.bar {
+		transition: width 0.1s linear;
+	}
+
+	.progress-bar:active {
+		transform: scale(0.98);
+		transition: transform 0.1s ease;
 	}
 </style>

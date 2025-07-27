@@ -56,14 +56,13 @@
 		<div class="media-upload">
 			<MediaUpload {supportedTypes} {onChange} />
 			{#if loading}
-				<div class="status loading">Загрузка...</div>
+				<div class="loading">Загрузка...</div>
 			{:else if loaded}
 				<Message value="Файл загружен и сохранён" />
 			{/if}
 
 			{#if fileUrl}
 				<div class="file-info">
-					<div class="filename">{fileName}</div>
 					<MediaView {fileUrl}></MediaView>
 				</div>
 			{/if}
@@ -82,7 +81,8 @@
 		overflow-wrap: anywhere;
 	}
 
-	.file-info {
+	.loading {
+		color: var(--warning);
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
@@ -91,11 +91,12 @@
 		margin-top: 0.6rem;
 	}
 
-	.filename {
-		font-size: 1.2rem;
-		color: var(--fg);
-		text-align: center;
-		word-break: break-word;
-		overflow-wrap: anywhere;
+	.file-info {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		width: 100%;
+		gap: 0.6rem;
+		margin-top: 0.6rem;
 	}
 </style>

@@ -46,6 +46,10 @@
 	}
 
 	.menu-button:hover {
+		background-color: var(--bg);
+		transform: none;
+		box-shadow: none;
+
 		transform: scale(1.08);
 		box-shadow: 0 0 35px var(--shadow);
 	}

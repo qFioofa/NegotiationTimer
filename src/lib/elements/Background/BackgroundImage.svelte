@@ -13,11 +13,7 @@
 	function removeBackground() {
 		if (typeof document === "undefined") return;
 
-		document.body.style.backgroundImage = originalStyles.backgroundImage;
-		document.body.style.backgroundSize = originalStyles.backgroundSize;
-		document.body.style.backgroundPosition = originalStyles.backgroundPosition;
-		document.body.style.backgroundRepeat = originalStyles.backgroundRepeat;
-		document.body.classList.remove("background-active");
+		document.body.style = "";
 	}
 
 	function applyBackground() {

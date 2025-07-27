@@ -24,7 +24,7 @@
 		cursor: pointer;
 		z-index: 1001;
 		box-shadow: 4px 0 12px var(--shadow);
-		transition: opacity 0.25s ease;
+		transition: all 0.15s ease;
 		user-select: none;
 		border-radius: 0 12px 12px 0;
 		display: flex;
@@ -32,5 +32,11 @@
 		justify-content: center;
 		pointer-events: auto;
 		overflow: hidden;
+	}
+
+	.panel-trigger:active {
+		transform: translateY(-50%) translateX(-10px);
+		box-shadow: 2px 0 6px var(--shadow);
+		text-shadow: 0 0 2px currentColor;
 	}
 </style>

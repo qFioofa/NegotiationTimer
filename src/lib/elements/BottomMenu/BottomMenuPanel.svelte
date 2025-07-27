@@ -54,10 +54,13 @@
 	on:mouseleave={handlePanelLeave}
 >
 	<div class="scroll-wrapper">
-		{#if title}
-			<h2 class="panel-title">{title}</h2>
-		{/if}
-		<slot />
+		<div class="content-wrapper">
+			{#if title}
+				<h2 class="panel-title">{title}</h2>
+			{/if}
+			<hr class="panel-divider" />
+			<slot />
+		</div>
 	</div>
 </div>
 
@@ -69,7 +72,9 @@
 		transform: translateY(-50%);
 		width: 30vw;
 		max-width: 50vw;
-		height: 66vh;
+		height: 80vh;
+		display: flex;
+		flex-direction: column;
 		background: var(--bg);
 		backdrop-filter: blur(25px);
 		border-radius: 0 20px 20px 0;
@@ -79,38 +84,52 @@
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.3s ease;
-		overflow: hidden;
 	}
+
 	.menu-panel.open {
 		opacity: 1;
 		pointer-events: auto;
 	}
+
 	.scroll-wrapper {
+		flex: 1;
 		max-height: 100%;
 		overflow-y: auto;
-		padding-right: 8px;
-		scrollbar-width: thin;
-		scrollbar-color: var(--accent) transparent;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
 	}
+
 	.scroll-wrapper::-webkit-scrollbar {
-		width: 6px;
+		display: none;
 	}
-	.scroll-wrapper::-webkit-scrollbar-thumb {
-		background-color: var(--accent);
-		border-radius: 4px;
+
+	.content-wrapper {
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+		padding-left: 0.2rem;
+		padding-right: 1rem;
+		box-sizing: border-box;
 	}
-	.scroll-wrapper::-webkit-scrollbar-track {
-		background: transparent;
-	}
+
 	.panel-title {
+		font-family: var(--font-family-accent);
 		font-size: 4rem;
-		text-align: left;
-		margin: 2rem;
-		background: linear-gradient(45deg, var(--accent), var(--accent-light));
-		-webkit-background-clip: text;
+		font-weight: var(--font-weight-bold);
+		line-height: var(--line-height-tight);
+		text-align: center;
+		margin: 2rem 0 1rem 0;
+		background: var(--accent);
 		background-clip: text;
 		color: transparent;
-		font-weight: bold;
 		user-select: none;
+	}
+
+	.panel-divider {
+		width: 100%;
+		height: 1px;
+		border: none;
+		background: var(--divider);
+		margin: 0 0 2rem 0;
 	}
 </style>

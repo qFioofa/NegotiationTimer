@@ -13,7 +13,7 @@
 		{/if}
 		<div class="item-title">
 			{#if title}
-				<span>{title}</span>
+				{title}
 			{/if}
 		</div>
 		<ToolTip {tooltipText} />
@@ -29,18 +29,11 @@
 <style>
 	.menu-item {
 		padding: 20px;
-		margin: 12px 0;
-		background: var(--bg);
 		border-radius: 14px;
-		border: 1px solid var(--accent);
-		transition: all 0.3s ease;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-	}
-
-	.menu-item:hover {
-		box-shadow: 0 0 20px var(--shadow);
+		transform: translateY(0);
 	}
 
 	.menu-top {
@@ -50,9 +43,6 @@
 	}
 
 	.item-title {
-		font-size: 1.6rem;
-		color: var(--fg);
-		font-weight: 500;
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -65,9 +55,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--input-bg);
 		border-radius: 50%;
-		color: var(--accent);
+		flex-shrink: 0;
 	}
 
 	.divider {
@@ -75,10 +64,73 @@
 		height: 1px;
 		border: none;
 		margin: 0;
-		background: var(--divider, rgba(255, 255, 255, 0.1));
 	}
 
 	.menu-slot {
 		margin-top: 0.5rem;
+	}
+
+	.menu-item {
+		background: var(--bg-card);
+		border: none;
+		box-shadow: none;
+	}
+
+	.item-title {
+		color: var(--fg-heading);
+	}
+
+	.item-icon {
+		background: var(--bg-muted);
+		color: var(--accent-light);
+	}
+
+	.divider {
+		background: var(--divider, rgba(255, 255, 255, 0.1));
+	}
+
+	.menu-slot {
+		color: var(--fg);
+	}
+
+	.menu-item:hover {
+		background: var(--bg);
+		border-color: var(--accent);
+		box-shadow: 0 0 0 2px var(--accent);
+		transform: translateY(2px) scale(1.06);
+		padding: 21px;
+	}
+
+	.menu-item {
+		font-family: var(--font-family-base);
+	}
+
+	.item-title {
+		font-family: var(--font-family-accent);
+		font-size: var(--font-size-lg);
+		font-weight: var(--font-weight-bold);
+		line-height: var(--line-height-tight);
+		letter-spacing: var(--letter-spacing-normal);
+	}
+
+	.menu-slot {
+		font-family: var(--font-family-base);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-normal);
+		line-height: var(--line-height-base);
+		letter-spacing: var(--letter-spacing-normal);
+	}
+
+	.menu-item {
+		transition:
+			background-color 0.3s ease,
+			border-color 0.3s ease,
+			box-shadow 0.3s ease,
+			transform 0.3s ease,
+			padding 0.3s ease;
+	}
+
+	.item-title {
+		user-select: none;
 	}
 </style>

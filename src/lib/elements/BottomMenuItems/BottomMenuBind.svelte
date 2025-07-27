@@ -97,29 +97,45 @@
 
 	.bind-button {
 		width: 100%;
-		font-size: 0.9rem;
-		background: var(--bg-secondary);
-		color: var(--fg);
-		border: 1px solid var(--accent);
 		padding: 0.5rem 0.8rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.4rem;
+	}
+
+	.bind-button {
+		background: var(--bg-muted);
+		color: var(--fg);
+		border: 1px solid var(--accent);
 		border-radius: 10px;
 		cursor: pointer;
-		transition:
-			background 0.2s,
-			border-color 0.2s;
+		transition: var(--transition);
 	}
 
 	.bind-button:hover {
-		background: var(--bg-hover, var(--bg));
-		border-color: var(--accent-hover, var(--accent));
+		background: var(--bg-hover);
+		border-color: var(--accent-light);
+	}
+
+	.bind-button {
+		font-family: var(--font-family-base);
+		font-size: 0.9rem;
+		font-weight: var(--font-weight-normal);
+		line-height: var(--line-height-base);
+		letter-spacing: var(--letter-spacing-normal);
 	}
 
 	.bind-label {
+		color: var(--accent-light);
 		white-space: nowrap;
 		text-align: center;
+		user-select: none;
+	}
+
+	.bind-button {
+		transition:
+			background 0.2s,
+			border-color 0.2s;
 	}
 </style>

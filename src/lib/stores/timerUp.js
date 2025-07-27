@@ -16,6 +16,10 @@ export function stopUpTimer() {
     upTimerInstance.pause();
 }
 
+export function toggleUpTimer() {
+    upTimerInstance.toggle();
+}
+
 export function resetUpTimer() {
     upTimerInstance.pause();
     upTimerInstance.timeSubtract(upTimerInstance.toMs() / 1000);

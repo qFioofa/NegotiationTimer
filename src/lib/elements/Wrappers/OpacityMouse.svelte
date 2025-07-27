@@ -54,24 +54,75 @@
 	on:click={handleClick}
 	tabindex="0"
 	style="
-		opacity: {$triggerOpacity};
-		pointer-events: {$triggerOpacity > pointerEventsThreshold ? 'auto' : 'none'};
-		z-index: {zIndex};
-	"
+        opacity: {$triggerOpacity};
+        pointer-events: {$triggerOpacity > pointerEventsThreshold ? 'auto' : 'none'};
+        z-index: {zIndex};
+    "
 >
 	<slot />
 </button>
 
 <style>
+	/* === Компоновка / Расположение === */
 	.opacity-mouse-wrapper {
 		position: relative;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
+		padding: 0;
+		margin: 0;
+		border: none;
+		background: transparent;
+		box-shadow: none;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		line-height: inherit;
+		letter-spacing: inherit;
+		color: inherit;
+		appearance: none;
+		-webkit-appearance: none;
+	}
+
+	.opacity-mouse-wrapper {
 		background: transparent;
 		border: none;
 		box-shadow: none;
-		padding: 0;
-		margin: 0;
+	}
+
+	.opacity-mouse-wrapper {
+		transition: opacity 0.15s cubic-out;
+	}
+
+	.opacity-mouse-wrapper:hover:not(:disabled) {
+		background-color: transparent;
+		transform: none;
+		box-shadow: none;
+	}
+
+	.opacity-mouse-wrapper:active:not(:disabled) {
+		transform: none;
+		box-shadow: none;
+		transition: none;
+	}
+
+	.opacity-mouse-wrapper:disabled {
+		background-color: transparent;
+		color: inherit;
+		cursor: pointer;
+		transform: none;
+		box-shadow: none;
+	}
+
+	.opacity-mouse-wrapper:focus {
+		outline: none;
+		outline-offset: 0;
+	}
+
+	.opacity-mouse-wrapper::before,
+	.opacity-mouse-wrapper::after {
+		content: none;
+		display: none;
 	}
 </style>

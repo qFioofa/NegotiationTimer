@@ -10,7 +10,7 @@
 
 <style>
 	.error {
-		color: var(--error-text);
+		color: var(--danger);
 		font-size: 0.9rem;
 		margin-left: 5px;
 	}

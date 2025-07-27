@@ -18,7 +18,7 @@
 <Common {icon} {title} {tooltipText}>
 	<InputGroup>
 		<div class="toggle-wrapper">
-			<span class:label-active={!isToggled}>Выкл</span>
+			<span class="toggle-label label-off" class:label-active={!isToggled}>Выкл</span>
 			<button
 				class="toggle"
 				class:toggle-on={isToggled}
@@ -27,7 +27,7 @@
 			>
 				<div class="circle"></div>
 			</button>
-			<span class:label-active={isToggled}>Вкл</span>
+			<span class="toggle-label label-on" class:label-active={isToggled}>Вкл</span>
 		</div>
 	</InputGroup>
 </Common>
@@ -36,44 +36,97 @@
 	.toggle-wrapper {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.6rem;
-		font-size: 1.2rem;
-		color: var(--fg-muted, #888);
-		user-select: none;
-	}
-
-	.label-active {
-		color: var(--accent);
-		font-weight: bold;
 	}
 
 	.toggle {
 		width: 42px;
 		height: 24px;
-		border-radius: 999px;
-		background: var(--input-bg);
-		border: 1px solid var(--accent);
 		padding: 2px;
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		cursor: pointer;
-		transition: background 0.3s ease;
+		flex-shrink: 0;
 	}
 
 	.toggle.toggle-on {
 		justify-content: flex-end;
 	}
 
-	.toggle .circle {
+	.circle {
 		width: 18px;
 		height: 18px;
-		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.toggle-label {
+		width: 80px;
+		text-align: center;
+	}
+
+	.toggle-wrapper {
+		color: var(--fg-muted);
+		user-select: none;
+	}
+
+	.label-active {
+		color: var(--success);
+	}
+
+	.toggle {
+		background: var(--input-bg);
+		border: 1px solid var(--accent);
+		border-radius: 999px;
+		cursor: pointer;
+	}
+
+	.toggle:not(.toggle-on) {
+		border-color: var(--accent);
+	}
+
+	.circle {
 		background: var(--fg);
-		transition: background 0.3s ease;
+		border-radius: 50%;
 	}
 
 	.toggle.toggle-on .circle {
 		background: var(--accent);
+	}
+
+	.toggle-wrapper {
+		font-family: var(--font-family-base);
+		font-size: 1.2rem;
+		font-weight: var(--font-weight-normal);
+		line-height: var(--line-height-base);
+	}
+
+	.label-active {
+		font-weight: var(--font-weight-bold);
+	}
+
+	.toggle {
+		transition:
+			background 0.3s ease,
+			border-color 0.3s ease;
+	}
+
+	.circle {
+		transition:
+			background 0.3s ease,
+			transform 0.2s ease;
+	}
+
+	.toggle:active .circle {
+		transform: scale(0.9);
+	}
+
+	.label-off,
+	.label-on {
+		transition: color 0.3s ease;
+	}
+
+	.label-off.label-active {
+		color: var(--danger);
 	}
 </style>

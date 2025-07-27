@@ -10,6 +10,6 @@
 	.decoder-message {
 		margin: 0;
 		text-align: center;
-		color: green;
+		color: var(--success);
 	}
 </style>

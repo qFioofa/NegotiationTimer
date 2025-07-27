@@ -3,7 +3,7 @@
 	import PlayerNumber from "./Players/Wrappers/PlayerNumber.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
 	import ElementShuffler from "$lib/components/Shuffle";
-	import { onMount, onDestroy } from "svelte";
+	import { onMount } from "svelte";
 
 	let number1, number2;
 	let input1Ref, input2Ref;
@@ -27,12 +27,16 @@
 <div class="players-wrapper {playerBackground ? '' : 'transparent'}">
 	<div class="player left">
 		<PlayerNumber text="1" bind:ref={number1} />
-		<NameInput />
+		<div class="input-wrapper">
+			<NameInput />
+		</div>
 	</div>
 
 	<div class="player right">
 		<PlayerNumber text="2" bind:ref={number2} />
-		<NameInput />
+		<div class="input-wrapper">
+			<NameInput />
+		</div>
 	</div>
 </div>
 
@@ -47,10 +51,11 @@
 		border-radius: 1rem;
 		box-shadow: 0 0 30px var(--shadow);
 		color: var(--fg);
-		border: 1px solid var(--accent);
-		transition: width 0.3s ease;
+		border: 2px solid var(--accent);
 		width: 60.4%;
 		max-width: 73.4%;
+		transition: var(--transition);
+		box-shadow: 6px 6px 0 var(--accent-dark);
 	}
 
 	.transparent {
@@ -64,6 +69,11 @@
 		flex-direction: column;
 		align-items: center;
 		position: relative;
+	}
+
+	.input-wrapper {
+		flex-shrink: 0;
+		width: fit-content;
 	}
 
 	@media (max-width: 768px) {

@@ -13,6 +13,8 @@
 	}
 
 	async function loadBlackoutAudio() {
+		if (!GlobalConfig.get("afterSound")) return;
+
 		const url = await GlobalConfig.getMedia(configKey);
 		if (url) {
 			if (audio) {
@@ -60,13 +62,33 @@
 		align-items: center;
 		justify-content: center;
 		flex-direction: column;
-		z-index: 2000;
+		z-index: 3000;
 		cursor: pointer;
+	}
+
+	.blackout-overlay:hover {
+		background: var(--blackout-backround);
+		box-shadow:
+			0 0 35px var(--shadow),
+			inset 0 0 16px var(--shadow);
+	}
+
+	.blackout-overlay {
+		background-color: black;
+		transform: none;
+		box-shadow: none;
+
+		box-shadow: 0 0 35px var(--shadow);
 	}
 
 	.blackout-content {
 		text-align: center;
 		color: var(--accent);
+		transition: var(--transition);
+	}
+
+	.blackout-content:hover {
+		transform: scale(1.08);
 	}
 
 	.blackout-title {

@@ -67,7 +67,7 @@
 			const ms = mmssToMs(val);
 			timeSubtract(toMs());
 			timeAdd(ms);
-			GlobalConfig.set("setTime", ms);
+			GlobalConfig.set("setTime", val);
 		}}
 	/>
 
