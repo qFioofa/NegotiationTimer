@@ -6,6 +6,7 @@ export default class TimerLogic {
         this.updateCallbacks = [];
         this.runningCallbacks = [];
         this.isInverted = isInverted;
+        this.timerSpan = () => { };
 
         this.launch = this.launch.bind(this);
         this.pause = this.pause.bind(this);
@@ -29,6 +30,10 @@ export default class TimerLogic {
         };
     }
 
+    addTimerSnap(callback) {
+        this.timerSpan = callback;
+    }
+
     notifyUpdate() {
         this.updateCallbacks.forEach(cb => cb(this.time));
     }
@@ -41,6 +46,7 @@ export default class TimerLogic {
         if (this.isRunning) return;
         if (!this.isInverted && this.time <= 0) return;
 
+        this.timerSpan(this.time);
         this.isRunning = true;
         this.notifyRunningChange();
 

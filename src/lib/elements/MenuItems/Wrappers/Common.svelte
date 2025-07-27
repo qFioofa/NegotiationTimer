@@ -1,4 +1,5 @@
 <script>
+	import Devider from "$lib/elements/General/Devider.svelte";
 	import ToolTip from "./ToolTip.svelte";
 
 	export let icon;
@@ -19,7 +20,7 @@
 		<ToolTip {tooltipText} />
 	</div>
 
-	<hr class="divider" />
+	<Devider />
 
 	<div class="menu-slot">
 		<slot />
@@ -59,13 +60,6 @@
 		flex-shrink: 0;
 	}
 
-	.divider {
-		width: 100%;
-		height: 1px;
-		border: none;
-		margin: 0;
-	}
-
 	.menu-slot {
 		margin-top: 0.5rem;
 	}
@@ -83,10 +77,6 @@
 	.item-icon {
 		background: var(--bg-muted);
 		color: var(--accent-light);
-	}
-
-	.divider {
-		background: var(--divider, rgba(255, 255, 255, 0.1));
 	}
 
 	.menu-slot {

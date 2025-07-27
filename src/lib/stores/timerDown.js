@@ -5,9 +5,11 @@ import { GlobalConfig } from './parameters';
 export const timerInstance = new TimerLogic();
 export const timeMs = writable(GlobalConfig.get("timerDuration") || 0);
 export const isRunning = writable(false);
+export const downTimerSnap = writable(get(timeMs));
 
 timerInstance.addUpdateListener(ms => timeMs.set(ms));
 timerInstance.addRunningListener(running => isRunning.set(running));
+timerInstance.addTimerSnap(ms => downTimerSnap.set(ms));
 
 export function initTimer() {
     timerInstance.timeAdd(get(timeMs))

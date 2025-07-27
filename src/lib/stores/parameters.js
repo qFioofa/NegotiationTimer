@@ -11,3 +11,5 @@ export let ShuffleFunction = writable(null);
 export const IntroGuideVisiable = writable(GlobalConfig.get("introGuide"));
 
 export const isBlackout = writable(false);
+
+export const isPanelOpen = writable(false);

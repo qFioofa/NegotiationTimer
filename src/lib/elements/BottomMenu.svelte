@@ -1,6 +1,6 @@
 <script>
+	import { ShuffleFunction, GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
 	import BottomMenuAdjust from "./BottomMenuItems/BottomMenuAdjust.svelte";
-	import { ShuffleFunction, GlobalConfig } from "$lib/stores/parameters";
 	import BottomMenuInput from "./BottomMenuItems/BottomMenuInput.svelte";
 	import BottomMenuTrigger from "./BottomMenu/BottomMenuTrigger.svelte";
 	import BottomMenuBind from "./BottomMenuItems/BottomMenuBind.svelte";
@@ -9,17 +9,19 @@
 	import { mmssToMs } from "$lib/components/utils/TimerUtils";
 	import OpacityMouse from "./Wrappers/OpacityMouse.svelte";
 	import { togglePause } from "$lib/components/Pause";
+	import { toggleTimer } from "$lib/stores/timerDown";
+	import { toggleUpTimer } from "$lib/stores/timerUp";
+	import { isPaused } from "$lib/components/Pause";
 	import Pause from "./Pause.svelte";
 	import { get } from "svelte/store";
 
-	let isPanelOpen = false;
 	let isTriggerHovered = false;
 
 	let triggerRef;
 
 	function handleClick() {
 		if (!GlobalConfig.get("panelAutoOpen")) {
-			isPanelOpen = !isPanelOpen;
+			$isPanelOpen = !$isPanelOpen;
 		}
 	}
 
@@ -27,12 +29,20 @@
 		const ShufflePlayers = $ShuffleFunction;
 		if (ShufflePlayers) ShufflePlayers();
 	}
+
+	function anyTimerToggle() {
+		if ($isPaused) {
+			toggleUpTimer();
+			return;
+		}
+		toggleTimer();
+	}
 </script>
 
 <Pause />
 
 <OpacityMouse
-	bind:isOpen={isPanelOpen}
+	bind:isOpen={$isPanelOpen}
 	handleTriggerEnter={() => {
 		isTriggerHovered = true;
 	}}
@@ -45,7 +55,7 @@
 	<BottomMenuTrigger bind:ref={triggerRef} text="Панель" />
 </OpacityMouse>
 
-<BottomMenuPanel title="Панель" bind:isMenuOpen={isPanelOpen} bind:isTriggerHovered>
+<BottomMenuPanel title="Панель" bind:isMenuOpen={$isPanelOpen} bind:isTriggerHovered>
 	<BottomMenuBind
 		icon="🔀"
 		title="Сделать жеребьевку"
@@ -98,5 +108,15 @@
 		bindKey={GlobalConfig.get("pauseKey")}
 		onApply={togglePause}
 		onBindTrigger={togglePause}
+	/>
+
+	<BottomMenuBind
+		icon="▶️"
+		title="Включить таймер"
+		description="Назначьте клавишу для включения любого таймера"
+		configKey="toggleTimer"
+		bindKey={GlobalConfig.get("toggleTimer")}
+		onApply={anyTimerToggle}
+		onBindTrigger={anyTimerToggle}
 	/>
 </BottomMenuPanel>

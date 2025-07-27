@@ -1,9 +1,10 @@
 <script>
-	import { isPaused, setPause } from "$lib/components/Pause";
 	import { GlobalConfig, IntroGuideVisiable } from "$lib/stores/parameters";
+	import { isPaused, setPause } from "$lib/components/Pause";
+	import DeviderTheme from "./General/DeviderTheme.svelte";
+	import { themeManager, csHandler } from "$lib/cssStyles/themeHanager";
 	import { dConfig } from "$lib/stores/defaultConfig";
 	import IntroGuide from "./IntroGuide.svelte";
-	import themeManager from "$lib/cssStyles/themeHanager";
 
 	import OpacityMouse from "./Wrappers/OpacityMouse.svelte";
 
@@ -50,6 +51,16 @@
 	/>
 
 	<MenuToggle
+		icon="🎵"
+		title="Звук"
+		tooltipText="Воспроизводит звук по завершении времени"
+		isToggled={GlobalConfig.get("afterSound")}
+		onToggle={v => {
+			GlobalConfig.set("afterSound", v);
+		}}
+	/>
+
+	<MenuToggle
 		icon="🛠"
 		title="Выдвигать панель"
 		tooltipText="Автоматически выдвигать панель, когда мышка на иконке панели"
@@ -59,15 +70,29 @@
 		}}
 	/>
 
+	<DeviderTheme />
+
 	<MenuToggle
-		icon="⏸️"
-		title="Автопауза: панель"
-		tooltipText="Автоматически ставить на паузу, когда панель открыта"
-		isToggled={GlobalConfig.get("panelAutoPause")}
+		icon="⏬"
+		title="Доп. кнопки: меню"
+		tooltipText="Добавляет кнопки 'сбросить таймер до начального значения' и 'пауза'"
+		isToggled={GlobalConfig.get("extraButtonsOn")}
 		onToggle={v => {
-			GlobalConfig.set("panelAutoPause", v);
+			GlobalConfig.set("extraButtonsOn", v);
 		}}
 	/>
+
+	<MenuToggle
+		icon="⏬"
+		title="Доп. кнопки: пауза"
+		tooltipText="Добавляет кнопки 'сбросить таймер' и 'закрыть паузу'"
+		isToggled={GlobalConfig.get("extraButtonsPauseOn")}
+		onToggle={v => {
+			GlobalConfig.set("extraButtonsPauseOn", v);
+		}}
+	/>
+
+	<DeviderTheme />
 
 	<MenuToggle
 		icon="⏸️"
@@ -79,15 +104,7 @@
 		}}
 	/>
 
-	<MenuToggle
-		icon="🎵"
-		title="Звук"
-		tooltipText="Воспроизводит звук по завершении времени"
-		isToggled={GlobalConfig.get("afterSound")}
-		onToggle={v => {
-			GlobalConfig.set("afterSound", v);
-		}}
-	/>
+	<DeviderTheme />
 
 	<MenuToggle
 		icon="🖼️"
@@ -121,6 +138,23 @@
 		}}
 	/>
 
+	<MenuOptionList
+		icon="🎨"
+		title="Готовые конфиги"
+		tooltipText="Встроенные конфиги"
+		options={csHandler.getAvailableThemes()}
+		onOptionSelect={async opt => {
+			if (await csHandler.setConfigStyle(opt)) {
+				await new Promise(resolve => setTimeout(resolve, 500));
+				location.reload();
+			} else {
+				console.error(`Ошибка в загрузке конфига: ${opt}`);
+			}
+		}}
+	/>
+
+	<DeviderTheme />
+
 	<MenuMedia
 		icon="🎥"
 		title="Фоновое медиа"
@@ -144,6 +178,8 @@
 		configKey="audioTimerEnd"
 	/>
 
+	<DeviderTheme />
+
 	<MenuCoder
 		icon="📋"
 		title="Сохранить конфиг"
@@ -156,6 +192,8 @@
 		title="Загрузить конфиг"
 		tooltipText="Преобразовывает входную строку в конфиг"
 	/>
+
+	<DeviderTheme />
 
 	<MenuHold
 		icon="💾"

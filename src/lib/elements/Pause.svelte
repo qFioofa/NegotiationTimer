@@ -1,8 +1,12 @@
 <script>
 	import { upTimeMs, upIsRunning, resetUpTimer, toggleUpTimer } from "$lib/stores/timerUp";
+	import ExtraButtonsWrapper from "./Wrappers/ExtraButtonsWrapper.svelte";
 	import { timerDisplay } from "$lib/components/utils/TimerUtils";
+	import ExtraButtons from "./General/ExtraButtons.svelte";
+	import { GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
 	import TimerButton from "./Timer/TimerButton.svelte";
 	import { isPaused } from "$lib/components/Pause";
+	import { onMount } from "svelte";
 
 	let displayUpTime = "00:00";
 
@@ -13,14 +17,37 @@
 	$: if (!$isPaused) {
 		resetUpTimer();
 	}
+
+	let panelAutoOpen = GlobalConfig.get("panelAutoOpen");
+	let extraButtonsPauseOn = GlobalConfig.get("extraButtonsPauseOn");
+
+	onMount(() => {
+		GlobalConfig.subscribe("panelAutoOpen", v => (panelAutoOpen = v));
+		GlobalConfig.subscribe("extraButtonsPauseOn", v => (extraButtonsPauseOn = v));
+	});
 </script>
 
 <div class="pause-overlay" class:active={$isPaused}>
 	{#if $isPaused}
-		<div class="pause-content">
+		<div class="pause-title-wrapper">
 			<h1 class="pause-title">ПАУЗА</h1>
-			<TimerButton displayTime={displayUpTime} onClick={toggleUpTimer} />
 		</div>
+		{#if !$isPanelOpen || ($isPanelOpen && !panelAutoOpen)}
+			<div class="pause-content">
+				<TimerButton displayTime={displayUpTime} onClick={toggleUpTimer} />
+				{#if extraButtonsPauseOn}
+					<ExtraButtonsWrapper>
+						<ExtraButtons icon="🔃" onClick={resetUpTimer} />
+						<ExtraButtons
+							icon="❌"
+							onClick={() => {
+								isPaused.set(false);
+							}}
+						/>
+					</ExtraButtonsWrapper>
+				{/if}
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -39,17 +66,24 @@
 		display: flex;
 	}
 
-	.pause-content {
-		text-align: center;
+	.pause-title-wrapper {
+		margin: 5rem;
+		padding: var(--spacing-md) var(--spacing-xl);
+		border-radius: var(--radius-lg);
+		border: none;
 	}
 
-	.pause-title {
-		margin-bottom: 2rem;
+	.pause-content {
+		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
 	}
 
 	.pause-overlay {
 		background: var(--pause-backround);
-		backdrop-filter: blur(3px);
+		backdrop-filter: blur(8px);
 		opacity: 0;
 		pointer-events: none;
 	}
@@ -59,26 +93,27 @@
 		pointer-events: auto;
 	}
 
-	.pause-content {
+	.pause-title {
 		color: var(--accent-light);
 	}
 
 	.pause-title {
-		text-shadow: 0 0 10px var(--accent);
-	}
-
-	.pause-title {
 		font-family: var(--font-family-accent);
-		font-size: 4rem;
-		font-weight: var(--font-weight-bold);
+		font-size: 8rem;
+		font-weight: var(--font-weight-black);
+		line-height: var(--line-height-tight);
+		letter-spacing: var(--letter-spacing-wide);
+		text-align: center;
 		user-select: none;
+		margin: 0;
 	}
 
 	.pause-overlay {
-		transition: opacity 0.3s ease;
+		transition: opacity 0.5s ease;
 	}
 
 	.pause-title {
 		transition: opacity 1s ease;
+		animation: pulse 2s infinite;
 	}
 </style>

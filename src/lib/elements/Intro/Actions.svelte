@@ -45,4 +45,9 @@
 		font-size: 1rem;
 		transition: background 0.2s;
 	}
+
+	.forget-intro:hover {
+		background: var(--bg-secondary);
+		color: var(--fg);
+	}
 </style>

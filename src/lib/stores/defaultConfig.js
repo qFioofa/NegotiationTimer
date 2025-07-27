@@ -4,9 +4,13 @@ export const dConfig = {
     timeAddSubStep: '00:15',
 
     shuffleKey: 'KeyR',
+    toggleTimer: 'KeyW',
     pauseKey: 'Space',
 
     theme: 'green',
+
+    extraButtonsOn: true,
+    extraButtonsPauseOn: true,
 
     panelAutoPause: true,
     panelAutoOpen: true,
