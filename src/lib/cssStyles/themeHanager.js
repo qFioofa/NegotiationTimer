@@ -11,7 +11,8 @@ const themeArray = [
     "blue",
     "cyan",
     "pink",
-    "grey"
+    "grey",
+    "yellow"
 ]
 
 const configFileNameArray = [
@@ -19,10 +20,6 @@ const configFileNameArray = [
         name: "SSL",
         fileName: "ssl.cfg"
     },
-    {
-        name: "SSL Online",
-        fileName: "sslOnline.cfg"
-    }
 ]
 
 themeArray.forEach(

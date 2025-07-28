@@ -242,3 +242,38 @@
 	--shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.3);
 	--shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.theme-yellow {
+	--bg: #1e1e1e;
+	--bg-muted: #2a2a2a;
+	--bg-subtle: #333333;
+	--bg-overlay: rgba(30, 30, 30, 0.8);
+	--bg-card: #252525;
+	--bg-hover: #3a3a3a;
+
+	--fg: #f2f0d8;
+	--fg-muted: #b8b08a;
+	--fg-subtle: #8a825a;
+	--fg-disabled: #6a623a;
+	--fg-heading: #ffffff;
+	--fg-link: var(--accent);
+	--fg-link-hover: var(--accent-light);
+
+	--accent: #c2b24b;
+	--accent-light: #d9d18a;
+	--accent-dark: #9a8a35;
+	--accent-muted: #b8a868;
+
+	--panel: #2a2a2a;
+	--input-bg: #2a2a2a;
+	--input-fg: #f2f0d8;
+	--input-border: var(--accent);
+	--input-placeholder: #b8b08a;
+	--border: rgba(255, 255, 255, 0.1);
+	--divider: rgba(255, 255, 255, 0.1);
+
+	--shadow: 0 0 20px rgba(194, 178, 75, 0.4);
+	--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+	--shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.3);
+	--shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}

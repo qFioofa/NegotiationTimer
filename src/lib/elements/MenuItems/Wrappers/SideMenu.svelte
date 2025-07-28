@@ -34,12 +34,13 @@
 
 	.menu-header {
 		padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md);
-		border-bottom: 1px solid var(--accent);
+		border-bottom: 3px solid var(--accent);
 	}
 
 	.menu-content {
 		flex: 1;
 		overflow-y: auto;
+		overflow-x: hidden;
 		padding: var(--spacing-xl);
 	}
 
@@ -55,13 +56,13 @@
 	.menu-panel {
 		background: var(--bg);
 		backdrop-filter: blur(16px);
-		box-shadow: -6px 0 60px var(--shadow);
-		border-left: 1px solid var(--accent);
+		box-shadow: 0px 0 60px var(--shadow);
+		border-left: 3px solid var(--accent);
 		z-index: 1000;
 	}
 
 	.menu-title {
-		color: var(--fg-heading);
+		color: var(--accent);
 	}
 
 	.menu-content {

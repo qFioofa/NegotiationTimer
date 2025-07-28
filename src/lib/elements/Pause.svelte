@@ -1,9 +1,9 @@
 <script>
 	import { upTimeMs, upIsRunning, resetUpTimer, toggleUpTimer } from "$lib/stores/timerUp";
 	import ExtraButtonsWrapper from "./Wrappers/ExtraButtonsWrapper.svelte";
+	import { GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
 	import { timerDisplay } from "$lib/components/utils/TimerUtils";
 	import ExtraButtons from "./General/ExtraButtons.svelte";
-	import { GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
 	import TimerButton from "./Timer/TimerButton.svelte";
 	import { isPaused } from "$lib/components/Pause";
 	import { onMount } from "svelte";
@@ -55,15 +55,20 @@
 	.pause-overlay {
 		position: fixed;
 		inset: 0;
-		display: none;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-direction: column;
 		z-index: 999;
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
 	}
 
 	.pause-overlay.active {
-		display: flex;
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
 	}
 
 	.pause-title-wrapper {
@@ -71,6 +76,16 @@
 		padding: var(--spacing-md) var(--spacing-xl);
 		border-radius: var(--radius-lg);
 		border: none;
+		transform: scale(0.8);
+		opacity: 0;
+	}
+
+	.pause-overlay.active .pause-title-wrapper {
+		transform: scale(1);
+		opacity: 1;
+		transition:
+			transform 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+			opacity 0.9s ease;
 	}
 
 	.pause-content {
@@ -79,18 +94,21 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
+		transform: translateY(20px);
+		opacity: 0;
+	}
+
+	.pause-overlay.active .pause-content {
+		transform: translateY(0);
+		opacity: 1;
+		transition:
+			transform 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s,
+			opacity 0.9s ease 0.3s;
 	}
 
 	.pause-overlay {
 		background: var(--pause-backround);
 		backdrop-filter: blur(8px);
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.pause-overlay.active {
-		opacity: 1;
-		pointer-events: auto;
 	}
 
 	.pause-title {
@@ -109,11 +127,8 @@
 	}
 
 	.pause-overlay {
-		transition: opacity 0.5s ease;
-	}
-
-	.pause-title {
-		transition: opacity 1s ease;
-		animation: pulse 2s infinite;
+		transition:
+			opacity 0.5s ease,
+			visibility 0.5s ease;
 	}
 </style>

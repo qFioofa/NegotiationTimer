@@ -9,7 +9,7 @@ export const downTimerSnap = writable(get(timeMs));
 
 timerInstance.addUpdateListener(ms => timeMs.set(ms));
 timerInstance.addRunningListener(running => isRunning.set(running));
-timerInstance.addTimerSnap(ms => downTimerSnap.set(ms));
+timerInstance.addTimerSnap(ms => downTimerSnap.set(ms / 1000));
 
 export function initTimer() {
     timerInstance.timeAdd(get(timeMs))

@@ -1,3 +1,4 @@
+<!-- OpacityMouse.svelte -->
 <script>
 	import { onMount } from "svelte";
 	import { tweened } from "svelte/motion";
@@ -8,7 +9,6 @@
 	export let handleTriggerLeave = () => {};
 
 	export let isOpen = false;
-
 	export let MouseDistance = 0.25;
 	export let pointerEventsThreshold = 0.05;
 	export let targetRef = null;
@@ -46,13 +46,15 @@
 	});
 </script>
 
-<button
+<div
 	bind:this={wrapperRef}
 	class="opacity-mouse-wrapper"
 	on:mouseenter={handleTriggerEnter}
 	on:mouseleave={handleTriggerLeave}
 	on:click={handleClick}
 	tabindex="0"
+	role="button"
+	aria-pressed={isOpen ? "true" : "false"}
 	style="
         opacity: {$triggerOpacity};
         pointer-events: {$triggerOpacity > pointerEventsThreshold ? 'auto' : 'none'};
@@ -60,10 +62,9 @@
     "
 >
 	<slot />
-</button>
+</div>
 
 <style>
-	/* === Компоновка / Расположение === */
 	.opacity-mouse-wrapper {
 		position: relative;
 		display: inline-flex;
@@ -83,46 +84,23 @@
 		color: inherit;
 		appearance: none;
 		-webkit-appearance: none;
+		outline: none;
 	}
 
-	.opacity-mouse-wrapper {
-		background: transparent;
-		border: none;
-		box-shadow: none;
+	.opacity-mouse-wrapper:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
 	}
 
-	.opacity-mouse-wrapper {
-		transition: opacity 0.15s cubic-out;
-	}
-
-	.opacity-mouse-wrapper:hover:not(:disabled) {
+	.opacity-mouse-wrapper:hover:not([aria-disabled="true"]) {
 		background-color: transparent;
 		transform: none;
 		box-shadow: none;
 	}
 
-	.opacity-mouse-wrapper:active:not(:disabled) {
+	.opacity-mouse-wrapper:active:not([aria-disabled="true"]) {
 		transform: none;
 		box-shadow: none;
 		transition: none;
-	}
-
-	.opacity-mouse-wrapper:disabled {
-		background-color: transparent;
-		color: inherit;
-		cursor: pointer;
-		transform: none;
-		box-shadow: none;
-	}
-
-	.opacity-mouse-wrapper:focus {
-		outline: none;
-		outline-offset: 0;
-	}
-
-	.opacity-mouse-wrapper::before,
-	.opacity-mouse-wrapper::after {
-		content: none;
-		display: none;
 	}
 </style>

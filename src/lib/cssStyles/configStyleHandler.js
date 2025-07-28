@@ -20,9 +20,9 @@ export default class ConfigStyleHandler {
         let response;
 
         try {
-            const staticUrl = configFilePath.startsWith('/')
+            const staticUrl = configFilePath.startsWith('/configs/')
                 ? configFilePath
-                : `/${configFilePath}`;
+                : `/configs/${configFilePath}`;
 
             response = await fetch(staticUrl);
 

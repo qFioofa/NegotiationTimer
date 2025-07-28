@@ -2,39 +2,39 @@
 	import { ShuffleFunction, GlobalConfig } from "$lib/stores/parameters";
 	import PlayerNumber from "./Players/Wrappers/PlayerNumber.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
-	import ElementShuffler from "$lib/components/Shuffle";
+	import { shuffleMap } from "$lib/components/Shuffle";
 	import { onMount } from "svelte";
 
 	let number1, number2;
 	let input1Ref, input2Ref;
 	let ghost1Ref, ghost2Ref;
 	let wrapperRef;
-	let shuffler;
 
 	let playerBackground = GlobalConfig.get("playerBackground");
 
-	function ShufflePlayers() {
-		shuffler.launch();
+	async function ShufflePlayers() {
+		const _f = shuffleMap.get(GlobalConfig.get("shuffleAnimation"));
+		if (_f) await _f(number1, number2);
 	}
 
 	onMount(() => {
 		GlobalConfig.subscribe("playerBackground", v => (playerBackground = v));
-		shuffler = new ElementShuffler([number1, number2]);
 		ShuffleFunction.set(ShufflePlayers);
 	});
 </script>
 
 <div class="players-wrapper {playerBackground ? '' : 'transparent'}">
-	<div class="player left">
-		<PlayerNumber text="1" bind:ref={number1} />
-		<div class="input-wrapper">
+	<div class="grid-container">
+		<div class="grid-item">
+			<PlayerNumber text="1" bind:ref={number1} />
+		</div>
+		<div class="grid-item">
+			<PlayerNumber text="2" bind:ref={number2} />
+		</div>
+		<div class="grid-item">
 			<NameInput />
 		</div>
-	</div>
-
-	<div class="player right">
-		<PlayerNumber text="2" bind:ref={number2} />
-		<div class="input-wrapper">
+		<div class="grid-item">
 			<NameInput />
 		</div>
 	</div>
@@ -43,19 +43,19 @@
 <style>
 	.players-wrapper {
 		display: flex;
-		justify-content: space-between;
+		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		margin: 0 auto;
 		padding: 2rem;
 		background: var(--bg);
 		border-radius: 1rem;
-		box-shadow: 0 0 30px var(--shadow);
+		box-shadow: 6px 6px 0 var(--accent-dark);
 		color: var(--fg);
 		border: 2px solid var(--accent);
 		width: 60.4%;
 		max-width: 73.4%;
 		transition: var(--transition);
-		box-shadow: 6px 6px 0 var(--accent-dark);
 	}
 
 	.transparent {
@@ -64,24 +64,44 @@
 		box-shadow: none !important;
 	}
 
-	.player {
-		display: flex;
-		flex-direction: column;
+	.grid-container {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto;
+		gap: 0rem 28rem;
+		width: 100%;
+		justify-items: center;
 		align-items: center;
-		position: relative;
 	}
 
-	.input-wrapper {
-		flex-shrink: 0;
-		width: fit-content;
+	.grid-item:nth-child(1) {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.grid-item:nth-child(2) {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.grid-item:nth-child(3) {
+		grid-column: 1;
+		grid-row: 2;
+	}
+
+	.grid-item:nth-child(4) {
+		grid-column: 2;
+		grid-row: 2;
 	}
 
 	@media (max-width: 768px) {
 		.players-wrapper {
-			flex-direction: column;
-			gap: 2rem;
 			padding: 2rem 1rem;
 			width: 95vw !important;
+		}
+
+		.grid-container {
+			gap: 1.5rem 2rem;
 		}
 	}
 </style>

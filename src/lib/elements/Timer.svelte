@@ -69,8 +69,8 @@
 					icon="🔄"
 					onClick={() => {
 						timeSubtract(toMs());
-						timeAdd(get(downTimerSnap) / 1000);
-						GlobalConfig.set("timerDuration", get(downTimerSnap) / 1000);
+						timeAdd($downTimerSnap);
+						GlobalConfig.set("timerDuration", $downTimerSnap);
 					}}
 				/>
 				<ExtraButtons

@@ -1,13 +1,14 @@
 export const dConfig = {
-    timerDuration: 60,
-    setTime: '01:00',
-    timeAddSubStep: '00:15',
+    timerDuration: 55,
+    setTime: '04:00',
+    timeAddSubStep: '00:05',
 
     shuffleKey: 'KeyR',
     toggleTimer: 'KeyW',
     pauseKey: 'Space',
 
     theme: 'green',
+    shuffleAnimation: "Spring",
 
     extraButtonsOn: true,
     extraButtonsPauseOn: true,

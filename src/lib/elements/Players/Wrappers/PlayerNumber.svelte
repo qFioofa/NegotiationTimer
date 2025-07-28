@@ -13,7 +13,6 @@
 		font-weight: var(--font-weight-black);
 		line-height: 1;
 		color: var(--accent);
-		margin-bottom: 1.2rem;
 		user-select: none;
 	}
 </style>

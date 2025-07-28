@@ -10,6 +10,7 @@ COPY vite.config.ts ./
 RUN npm ci
 
 COPY src/ src/
+COPY static/ static/
 
 RUN npm run build
 

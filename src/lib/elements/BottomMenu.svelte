@@ -25,9 +25,9 @@
 		}
 	}
 
-	function handleShuffle() {
-		const ShufflePlayers = $ShuffleFunction;
-		if (ShufflePlayers) ShufflePlayers();
+	async function handleShuffle() {
+		const ShufflePlayers = await $ShuffleFunction;
+		if (ShufflePlayers) await ShufflePlayers();
 	}
 
 	function anyTimerToggle() {

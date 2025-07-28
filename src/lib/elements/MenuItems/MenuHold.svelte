@@ -32,7 +32,7 @@
 				setTimeout(() => {
 					if (onHoldComplete) onHoldComplete();
 					clearHold();
-				}, 1500);
+				}, 500);
 			}
 			await tick();
 		}, 100);

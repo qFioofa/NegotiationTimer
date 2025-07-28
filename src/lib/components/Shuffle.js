@@ -1,59 +1,37 @@
-export default class ElementShuffler {
-    constructor(playerElements, delayStart = 15, maxDelay = 400) {
-        this.playerElements = playerElements;
-        this.initialDelay = delayStart;
-        this.maxDelay = maxDelay;
+import { SideMovingShuffle } from "./Shuffles/SideMovingShuffle";
+import { replaceShuffle } from "./Shuffles/replaceShuffle";
+import { SpringShuffle } from "./Shuffles/SpringShuffle";
+import { CubeShuffle } from "./Shuffles/CubeShuffle";
+import { VoidShuffle } from "./Shuffles/VoidShuffle";
 
-        this.timeoutId = null;
-        this.delay = delayStart;
-        this.active = false;
-    }
+const shuffleMap = new Map();
+const shuffleArray = [
+    {
+        name: "Spring",
+        _function: SpringShuffle
+    },
+    {
+        name: "Void",
+        _function: VoidShuffle
+    },
+    {
+        name: "Moving",
+        _function: SideMovingShuffle
+    },
+    {
+        name: "Cube",
+        _function: CubeShuffle
+    },
+    {
+        name: "Replace",
+        _function: replaceShuffle
+    },
+]
 
-    launch() {
-        this.stop();
-        this.delay = this.initialDelay;
-        this.active = true;
-        this._shuffle();
-    }
+shuffleArray.forEach(item => shuffleMap.set(item.name, item._function))
 
-    _shuffle() {
-        if (!this.active) return;
-
-        if (this.delay > this.maxDelay) {
-            const result = Math.round(Math.random());
-            this._applyFinalResult(result);
-            this.active = false;
-            return;
-        }
-
-        this._togglePlayers();
-
-        this.timeoutId = setTimeout(() => {
-            this.delay *= 1.2;
-            this._shuffle();
-        }, Math.max(this.delay, 50));
-    }
-
-    _togglePlayers() {
-        if (this.playerElements.length < 2) return;
-        const [p1, p2] = this.playerElements;
-
-        const val = p1.textContent.trim();
-        p1.textContent = val === "1" ? "2" : "1";
-        p2.textContent = p1.textContent === "1" ? "2" : "1";
-    }
-
-    _applyFinalResult(resultIndex) {
-        const [p1, p2] = this.playerElements;
-        p1.textContent = resultIndex === 0 ? "1" : "2";
-        p2.textContent = resultIndex === 0 ? "2" : "1";
-    }
-
-    stop() {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-            this.timeoutId = null;
-        }
-        this.active = false;
-    }
+function getShuffleNames() {
+    return shuffleArray.map(item => item.name);
 }
+
+export { shuffleMap, getShuffleNames }

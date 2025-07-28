@@ -1,10 +1,12 @@
 <script>
+	import RollingCounter from "./RollingCounter.svelte";
+
 	export let displayTime;
 	export let onClick = () => {};
 </script>
 
 <button class="timer" on:click={onClick}>
-	{displayTime}
+	<RollingCounter value={displayTime} />
 </button>
 
 <style>
@@ -14,10 +16,11 @@
 		align-items: center;
 		justify-content: center;
 		padding: 1.6rem 4rem;
-		border-radius: var(--spacing-extra);
+		border-radius: var(--radius-xxl);
 		border: 2px solid var(--accent);
 		box-shadow: 6px 6px 0 var(--accent-dark);
 		text-align: center;
+		min-width: 8rem;
 	}
 
 	.timer {
@@ -33,8 +36,8 @@
 	}
 
 	.timer {
+		font-family: var(--font-family-accent);
 		font-size: 6rem;
-		font-family: var(--font-family-simple);
 		font-weight: var(--font-weight-bold);
 		line-height: var(--line-height-tight);
 		text-shadow: 0 0 8px var(--shadow);
@@ -49,10 +52,12 @@
 
 	.timer:hover {
 		transform: scale(1.08);
+		box-shadow: 8px 8px 0 var(--accent-dark);
 	}
 
 	.timer:active {
 		transform: scale(0.95);
+		box-shadow: 2px 2px 0 var(--accent-dark);
 	}
 
 	@media (max-width: 768px) {

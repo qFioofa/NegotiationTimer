@@ -71,7 +71,7 @@
 	}
 
 	.item-title {
-		color: var(--fg-heading);
+		color: var(--fg);
 	}
 
 	.item-icon {
@@ -97,7 +97,7 @@
 
 	.item-title {
 		font-family: var(--font-family-accent);
-		font-size: var(--font-size-lg);
+		font-size: var(--font-size-slg);
 		font-weight: var(--font-weight-bold);
 		line-height: var(--line-height-tight);
 		letter-spacing: var(--letter-spacing-normal);

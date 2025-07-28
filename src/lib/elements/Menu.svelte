@@ -1,8 +1,9 @@
 <script>
 	import { GlobalConfig, IntroGuideVisiable } from "$lib/stores/parameters";
+	import { themeManager, csHandler } from "$lib/cssStyles/themeHanager";
+	import { shuffleMap, getShuffleNames } from "$lib/components/Shuffle";
 	import { isPaused, setPause } from "$lib/components/Pause";
 	import DeviderTheme from "./General/DeviderTheme.svelte";
-	import { themeManager, csHandler } from "$lib/cssStyles/themeHanager";
 	import { dConfig } from "$lib/stores/defaultConfig";
 	import IntroGuide from "./IntroGuide.svelte";
 
@@ -109,7 +110,7 @@
 	<MenuToggle
 		icon="🖼️"
 		title="Фон игроков"
-		tooltipText="Использовать задний фон для игроков (Требует перезагрузки страницы)"
+		tooltipText="Использовать задний фон для игроков"
 		isToggled={GlobalConfig.get("playerBackground")}
 		onToggle={v => {
 			GlobalConfig.set("playerBackground", v);
@@ -119,7 +120,7 @@
 	<MenuToggle
 		icon="🖼️"
 		title="Свой задний фон"
-		tooltipText="Использовать свой загружанный задний фон (Требует перезагрузки страницы)"
+		tooltipText="Использовать свой загружанный задний фон"
 		isToggled={GlobalConfig.get("usingBackroundImage")}
 		onToggle={v => {
 			GlobalConfig.set("usingBackroundImage", v);
@@ -153,12 +154,23 @@
 		}}
 	/>
 
+	<MenuOptionList
+		icon="🔂"
+		title="Анимации режебьевки"
+		tooltipText="Устанавливает анимацию игроков при разыгрывании жеребьевки"
+		options={getShuffleNames()}
+		selectedOption={GlobalConfig.get("shuffleAnimation")}
+		onOptionSelect={opt => {
+			GlobalConfig.set("shuffleAnimation", opt);
+		}}
+	/>
+
 	<DeviderTheme />
 
 	<MenuMedia
 		icon="🎥"
 		title="Фоновое медиа"
-		tooltipText="Изображение или видео, которое будет использоваться в фоне. Поддерживаются PNG, JPEG, WEBP, MP4, WebM и OGG."
+		tooltipText="Изображение или видео, которое будет использоваться в фоне. Поддерживаются png, jpeg, webp."
 		supportedTypes={[
 			"image/png",
 			"image/jpeg",
