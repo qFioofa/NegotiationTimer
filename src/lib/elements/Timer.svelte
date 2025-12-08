@@ -1,6 +1,5 @@
 <script>
 	import ExtraButtonsWrapper from "./Wrappers/ExtraButtonsWrapper.svelte";
-	import { GlobalConfig, isBlackout } from "$lib/stores/parameters";
 	import { timerDisplay } from "$lib/components/utils/TimerUtils";
 	import RollingCounter from "./Timer/RollingCounter.svelte";
 	import ExtraButtons from "./General/ExtraButtons.svelte";
@@ -9,6 +8,12 @@
 	import BlackOut from "./BlackOut.svelte";
 	import { get } from "svelte/store";
 	import { onMount } from "svelte";
+	import {
+		ShuffleFunction,
+		GlobalConfig,
+		isPanelOpen,
+		isBlackout,
+	} from "$lib/stores/parameters";
 	import {
 		initTimer,
 		isRunning,
@@ -20,6 +25,11 @@
 		toMs,
 		downTimerSnap,
 	} from "$lib/stores/timerDown";
+
+	async function handleShuffle() {
+		const ShufflePlayers = await $ShuffleFunction;
+		if (ShufflePlayers) await ShufflePlayers();
+	}
 
 	let wasRunningBeforePause = false;
 	let wasStartedOnce = false;
@@ -54,7 +64,7 @@
 
 	onMount(() => {
 		initTimer();
-		GlobalConfig.subscribe("extraButtonsOn", v => (extraButtonsOn = v));
+		GlobalConfig.subscribe("extraButtonsOn", (v) => (extraButtonsOn = v));
 	});
 </script>
 
@@ -77,6 +87,12 @@
 					icon="⏯️"
 					onClick={() => {
 						isPaused.set(true);
+					}}
+				/>
+				<ExtraButtons
+					icon="🔃"
+					onClick={() => {
+						handleShuffle();
 					}}
 				/>
 			</ExtraButtonsWrapper>
