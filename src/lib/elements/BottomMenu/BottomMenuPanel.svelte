@@ -83,7 +83,10 @@
 		z-index: 1000;
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.3s ease;
+		transition:
+			opacity 0.3s ease,
+			left 0.3s ease,
+			transform 0.3s ease;
 	}
 
 	.menu-panel.open {
@@ -109,6 +112,7 @@
 		flex-direction: column;
 		padding-left: 0.2rem;
 		padding-right: 1rem;
+		padding-bottom: 1rem;
 		box-sizing: border-box;
 	}
 
@@ -131,5 +135,83 @@
 		border: none;
 		background: var(--divider);
 		margin: 0 0 2rem 0;
+	}
+
+	@media (max-width: 768px) {
+		.menu-panel {
+			left: 50% !important;
+			top: 50% !important;
+			transform: translate(-50%, -50%) !important;
+			width: min(90vw, 400px) !important;
+			max-width: 95vw !important;
+			height: min(85vh, 700px) !important;
+			max-height: 90vh !important;
+			border-radius: 20px !important;
+			border-width: 2px !important;
+			box-shadow: 0 0px 30px var(--shadow) !important;
+			z-index: 1001 !important;
+		}
+
+		@media (orientation: landscape) {
+			.menu-panel {
+				height: min(90vh, 500px) !important;
+				max-height: 95vh !important;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.menu-panel {
+				width: 95vw !important;
+				height: 85vh !important;
+				border-radius: 16px !important;
+			}
+		}
+
+		@media (max-width: 360px) {
+			.menu-panel {
+				width: 98vw !important;
+				height: 90vh !important;
+				border-radius: 12px !important;
+			}
+		}
+
+		.content-wrapper {
+			padding: 0 0.75rem 0.75rem 0.75rem !important;
+		}
+
+		.panel-title {
+			font-size: clamp(2.5rem, 8vw, 3.5rem) !important;
+			margin: 1.5rem 0 1rem 0 !important;
+		}
+
+		.panel-divider {
+			margin: 0 0 1.5rem 0 !important;
+		}
+
+		.scroll-wrapper {
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.menu-panel.open {
+			position: fixed !important;
+		}
+	}
+
+	@supports (padding: max(0px)) {
+		@media (max-width: 768px) {
+			.menu-panel {
+				top: max(50%, env(safe-area-inset-top, 0px) + 50%) !important;
+				height: calc(
+					min(85vh, 700px) - env(safe-area-inset-top, 0px) -
+						env(safe-area-inset-bottom, 0px)
+				) !important;
+			}
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-panel {
+			transition: opacity 0.1s ease !important;
+		}
 	}
 </style>

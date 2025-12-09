@@ -21,36 +21,25 @@
 		box-shadow: 6px 6px 0 var(--accent-dark);
 		text-align: center;
 		min-width: 8rem;
-	}
-
-	.timer {
 		background: var(--bg-overlay);
 		color: var(--accent-light);
 		backdrop-filter: blur(14px);
 		cursor: pointer;
 		user-select: none;
-	}
-
-	.timer:hover {
-		background: var(--bg-overlay);
-	}
-
-	.timer {
 		font-family: var(--font-family-accent);
 		font-size: 6rem;
 		font-weight: var(--font-weight-bold);
 		line-height: var(--line-height-tight);
 		text-shadow: 0 0 8px var(--shadow);
-	}
-
-	.timer {
 		transition:
 			transform 0.3s ease,
 			box-shadow 0.3s ease,
 			background 0.3s ease;
+		box-sizing: border-box;
 	}
 
 	.timer:hover {
+		background: var(--bg-overlay);
 		transform: scale(1.08);
 		box-shadow: 8px 8px 0 var(--accent-dark);
 	}
@@ -62,10 +51,25 @@
 
 	@media (max-width: 768px) {
 		.timer {
-			width: 12rem;
-			height: 12rem;
-			font-size: 3.2rem;
-			padding: 1.2rem;
+			padding: 1rem 2.5rem;
+			font-size: 4rem;
+			min-width: 6rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.timer {
+			padding: 0.8rem 2rem;
+			font-size: 3rem;
+			min-width: 5rem;
+		}
+	}
+
+	@media (max-width: 360px) {
+		.timer {
+			padding: 0.6rem 1.5rem;
+			font-size: 2.5rem;
+			min-width: 4rem;
 		}
 	}
 </style>

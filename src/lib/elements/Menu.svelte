@@ -46,7 +46,7 @@
 		title="Черный экран"
 		tooltipText="При завершении времени появляется черный экран"
 		isToggled={GlobalConfig.get("timerBlackOut")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("timerBlackOut", v);
 		}}
 	/>
@@ -56,7 +56,7 @@
 		title="Звук"
 		tooltipText="Воспроизводит звук по завершении времени"
 		isToggled={GlobalConfig.get("afterSound")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("afterSound", v);
 		}}
 	/>
@@ -66,7 +66,7 @@
 		title="Выдвигать панель"
 		tooltipText="Автоматически выдвигать панель, когда мышка на иконке панели"
 		isToggled={GlobalConfig.get("panelAutoOpen")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("panelAutoOpen", v);
 		}}
 	/>
@@ -78,7 +78,7 @@
 		title="Доп. кнопки: меню"
 		tooltipText="Добавляет кнопки 'сбросить таймер до начального значения' и 'пауза'"
 		isToggled={GlobalConfig.get("extraButtonsOn")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("extraButtonsOn", v);
 		}}
 	/>
@@ -88,7 +88,7 @@
 		title="Доп. кнопки: пауза"
 		tooltipText="Добавляет кнопки 'сбросить таймер' и 'закрыть паузу'"
 		isToggled={GlobalConfig.get("extraButtonsPauseOn")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("extraButtonsPauseOn", v);
 		}}
 	/>
@@ -100,7 +100,7 @@
 		title="Автопауза: меню"
 		tooltipText="Автоматически ставить на паузу, когда меню открыто"
 		isToggled={GlobalConfig.get("menuAutoPause")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("menuAutoPause", v);
 		}}
 	/>
@@ -112,8 +112,18 @@
 		title="Фон игроков"
 		tooltipText="Использовать задний фон для игроков"
 		isToggled={GlobalConfig.get("playerBackground")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("playerBackground", v);
+		}}
+	/>
+
+	<MenuToggle
+		icon="🖼️"
+		title="Скрыть элементы интерфейса"
+		tooltipText="Скрывает все видимые элементы интерфейса: игроки, таймер и т.д."
+		isToggled={GlobalConfig.get("hideAllUI")}
+		onToggle={(v) => {
+			GlobalConfig.set("hideAllUI", v);
 		}}
 	/>
 
@@ -122,7 +132,7 @@
 		title="Свой задний фон"
 		tooltipText="Использовать свой загружанный задний фон"
 		isToggled={GlobalConfig.get("usingBackroundImage")}
-		onToggle={v => {
+		onToggle={(v) => {
 			GlobalConfig.set("usingBackroundImage", v);
 		}}
 	/>
@@ -133,7 +143,7 @@
 		tooltipText="Выберите визуальную тему"
 		options={themeManager.getAvailableThemes()}
 		selectedOption={GlobalConfig.get("theme")}
-		onOptionSelect={opt => {
+		onOptionSelect={(opt) => {
 			GlobalConfig.set("theme", opt);
 			themeManager.setTheme(opt);
 		}}
@@ -144,9 +154,9 @@
 		title="Готовые конфиги"
 		tooltipText="Встроенные конфиги"
 		options={csHandler.getAvailableThemes()}
-		onOptionSelect={async opt => {
+		onOptionSelect={async (opt) => {
 			if (await csHandler.setConfigStyle(opt)) {
-				await new Promise(resolve => setTimeout(resolve, 500));
+				await new Promise((resolve) => setTimeout(resolve, 500));
 				location.reload();
 			} else {
 				console.error(`Ошибка в загрузке конфига: ${opt}`);
@@ -160,7 +170,7 @@
 		tooltipText="Устанавливает анимацию игроков при разыгрывании жеребьевки"
 		options={getShuffleNames()}
 		selectedOption={GlobalConfig.get("shuffleAnimation")}
-		onOptionSelect={opt => {
+		onOptionSelect={(opt) => {
 			GlobalConfig.set("shuffleAnimation", opt);
 		}}
 	/>

@@ -9,8 +9,12 @@
 	import Menu from "$lib/elements/Menu.svelte";
 	import { onMount } from "svelte";
 
+	let hideUI = GlobalConfig.get("hideAllUI");
+
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
+
+		GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
 	});
 </script>
 
@@ -18,10 +22,12 @@
 
 <IntroGuide />
 
-<PlayerComp />
+{#if !hideUI}
+	<PlayerComp />
 
-<BottomMenu />
+	<BottomMenu />
 
-<Timer />
+	<Timer />
+{/if}
 
 <Menu />

@@ -13,7 +13,7 @@
 	type="text"
 	class="timer-text-input"
 	bind:value
-	on:input={e => {
+	on:input={(e) => {
 		const _result = onInputChange(e.target.value);
 		if (_result == null) return;
 
@@ -33,17 +33,24 @@
 
 <style>
 	.timer-text-input {
-		flex: 1;
+		min-width: 0;
+		width: 100%;
 		padding: var(--spacing-sm) var(--spacing-md);
 		text-align: center;
 		box-sizing: border-box;
-	}
-
-	.timer-text-input {
 		background: var(--input-bg);
 		color: var(--input-fg);
 		border: 1px solid var(--input-border);
 		border-radius: var(--radius-md);
+		font-family: var(--font-family-base);
+		font-size: var(--font-size-base);
+		font-weight: var(--font-weight-normal);
+		line-height: var(--line-height-base);
+		letter-spacing: var(--letter-spacing-normal);
+		transition: var(--transition);
+		appearance: none;
+		-webkit-appearance: none;
+		user-select: auto;
 	}
 
 	.timer-text-input:focus {
@@ -62,26 +69,38 @@
 		cursor: not-allowed;
 	}
 
-	.timer-text-input {
-		font-family: var(--font-family-base);
-		font-size: var(--font-size-base);
-		font-weight: var(--font-weight-normal);
-		line-height: var(--line-height-base);
-		letter-spacing: var(--letter-spacing-normal);
-	}
-
-	.timer-text-input {
-		transition: var(--transition);
-	}
-
-	.timer-text-input {
-		appearance: none;
-		-webkit-appearance: none;
-		user-select: auto;
-	}
-
 	.timer-text-input.error {
 		border-color: var(--danger);
 		box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+	}
+
+	@media (max-width: 768px) {
+		.timer-text-input {
+			padding: var(--spacing-md) var(--spacing-lg);
+			font-size: calc(var(--font-size-base) * 1.1);
+			min-height: 48px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.timer-text-input {
+			padding: var(--spacing-lg) var(--spacing-xl);
+			font-size: calc(var(--font-size-base) * 1.2);
+			min-height: 52px;
+			border-radius: var(--radius-lg);
+		}
+	}
+
+	@media (max-width: 360px) {
+		.timer-text-input {
+			padding: var(--spacing-md) var(--spacing-lg);
+			font-size: var(--font-size-base);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.timer-text-input {
+			transition: none;
+		}
 	}
 </style>

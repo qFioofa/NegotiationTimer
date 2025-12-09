@@ -18,7 +18,10 @@
 	}
 
 	onMount(() => {
-		GlobalConfig.subscribe("playerBackground", v => (playerBackground = v));
+		GlobalConfig.subscribe(
+			"playerBackground",
+			(v) => (playerBackground = v),
+		);
 		ShuffleFunction.set(ShufflePlayers);
 	});
 </script>
@@ -46,15 +49,17 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto;
-		padding: 2rem;
+		margin-inline: auto;
+		padding-block: clamp(1rem, 2vw, 2rem);
+		padding-inline: clamp(1rem, 2vw, 2rem);
 		background: var(--bg);
-		border-radius: 1rem;
-		box-shadow: 6px 6px 0 var(--accent-dark);
+		border-radius: clamp(0.5rem, 1vw, 1rem);
+		box-shadow: clamp(3px, 1vw, 6px) clamp(3px, 1vw, 6px) 0
+			var(--accent-dark);
 		color: var(--fg);
 		border: 2px solid var(--accent);
-		width: 60.4%;
-		max-width: 73.4%;
+		width: min(90vw, 60.4%);
+		max-width: min(95vw, 73.4%);
 		transition: var(--transition);
 	}
 
@@ -68,7 +73,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		grid-template-rows: auto auto;
-		gap: 0rem 28rem;
+		gap: clamp(1rem, 2vw, 2rem) clamp(1rem, 8vw, 24rem);
 		width: 100%;
 		justify-items: center;
 		align-items: center;
@@ -95,13 +100,20 @@
 	}
 
 	@media (max-width: 768px) {
-		.players-wrapper {
-			padding: 2rem 1rem;
-			width: 95vw !important;
-		}
-
 		.grid-container {
-			gap: 1.5rem 2rem;
+			gap: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 4vw, 2rem);
+		}
+	}
+
+	@media (max-width: 480px) {
+		.grid-container {
+			gap: clamp(0.75rem, 1.5vw, 1rem) clamp(0.75rem, 3vw, 1.5rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.players-wrapper {
+			transition: none !important;
 		}
 	}
 </style>

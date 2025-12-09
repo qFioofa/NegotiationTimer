@@ -38,6 +38,7 @@
 
 	$: {
 		displayTime = timerDisplay($timeMs);
+		console.log($timeMs);
 	}
 
 	$: if ($isPaused) {
@@ -63,7 +64,7 @@
 	let extraButtonsOn = GlobalConfig.get("extraButtonsOn");
 
 	onMount(() => {
-		initTimer();
+		// initTimer();
 		GlobalConfig.subscribe("extraButtonsOn", (v) => (extraButtonsOn = v));
 	});
 </script>
