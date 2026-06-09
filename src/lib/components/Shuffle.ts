@@ -4,8 +4,18 @@ import { SpringShuffle } from "./Shuffles/SpringShuffle";
 import { CubeShuffle } from "./Shuffles/CubeShuffle";
 import { VoidShuffle } from "./Shuffles/VoidShuffle";
 
-const shuffleMap = new Map();
-const shuffleArray = [
+export type ShuffleFunction = (
+    element1: HTMLElement,
+    element2: HTMLElement
+) => Promise<void | number>;
+
+interface ShuffleEntry {
+    name: string;
+    _function: ShuffleFunction;
+}
+
+const shuffleMap = new Map<string, ShuffleFunction>();
+const shuffleArray: ShuffleEntry[] = [
     {
         name: "Spring",
         _function: SpringShuffle
@@ -26,12 +36,12 @@ const shuffleArray = [
         name: "Replace",
         _function: replaceShuffle
     },
-]
+];
 
-shuffleArray.forEach(item => shuffleMap.set(item.name, item._function))
+shuffleArray.forEach(item => shuffleMap.set(item.name, item._function));
 
-function getShuffleNames() {
+function getShuffleNames(): string[] {
     return shuffleArray.map(item => item.name);
 }
 
-export { shuffleMap, getShuffleNames }
+export { shuffleMap, getShuffleNames };

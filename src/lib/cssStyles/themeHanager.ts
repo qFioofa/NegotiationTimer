@@ -1,10 +1,10 @@
-import configStyleHandler from './configStyleHandler';
+import ConfigStyleHandler from './configStyleHandler';
 import StyleHandler from './styleHandler';
 
 const themeManager = new StyleHandler();
-const csHandler = new configStyleHandler();
+const csHandler = new ConfigStyleHandler();
 
-const themeArray = [
+const themeArray: string[] = [
 	"green",
 	"brown",
 	"red",
@@ -14,9 +14,14 @@ const themeArray = [
 	"grey",
 	"yellow",
 	"yugen",
-]
+];
 
-const configFileNameArray = [
+interface ConfigFileEntry {
+	name: string;
+	fileName: string;
+}
+
+const configFileNameArray: ConfigFileEntry[] = [
 	{
 		name: "SSL",
 		fileName: "ssl.cfg"
@@ -25,7 +30,7 @@ const configFileNameArray = [
 		name: "Minecraft Parkour",
 		fileName: "minecraftParkour.cfg"
 	}
-]
+];
 
 themeArray.forEach(
 	item => themeManager.registerTheme(item)
@@ -35,4 +40,4 @@ configFileNameArray.forEach(
 	item => csHandler.registerConfigStyle(item.name, item.fileName)
 );
 
-export { themeManager, csHandler }
+export { themeManager, csHandler };

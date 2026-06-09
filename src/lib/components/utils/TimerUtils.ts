@@ -1,4 +1,4 @@
-export function mmssToMs(timerStr) {
+export function mmssToMs(timerStr: string): number {
     if (!timerStr || typeof timerStr !== "string") return 0;
 
     const parts = timerStr.split(":");
@@ -12,28 +12,33 @@ export function mmssToMs(timerStr) {
     return mm * 60 + ss;
 }
 
-export function validateTimeFormat(timerStr) {
+export function validateTimeFormat(timerStr: unknown): boolean {
     return typeof timerStr === "string" &&
         /^([0-5][0-9]):([0-5][0-9])$/.test(timerStr);
 }
 
-export function onTimerInputChange(timerStr) {
+export interface TimerInputError {
+    value: string;
+    error: string;
+}
+
+export function onTimerInputChange(timerStr: string): string | TimerInputError {
     let _value = timerStr.replace(/[^0-9]/g, "").slice(0, 4);
     if (_value.length > 2) {
-        _value = _value.slice(0, 2) + ":" + _value.slice(2)
-    };
+        _value = _value.slice(0, 2) + ":" + _value.slice(2);
+    }
 
     if (!validateTimeFormat(_value)) {
         return {
             value: _value,
             error: "Введите время в формате MM:SS"
-        }
+        };
     }
 
-    return _value
+    return _value;
 }
 
-export function timerDisplay(timeMs) {
+export function timerDisplay(timeMs: number): string {
     const totalSec = Math.floor(timeMs / 1000);
     const min = Math.floor(totalSec / 60).toString().padStart(2, '0');
     const sec = (totalSec % 60).toString().padStart(2, '0');

@@ -2,10 +2,10 @@ import { writable } from 'svelte/store';
 
 export const isPaused = writable(false);
 
-export function setPause(value = false) {
-    isPaused.update(v => value);
+export function setPause(value = false): void {
+    isPaused.set(value);
 }
 
-export function togglePause() {
+export function togglePause(): void {
     isPaused.update(v => !v);
 }

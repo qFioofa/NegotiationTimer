@@ -1,9 +1,11 @@
 import { get, writable } from 'svelte/store';
 
-export const isListeningBind = writable(false);
-const bindMap = new Map();
+type BindCallback = (event: KeyboardEvent) => void;
 
-function bindHandler(event) {
+export const isListeningBind = writable(false);
+const bindMap = new Map<string, BindCallback>();
+
+function bindHandler(event: KeyboardEvent): void {
     const callback = bindMap.get(event.code);
     if (callback) {
         event.preventDefault();
@@ -11,7 +13,7 @@ function bindHandler(event) {
     }
 }
 
-export function setBindListener(code, callback) {
+export function setBindListener(code: string, callback: BindCallback): void {
     if (typeof window === "undefined" || typeof code !== "string" || typeof callback !== "function") return;
 
     if (bindMap.size === 0) {
@@ -20,7 +22,7 @@ export function setBindListener(code, callback) {
     bindMap.set(code, callback);
 }
 
-export function removeBindListener(code) {
+export function removeBindListener(code: string): void {
     if (typeof window === "undefined") return;
 
     bindMap.delete(code);
@@ -29,27 +31,27 @@ export function removeBindListener(code) {
     }
 }
 
-export function clearAllBindListeners() {
+export function clearAllBindListeners(): void {
     if (typeof window === "undefined") return;
 
     bindMap.clear();
     window.removeEventListener("keydown", bindHandler);
 }
 
-function handleSingleKey(event, callback) {
+function handleSingleKey(event: KeyboardEvent, callback?: BindCallback): void {
     isListeningBind.set(false);
     callback?.(event);
 }
 
-export function startListeningForKey(callback) {
+export function startListeningForKey(callback?: BindCallback): void {
     if (typeof window === "undefined" || get(isListeningBind)) return;
 
     isListeningBind.set(true);
     window.addEventListener("keydown", (e) => handleSingleKey(e, callback), { once: true });
 }
 
-export function codeToLabel(code) {
-    const keyMap = {
+export function codeToLabel(code: string): string {
+    const keyMap: Record<string, string> = {
         Space: 'Space',
         Enter: 'Enter',
         Escape: 'Esc',

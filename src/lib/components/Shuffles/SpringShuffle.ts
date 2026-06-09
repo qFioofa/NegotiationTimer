@@ -1,4 +1,4 @@
-export function SpringShuffle(...elements) {
+export function SpringShuffle(...elements: HTMLElement[]): Promise<void> {
     return new Promise((resolve) => {
         const duration = 1500;
         const texts = elements.map(el => el.textContent);

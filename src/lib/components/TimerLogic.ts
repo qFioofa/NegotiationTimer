@@ -1,6 +1,18 @@
+type TimeListener = (ms: number) => void;
+type RunningListener = (running: boolean) => void;
+type Unsubscribe = () => void;
+
 export default class TimerLogic {
+    private time: number;
+    private isRunning: boolean;
+    private intervalId: ReturnType<typeof setInterval> | null;
+    private updateCallbacks: TimeListener[];
+    private runningCallbacks: RunningListener[];
+    private isInverted: boolean;
+    private timerSpan: TimeListener;
+
     constructor(isInverted = false) {
-        this.time = isInverted ? 0 : 0;
+        this.time = 0;
         this.isRunning = false;
         this.intervalId = null;
         this.updateCallbacks = [];
@@ -16,33 +28,33 @@ export default class TimerLogic {
         this.toMs = this.toMs.bind(this);
     }
 
-    addUpdateListener(callback) {
+    addUpdateListener(callback: TimeListener): Unsubscribe {
         this.updateCallbacks.push(callback);
         return () => {
             this.updateCallbacks = this.updateCallbacks.filter(cb => cb !== callback);
         };
     }
 
-    addRunningListener(callback) {
+    addRunningListener(callback: RunningListener): Unsubscribe {
         this.runningCallbacks.push(callback);
         return () => {
             this.runningCallbacks = this.runningCallbacks.filter(cb => cb !== callback);
         };
     }
 
-    addTimerSnap(callback) {
+    addTimerSnap(callback: TimeListener): void {
         this.timerSpan = callback;
     }
 
-    notifyUpdate() {
+    notifyUpdate(): void {
         this.updateCallbacks.forEach(cb => cb(this.time));
     }
 
-    notifyRunningChange() {
+    notifyRunningChange(): void {
         this.runningCallbacks.forEach(cb => cb(this.isRunning));
     }
 
-    launch() {
+    launch(): void {
         if (this.isRunning) return;
         if (!this.isInverted && this.time <= 0) return;
 
@@ -69,16 +81,18 @@ export default class TimerLogic {
         }, 1000);
     }
 
-    pause() {
+    pause(): void {
         if (!this.isRunning) return;
 
-        clearInterval(this.intervalId);
+        if (this.intervalId !== null) {
+            clearInterval(this.intervalId);
+        }
         this.isRunning = false;
         this.intervalId = null;
         this.notifyRunningChange();
     }
 
-    toggle() {
+    toggle(): void {
         if (this.isRunning) {
             this.pause();
         } else {
@@ -86,7 +100,7 @@ export default class TimerLogic {
         }
     }
 
-    timeAdd(seconds) {
+    timeAdd(seconds: number): void {
         this.time += seconds * 1000;
         if (!this.isInverted) {
             this.time = Math.min(this.time, 3599000);
@@ -94,7 +108,7 @@ export default class TimerLogic {
         this.notifyUpdate();
     }
 
-    timeSubtract(seconds) {
+    timeSubtract(seconds: number): void {
         if (this.isInverted) {
             this.time = Math.max(0, this.time - seconds * 1000);
         } else {
@@ -107,11 +121,11 @@ export default class TimerLogic {
         this.notifyUpdate();
     }
 
-    toMs() {
+    toMs(): number {
         return this.time;
     }
 
-    destroy() {
+    destroy(): void {
         this.pause();
         this.updateCallbacks = [];
         this.runningCallbacks = [];

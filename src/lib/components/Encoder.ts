@@ -1,12 +1,12 @@
 export default class Encoder {
-    static encode(obj) {
+    static encode(obj: unknown): string {
         if (obj === undefined || typeof obj === 'function') {
             throw new Error('Cannot encode undefined or functions');
         }
 
         const data = {
-            __class: obj.constructor.name,
-            __data: JSON.stringify(obj, (key, value) => {
+            __class: (obj as object).constructor.name,
+            __data: JSON.stringify(obj, (_key, value) => {
                 if (typeof value === 'bigint') {
                     return { __bigint: value.toString() };
                 }
@@ -30,12 +30,12 @@ export default class Encoder {
         return btoa(unescape(encodeURIComponent(jsonString)));
     }
 
-    static decode(str) {
-        let decodedString;
+    static decode(str: string): unknown {
+        let decodedString: string;
 
         try {
             decodedString = decodeURIComponent(escape(atob(str)));
-        } catch (e) {
+        } catch {
             decodedString = str;
         }
 
@@ -44,7 +44,7 @@ export default class Encoder {
             return parsed;
         }
 
-        const data = JSON.parse(parsed.__data, (key, value) => {
+        const data = JSON.parse(parsed.__data, (_key, value) => {
             if (value && typeof value === 'object') {
                 if ('__bigint' in value) {
                     return BigInt(value.__bigint);
@@ -60,20 +60,24 @@ export default class Encoder {
                 }
                 if ('__regex' in value) {
                     const match = /^\/(.*)\/([dgimsuy]*)$/.exec(value.__regex);
-                    return new RegExp(match[1], match[2]);
+                    if (match) {
+                        return new RegExp(match[1], match[2]);
+                    }
                 }
             }
             return value;
         });
 
-        if (globalThis[parsed.__class]) {
-            const instance = Object.create(globalThis[parsed.__class].prototype);
+        const registry = globalThis as unknown as Record<string, { prototype: object }>;
+        const ctor = registry[parsed.__class];
+        if (ctor) {
+            const instance = Object.create(ctor.prototype);
             return Object.assign(instance, data);
         }
         return data;
     }
 
-    static generateRandomId(length = 6) {
+    static generateRandomId(length = 6): string {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
         for (let i = 0; i < length; i++) {

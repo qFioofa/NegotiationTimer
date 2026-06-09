@@ -1,4 +1,4 @@
-export function SideMovingShuffle(element1, element2) {
+export function SideMovingShuffle(element1: HTMLElement, element2: HTMLElement): Promise<void> {
     return new Promise((resolve) => {
         const text1 = element1.textContent;
         const text2 = element2.textContent;

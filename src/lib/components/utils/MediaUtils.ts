@@ -1,6 +1,4 @@
-import { GlobalConfig } from "$lib/stores/parameters";
-
-export function fileFromUrl(fileUrl, name = "uploaded_file") {
+export function fileFromUrl(fileUrl: string, name = "uploaded_file"): File | null {
     if (!fileUrl.startsWith("data:")) return null;
 
     const arr = fileUrl.split(",");
@@ -20,7 +18,7 @@ export function fileFromUrl(fileUrl, name = "uploaded_file") {
     return new File([u8arr], name, { type: mime });
 }
 
-export function extractFilenameFromUrl(fileUrl) {
+export function extractFilenameFromUrl(fileUrl: string): string | null {
     if (!fileUrl || typeof fileUrl !== "string") return null;
 
     const base64Data = fileUrl.split(',')[1];
@@ -30,18 +28,20 @@ export function extractFilenameFromUrl(fileUrl) {
     if (!urlMatch) return null;
 
     const url = urlMatch[0];
-    return url.split('/').pop();
+    return url.split('/').pop() ?? null;
 }
 
 
-export function detectFileTypeFromBase64(base64) {
+export function detectFileTypeFromBase64(base64: string): string {
     if (!base64 || typeof base64 !== "string") return "unknown";
 
     const match = base64.match(/^data:(.*?);base64,/);
     return match ? match[1] : "unknown";
 }
 
-export function fileTypeFromUrl(fileUrl) {
+export type MediaType = "audio" | "image" | "video" | "unknown";
+
+export function fileTypeFromUrl(fileUrl: string): MediaType {
     if (!fileUrl || typeof fileUrl !== "string") return "unknown";
     const typePart = detectFileTypeFromBase64(fileUrl);
 
@@ -52,9 +52,20 @@ export function fileTypeFromUrl(fileUrl) {
     return "unknown";
 }
 
-export function handleFileUpload(event, supportedTypes = []) {
+export interface FileUploadResult {
+    fileUrl: string | null;
+    fileName: string | null;
+    fileType: MediaType | null;
+    file: File | null;
+    error: string | null;
+}
+
+export function handleFileUpload(
+    event: Event,
+    supportedTypes: string[] | false = []
+): Promise<FileUploadResult> {
     return new Promise((resolve) => {
-        const _result = {
+        const _result: FileUploadResult = {
             fileUrl: null,
             fileName: null,
             fileType: null,
@@ -62,7 +73,8 @@ export function handleFileUpload(event, supportedTypes = []) {
             error: null
         };
 
-        const file = event.target.files[0];
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
         if (!file) {
             _result.error = "Файл не выбран.";
             return resolve(_result);
@@ -75,10 +87,11 @@ export function handleFileUpload(event, supportedTypes = []) {
 
         const reader = new FileReader();
         reader.onload = () => {
-            _result.fileUrl = reader.result;
+            const fileUrl = reader.result as string;
+            _result.fileUrl = fileUrl;
             _result.fileName = file.name;
-            _result.fileType = fileTypeFromUrl(_result.fileUrl);
-            _result.file = fileFromUrl(_result.fileUrl);
+            _result.fileType = fileTypeFromUrl(fileUrl);
+            _result.file = fileFromUrl(fileUrl);
             resolve(_result);
         };
 

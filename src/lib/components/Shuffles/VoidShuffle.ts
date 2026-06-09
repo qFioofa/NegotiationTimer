@@ -1,4 +1,4 @@
-export function VoidShuffle(...elements) {
+export function VoidShuffle(...elements: HTMLElement[]): Promise<void> {
     return new Promise((resolve) => {
         const duration = 2000;
         const texts = elements.map(el => el.textContent);

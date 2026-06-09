@@ -1,5 +1,14 @@
+type ConfigSettings = Record<string, unknown>;
+type ConfigSubscriber = (value: unknown) => void;
+type MediaMap = Record<string, Blob>;
+
 export default class Config {
-    constructor(defaultConfig = {}) {
+    private _storageKey: string;
+    private _defaultSettings: ConfigSettings;
+    private _settings: ConfigSettings;
+    private _subscribers: Record<string, ConfigSubscriber[]>;
+
+    constructor(defaultConfig: ConfigSettings = {}) {
         this._storageKey = 'appConfig';
         this._defaultSettings = { ...defaultConfig };
         this._settings = {};
@@ -13,7 +22,7 @@ export default class Config {
         }
     }
 
-    _loadFromStorage() {
+    private _loadFromStorage(): void {
         try {
             const saved = localStorage.getItem(this._storageKey);
             if (saved) {
@@ -28,37 +37,37 @@ export default class Config {
         }
     }
 
-    _attachAutoSave() {
+    private _attachAutoSave(): void {
         window.addEventListener('beforeunload', () => {
             this.save();
         });
     }
 
-    subscribe(key, callback) {
+    subscribe(key: string, callback: ConfigSubscriber): void {
         if (!this._subscribers[key]) {
             this._subscribers[key] = [];
         }
         this._subscribers[key].push(callback);
     }
 
-    unsubscribe(key, callback) {
+    unsubscribe(key: string, callback: ConfigSubscriber): void {
         if (this._subscribers[key]) {
             this._subscribers[key] = this._subscribers[key].filter(cb => cb !== callback);
         }
     }
 
-    _notify(key, value) {
+    private _notify(key: string, value: unknown): void {
         if (this._subscribers[key]) {
             this._subscribers[key].forEach(cb => cb(value));
         }
     }
 
-    default() {
+    default(): this {
         this._settings = { ...this._defaultSettings };
         return this;
     }
 
-    save() {
+    save(): boolean {
         if (typeof window === 'undefined') return false;
 
         try {
@@ -70,13 +79,13 @@ export default class Config {
         }
     }
 
-    set(key, value) {
+    set(key: string, value: unknown): this {
         this._settings[key] = value;
         this._notify(key, value);
         return this;
     }
 
-    async setConfig(cfg, mediaCfg) {
+    async setConfig(cfg?: ConfigSettings, mediaCfg?: MediaMap): Promise<void> {
         if (cfg) this._settings = cfg;
 
         if (mediaCfg && typeof mediaCfg === 'object') {
@@ -88,31 +97,32 @@ export default class Config {
         }
     }
 
-    load() {
+    load(): this {
         if (typeof window !== 'undefined') {
             this._loadFromStorage();
         }
         return this;
     }
 
-    getConfig() {
+    getConfig(): ConfigSettings {
         return this._settings;
     }
 
-    get(key) {
-        return this._settings[key];
+    get<T = unknown>(key: string): T {
+        return this._settings[key] as T;
     }
 
-    async getMedia(key) {
+    async getMedia(key: string): Promise<Blob | undefined> {
         try {
             const media = await this._loadMedia(key);
             if (media) return media;
         } catch (error) {
             console.error(` "${key}":`, error);
         }
+        return undefined;
     }
 
-    async setMedia(key, fileBlob) {
+    async setMedia(key: string, fileBlob: Blob): Promise<boolean> {
         try {
             await this._saveMedia(key, fileBlob);
             this._notify(key, fileBlob);
@@ -123,7 +133,7 @@ export default class Config {
         }
     }
 
-    async deleteMedia(key) {
+    async deleteMedia(key: string): Promise<boolean> {
         try {
             await this._deleteMedia(key);
             return true;
@@ -133,17 +143,17 @@ export default class Config {
         }
     }
 
-    async hasMedia(key) {
+    async hasMedia(key: string): Promise<boolean> {
         const media = await this._loadMedia(key);
         return !!media;
     }
 
-    _openDB() {
+    private _openDB(): Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('AppMediaStore', 1);
 
             request.onupgradeneeded = (event) => {
-                const db = event.target.result;
+                const db = (event.target as IDBOpenDBRequest).result;
                 if (!db.objectStoreNames.contains('media')) {
                     db.createObjectStore('media');
                 }
@@ -154,7 +164,7 @@ export default class Config {
         });
     }
 
-    async _saveMedia(key, blob) {
+    private async _saveMedia(key: string, blob: Blob): Promise<boolean> {
         const db = await this._openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction('media', 'readwrite');
@@ -166,7 +176,7 @@ export default class Config {
         });
     }
 
-    async _loadMedia(key) {
+    private async _loadMedia(key: string): Promise<Blob | undefined> {
         const db = await this._openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction('media', 'readonly');
@@ -178,7 +188,7 @@ export default class Config {
         });
     }
 
-    async _deleteMedia(key) {
+    private async _deleteMedia(key: string): Promise<boolean> {
         const db = await this._openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction('media', 'readwrite');
@@ -190,7 +200,7 @@ export default class Config {
         });
     }
 
-    async getAllMedia() {
+    async getAllMedia(): Promise<MediaMap> {
         const db = await this._openDB();
 
         return new Promise((resolve, reject) => {
@@ -198,9 +208,9 @@ export default class Config {
             const store = tx.objectStore('media');
             const request = store.getAllKeys();
 
-            request.onsuccess = async () => {
+            request.onsuccess = () => {
                 const keys = request.result;
-                const result = {};
+                const result: MediaMap = {};
 
                 const valueTx = db.transaction('media', 'readonly');
                 const valueStore = valueTx.objectStore('media');
@@ -211,7 +221,7 @@ export default class Config {
                 for (const key of keys) {
                     const getReq = valueStore.get(key);
                     getReq.onsuccess = () => {
-                        result[key] = getReq.result;
+                        result[key as string] = getReq.result;
                         if (--pending === 0) resolve(result);
                     };
                     getReq.onerror = () => {
@@ -224,7 +234,7 @@ export default class Config {
         });
     }
 
-    async setAllMedia(mediaMap) {
+    async setAllMedia(mediaMap: MediaMap): Promise<boolean> {
         const db = await this._openDB();
 
         return new Promise((resolve, reject) => {
@@ -244,7 +254,7 @@ export default class Config {
         });
     }
 
-    async deleteAllMedia() {
+    async deleteAllMedia(): Promise<boolean> {
         const db = await this._openDB();
 
         return new Promise((resolve, reject) => {

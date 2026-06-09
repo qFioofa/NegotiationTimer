@@ -1,24 +1,27 @@
 export default class StyleHandler {
+    private themes: Map<string, string>;
+    private currentTheme: string;
+
     constructor(defaultTheme = 'green') {
         this.themes = new Map();
         this.currentTheme = defaultTheme;
     }
 
-    registerTheme(name, className) {
+    registerTheme(name: string, className?: string): void {
         this.themes.set(name, className || `theme-${name}`);
     }
 
-    setTheme(name) {
-        if (!this.themes.has(name)) return;
+    setTheme(name: string): void {
+        const className = this.themes.get(name);
+        if (className === undefined) return;
         if (typeof document === 'undefined') return;
 
-        const className = this.themes.get(name);
         this.removeAllThemeClasses();
         document.documentElement.classList.add(className);
         this.currentTheme = name;
     }
 
-    removeAllThemeClasses() {
+    removeAllThemeClasses(): void {
         if (typeof document === 'undefined') return;
 
         for (const className of this.themes.values()) {
@@ -26,11 +29,11 @@ export default class StyleHandler {
         }
     }
 
-    getCurrentTheme() {
+    getCurrentTheme(): string {
         return this.currentTheme;
     }
 
-    getAvailableThemes() {
+    getAvailableThemes(): string[] {
         return Array.from(this.themes.keys());
     }
 }
