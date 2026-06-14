@@ -19,7 +19,7 @@
 
 	async function reloadPage() {
 		if (delay > 0) {
-			await new Promise(resolve => setTimeout(resolve, delay));
+			await new Promise((resolve) => setTimeout(resolve, delay));
 		}
 		if (typeof window === "undefined") return;
 		window.location.reload();
@@ -29,7 +29,10 @@
 		error = "";
 		value = "";
 
-		const { file, error: uploadError } = await handleFileUpload(event, false);
+		const { file, error: uploadError } = await handleFileUpload(
+			event,
+			false,
+		);
 		if (uploadError) {
 			error = uploadError;
 			return;

@@ -286,24 +286,24 @@
 	--bg-card: #000000;
 	--bg-hover: #696969;
 
-	--fg: #FAFAFA;
-	--fg-muted: #A9A9A9;
-	--fg-subtle: #D4D4D4;
+	--fg: #fafafa;
+	--fg-muted: #a9a9a9;
+	--fg-subtle: #d4d4d4;
 	--fg-disabled: #696969;
 	--fg-heading: #ffffff;
 	--fg-link: var(--accent);
 	--fg-link-hover: var(--accent-light);
 
-	--accent: #FFBE89;
-	--accent-light: #FFF2AF;
-	--accent-dark: #D4A017;
+	--accent: #ffbe89;
+	--accent-light: #fff2af;
+	--accent-dark: #d4a017;
 	--accent-muted: #c678dd;
 
 	--panel: #303030;
 	--input-bg: #303030;
-	--input-fg: #FAFAFA;
+	--input-fg: #fafafa;
 	--input-border: var(--accent);
-	--input-placeholder: #A9A9A9;
+	--input-placeholder: #a9a9a9;
 	--border: rgba(255, 255, 255, 0.1);
 	--divider: rgba(255, 255, 255, 0.1);
 

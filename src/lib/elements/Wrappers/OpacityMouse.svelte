@@ -42,7 +42,8 @@
 	onMount(() => {
 		if (typeof window === "undefined") return;
 		window.addEventListener("mousemove", updateTriggerOpacity);
-		return () => window.removeEventListener("mousemove", updateTriggerOpacity);
+		return () =>
+			window.removeEventListener("mousemove", updateTriggerOpacity);
 	});
 </script>
 
@@ -57,7 +58,9 @@
 	aria-pressed={isOpen ? "true" : "false"}
 	style="
         opacity: {$triggerOpacity};
-        pointer-events: {$triggerOpacity > pointerEventsThreshold ? 'auto' : 'none'};
+        pointer-events: {$triggerOpacity > pointerEventsThreshold
+		? 'auto'
+		: 'none'};
         z-index: {zIndex};
     "
 >

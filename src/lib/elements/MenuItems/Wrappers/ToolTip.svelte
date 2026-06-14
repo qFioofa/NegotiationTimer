@@ -4,7 +4,12 @@
 
 {#if tooltipText}
 	<div class="tooltip-wrapper">
-		<span class="info-icon" tabindex="0" role="button" aria-label="Показать подсказку">?</span>
+		<span
+			class="info-icon"
+			tabindex="0"
+			role="button"
+			aria-label="Показать подсказку">?</span
+		>
 		<div class="tooltip" role="tooltip">{tooltipText}</div>
 	</div>
 {/if}
@@ -51,7 +56,8 @@
 		transform: translateX(-50%);
 		border-width: 6px;
 		border-style: solid;
-		border-color: var(--tooltip-bg, #222) transparent transparent transparent;
+		border-color: var(--tooltip-bg, #222) transparent transparent
+			transparent;
 	}
 
 	.info-icon {

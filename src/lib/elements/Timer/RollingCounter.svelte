@@ -8,7 +8,7 @@
 	const height = fontSize + padding;
 
 	function parseDigits(str) {
-		return str.split("").map(c => (/\d/.test(c) ? parseInt(c) : c));
+		return str.split("").map((c) => (/\d/.test(c) ? parseInt(c) : c));
 	}
 </script>
 

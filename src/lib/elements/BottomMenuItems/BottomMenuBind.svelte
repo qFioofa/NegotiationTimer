@@ -31,7 +31,7 @@
 
 		localIsListeningBind = true;
 
-		startListeningForKey(event => {
+		startListeningForKey((event) => {
 			bindKey = event.code;
 			localIsListeningBind = false;
 		});
@@ -61,7 +61,9 @@
 					{#if localIsListeningBind}
 						<span class="bind-label">Нажмите клавишу...</span>
 					{:else if bindKey}
-						<span class="bind-label">Клавиша: {codeToLabel(bindKey)}</span>
+						<span class="bind-label"
+							>Клавиша: {codeToLabel(bindKey)}</span
+						>
 					{:else}
 						<span class="bind-label">Установить клавишу</span>
 					{/if}

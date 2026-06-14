@@ -1,5 +1,9 @@
 <script>
-	import { ShuffleFunction, GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
+	import {
+		ShuffleFunction,
+		GlobalConfig,
+		isPanelOpen,
+	} from "$lib/stores/parameters";
 	import BottomMenuAdjust from "./BottomMenuItems/BottomMenuAdjust.svelte";
 	import BottomMenuInput from "./BottomMenuItems/BottomMenuInput.svelte";
 	import BottomMenuTrigger from "./BottomMenu/BottomMenuTrigger.svelte";
@@ -55,7 +59,11 @@
 	<BottomMenuTrigger bind:ref={triggerRef} text="Панель" />
 </OpacityMouse>
 
-<BottomMenuPanel title="Панель" bind:isMenuOpen={$isPanelOpen} bind:isTriggerHovered>
+<BottomMenuPanel
+	title="Панель"
+	bind:isMenuOpen={$isPanelOpen}
+	bind:isTriggerHovered
+>
 	<BottomMenuBind
 		icon="🔀"
 		title="Сделать жеребьевку"
@@ -73,7 +81,7 @@
 		value={GlobalConfig.get("setTime")}
 		placeHolder="MM:SS"
 		maxLength="5"
-		onApply={val => {
+		onApply={(val) => {
 			const seconds = mmssToSeconds(val);
 			timeSubtract(toMs());
 			timeAdd(seconds);
@@ -88,12 +96,12 @@
 		value={GlobalConfig.get("timeAddSubStep")}
 		placeHolder="MM:SS"
 		maxLength="5"
-		onIncrement={val => {
+		onIncrement={(val) => {
 			const seconds = mmssToSeconds(val);
 			timeAdd(seconds);
 			GlobalConfig.set("timeAddSubStep", val);
 		}}
-		onDecrement={val => {
+		onDecrement={(val) => {
 			const seconds = mmssToSeconds(val);
 			timeSubtract(seconds);
 			GlobalConfig.set("timeAddSubStep", val);

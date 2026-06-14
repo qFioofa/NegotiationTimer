@@ -28,12 +28,13 @@
 		document.body.classList.add("background-active");
 	}
 
-	$: url, applyBackground();
+	$: (url, applyBackground());
 
 	onMount(() => {
 		originalStyles.backgroundImage = document.body.style.backgroundImage;
 		originalStyles.backgroundSize = document.body.style.backgroundSize;
-		originalStyles.backgroundPosition = document.body.style.backgroundPosition;
+		originalStyles.backgroundPosition =
+			document.body.style.backgroundPosition;
 		originalStyles.backgroundRepeat = document.body.style.backgroundRepeat;
 		applyBackground();
 	});

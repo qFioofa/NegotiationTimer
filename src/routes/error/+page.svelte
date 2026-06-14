@@ -7,7 +7,8 @@
 
 	onMount(() => {
 		document.body.style.backgroundColor = "#8B0000";
-		document.body.style.background = "linear-gradient(135deg, #8B0000 0%, #450000 100%)";
+		document.body.style.background =
+			"linear-gradient(135deg, #8B0000 0%, #450000 100%)";
 
 		createParticles();
 
@@ -30,7 +31,9 @@
 
 	<div class="bottom-right">
 		<h1 class="error-title">Куда мы попали?</h1>
-		<p class="error-message">Кажется, что нужно вернуться на главную страницу.</p>
+		<p class="error-message">
+			Кажется, что нужно вернуться на главную страницу.
+		</p>
 		<button on:click={goHome}>Вернуться на главную</button>
 	</div>
 </div>
@@ -42,7 +45,11 @@
 		min-height: 100vh;
 		overflow: hidden;
 		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-		background: linear-gradient(135deg, var(--error-black) 0%, #450000 100%);
+		background: linear-gradient(
+			135deg,
+			var(--error-black) 0%,
+			#450000 100%
+		);
 		color: #fff;
 		transition: background 0.5s ease;
 	}

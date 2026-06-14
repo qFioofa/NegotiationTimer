@@ -25,13 +25,13 @@ export type AppConfig = {
 
 export const dConfig: AppConfig = {
 	timerDuration: 55,
-	setTime: '04:00',
-	timeAddSubStep: '00:05',
-	shuffleKey: 'KeyR',
-	toggleTimer: 'KeyW',
-	pauseKey: 'Space',
-	theme: 'green',
-	shuffleAnimation: 'Replace',
+	setTime: "04:00",
+	timeAddSubStep: "00:05",
+	shuffleKey: "KeyR",
+	toggleTimer: "KeyW",
+	pauseKey: "Space",
+	theme: "green",
+	shuffleAnimation: "Replace",
 	hideAllUI: false,
 	extraButtonsOn: true,
 	extraButtonsPauseOn: true,
@@ -45,5 +45,5 @@ export const dConfig: AppConfig = {
 	audioTimerEnd: null,
 	playerBackground: true,
 	usingBackroundImage: false,
-	backgroundImage: null
+	backgroundImage: null,
 };

@@ -1,5 +1,10 @@
 <script>
-	import { upTimeMs, upIsRunning, resetUpTimer, toggleUpTimer } from "$lib/stores/timerUp";
+	import {
+		upTimeMs,
+		upIsRunning,
+		resetUpTimer,
+		toggleUpTimer,
+	} from "$lib/stores/timerUp";
 	import ExtraButtonsWrapper from "./Wrappers/ExtraButtonsWrapper.svelte";
 	import { GlobalConfig, isPanelOpen } from "$lib/stores/parameters";
 	import { timerDisplay } from "$lib/components/utils/TimerUtils";
@@ -22,8 +27,11 @@
 	let extraButtonsPauseOn = GlobalConfig.get("extraButtonsPauseOn");
 
 	onMount(() => {
-		GlobalConfig.subscribe("panelAutoOpen", v => (panelAutoOpen = v));
-		GlobalConfig.subscribe("extraButtonsPauseOn", v => (extraButtonsPauseOn = v));
+		GlobalConfig.subscribe("panelAutoOpen", (v) => (panelAutoOpen = v));
+		GlobalConfig.subscribe(
+			"extraButtonsPauseOn",
+			(v) => (extraButtonsPauseOn = v),
+		);
 	});
 </script>
 
@@ -34,7 +42,10 @@
 		</div>
 		{#if !$isPanelOpen || ($isPanelOpen && !panelAutoOpen)}
 			<div class="pause-content">
-				<TimerButton displayTime={displayUpTime} onClick={toggleUpTimer} />
+				<TimerButton
+					displayTime={displayUpTime}
+					onClick={toggleUpTimer}
+				/>
 				{#if extraButtonsPauseOn}
 					<ExtraButtonsWrapper>
 						<ExtraButtons icon="🔃" onClick={resetUpTimer} />

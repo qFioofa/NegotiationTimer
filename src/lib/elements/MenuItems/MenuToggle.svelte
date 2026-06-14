@@ -18,7 +18,9 @@
 <Common {icon} {title} {tooltipText}>
 	<InputGroup>
 		<div class="toggle-wrapper">
-			<span class="toggle-label label-off" class:label-active={!isToggled}>Выкл</span>
+			<span class="toggle-label label-off" class:label-active={!isToggled}
+				>Выкл</span
+			>
 			<button
 				class="toggle"
 				class:toggle-on={isToggled}
@@ -27,7 +29,9 @@
 			>
 				<div class="circle"></div>
 			</button>
-			<span class="toggle-label label-on" class:label-active={isToggled}>Вкл</span>
+			<span class="toggle-label label-on" class:label-active={isToggled}
+				>Вкл</span
+			>
 		</div>
 	</InputGroup>
 </Common>

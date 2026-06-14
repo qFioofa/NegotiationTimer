@@ -59,7 +59,7 @@
 		};
 
 		videoElement.onloadeddata = () => {
-			videoElement.play().catch(e => {
+			videoElement.play().catch((e) => {
 				console.warn("Autoplay blocked:", e);
 			});
 		};

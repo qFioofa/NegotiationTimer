@@ -33,9 +33,16 @@
 		ghostRef.textContent = currentText;
 
 		const textLength = currentText.length;
-		const normalizedLength = Math.max(0, (maxlength - textLength) / maxlength);
-		const dynamicFontSize = MIN_FONT_SIZE + normalizedLength * (MAX_FONT_SIZE - MIN_FONT_SIZE);
-		inputRef.style.setProperty("--font-size-dynamic", `${dynamicFontSize}rem`);
+		const normalizedLength = Math.max(
+			0,
+			(maxlength - textLength) / maxlength,
+		);
+		const dynamicFontSize =
+			MIN_FONT_SIZE + normalizedLength * (MAX_FONT_SIZE - MIN_FONT_SIZE);
+		inputRef.style.setProperty(
+			"--font-size-dynamic",
+			`${dynamicFontSize}rem`,
+		);
 
 		const paddingInCh = (paddingRem / dynamicFontSize) * 2;
 		const widthInCh = currentText.length + paddingInCh;
@@ -47,7 +54,7 @@
 		inputRef.style.borderRadius = `${dynamicHeight / 2}rem`;
 	}
 
-	export let updatePlayerName = e => {
+	export let updatePlayerName = (e) => {
 		playerName = e.target.value.slice(0, maxlength);
 		updateWidth();
 	};
@@ -135,8 +142,9 @@
 
 	.name-input {
 		transition: var(--transition);
-		transition-property: background-color, box-shadow, outline, outline-offset, width, height,
-			border-radius;
+		transition-property:
+			background-color, box-shadow, outline, outline-offset, width,
+			height, border-radius;
 		cursor: text;
 	}
 

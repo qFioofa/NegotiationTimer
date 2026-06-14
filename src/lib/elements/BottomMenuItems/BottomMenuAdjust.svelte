@@ -21,11 +21,15 @@
 
 <Common {icon} {title} {description}>
 	<InputGroup>
-		<ApplyButton bind:value bind:error onApply={onDecrement}><Minus size={16} /></ApplyButton>
+		<ApplyButton bind:value bind:error onApply={onDecrement}
+			><Minus size={16} /></ApplyButton
+		>
 
 		<TimerInput bind:value {placeHolder} {maxLength} bind:error />
 
-		<ApplyButton bind:value bind:error onApply={onIncrement}><Plus size={16} /></ApplyButton>
+		<ApplyButton bind:value bind:error onApply={onIncrement}
+			><Plus size={16} /></ApplyButton
+		>
 	</InputGroup>
 	<TextError bind:error />
 </Common>

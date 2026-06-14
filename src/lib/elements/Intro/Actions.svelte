@@ -8,7 +8,9 @@
 
 <div class="intro-actions">
 	{#if forgetText}
-		<button class="forget-intro" on:click={closeForever}>{forgetText}</button>
+		<button class="forget-intro" on:click={closeForever}
+			>{forgetText}</button
+		>
 	{/if}
 	{#if closeText}
 		<button class="close-intro" on:click={onClose}>{closeText}</button>

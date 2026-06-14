@@ -14,8 +14,9 @@ export default class ConfigStyleHandler {
 	}
 
 	registerConfigStyle(name: string, configFileName: string): void {
-		if (typeof name !== 'string' || !name.trim()) return;
-		if (typeof configFileName !== 'string' || !configFileName.trim()) return;
+		if (typeof name !== "string" || !name.trim()) return;
+		if (typeof configFileName !== "string" || !configFileName.trim())
+			return;
 
 		this.themes.set(name, configFileName);
 	}
@@ -25,7 +26,7 @@ export default class ConfigStyleHandler {
 		if (configFilePath === undefined) return;
 
 		try {
-			const staticUrl = configFilePath.startsWith('/configs/')
+			const staticUrl = configFilePath.startsWith("/configs/")
 				? configFilePath
 				: `/configs/${configFilePath}`;
 
@@ -36,9 +37,11 @@ export default class ConfigStyleHandler {
 			const fileText = await response.text();
 			if (!fileText.trim()) return;
 
-			const decoded = Encoder.decode(fileText.trim()) as DecodedConfigStyle | null;
+			const decoded = Encoder.decode(
+				fileText.trim(),
+			) as DecodedConfigStyle | null;
 
-			if (!decoded || typeof decoded !== 'object') return;
+			if (!decoded || typeof decoded !== "object") return;
 			if (!decoded.static || !decoded.media) return;
 
 			await GlobalConfig.setConfig(decoded.static, decoded.media);

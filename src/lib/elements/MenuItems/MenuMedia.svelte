@@ -1,5 +1,8 @@
 <script>
-	import { handleFileUpload, extractFilenameFromUrl } from "$lib/components/utils/MediaUtils";
+	import {
+		handleFileUpload,
+		extractFilenameFromUrl,
+	} from "$lib/components/utils/MediaUtils";
 	import MediaUpload from "./General/MediaUpload.svelte";
 	import InputGroup from "./Wrappers/InputGroup.svelte";
 	import { GlobalConfig } from "$lib/stores/parameters";

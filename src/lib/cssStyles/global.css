@@ -1,75 +1,77 @@
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-Light.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-Light.ttf") format("truetype");
 	font-weight: 300;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-Regular.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-Regular.ttf") format("truetype");
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-Medium.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-Medium.ttf") format("truetype");
 	font-weight: 500;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-SemiBold.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-SemiBold.ttf") format("truetype");
 	font-weight: 600;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-Bold.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-Bold.ttf") format("truetype");
 	font-weight: 700;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-ExtraBold.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-ExtraBold.ttf") format("truetype");
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Unbounded';
-	src: url('./fonts/Unbounded-Black.ttf') format('truetype');
+	font-family: "Unbounded";
+	src: url("./fonts/Unbounded-Black.ttf") format("truetype");
 	font-weight: 900;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Dela Gothic One';
-	src: url('./fonts/DelaGothicOne-Regular.ttf') format('truetype');
+	font-family: "Dela Gothic One";
+	src: url("./fonts/DelaGothicOne-Regular.ttf") format("truetype");
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
 }
 
 html[class^="theme-"] {
-	transition: background-color 0.3s ease, color 0.3s ease;
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease;
 }
 
 :root {
-	--font-family-base: 'Unbounded', system-ui, Arial, sans-serif, light;
-	--font-family-accent: 'Dela Gothic One', system-ui, Arial, sans-serif;
-	--font-family-simple: 'Segoe UI', sans-serif;
+	--font-family-base: "Unbounded", system-ui, Arial, sans-serif, light;
+	--font-family-accent: "Dela Gothic One", system-ui, Arial, sans-serif;
+	--font-family-simple: "Segoe UI", sans-serif;
 	--font-family-none: inherit;
 
 	--font-size-sm: 14px;
@@ -119,7 +121,6 @@ html[class^="theme-"] {
 	--error-black: #8b0000;
 }
 
-
 html,
 body {
 	height: 100%;
@@ -138,7 +139,6 @@ body {
 	letter-spacing: var(--letter-spacing-normal);
 	transition: var(--transition);
 }
-
 
 body.background-active {
 	background-color: transparent !important;
@@ -175,7 +175,9 @@ button:hover:not(:disabled) {
 button:active:not(:disabled) {
 	transform: translateY(4px);
 	box-shadow: 0 0 0 var(--accent-dark);
-	transition: transform 0.1s ease, box-shadow 0.1s ease;
+	transition:
+		transform 0.1s ease,
+		box-shadow 0.1s ease;
 }
 
 button:disabled {

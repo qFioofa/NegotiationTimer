@@ -1,5 +1,5 @@
-import ConfigStyleHandler from './configStyleHandler';
-import StyleHandler from './styleHandler';
+import ConfigStyleHandler from "./configStyleHandler";
+import StyleHandler from "./styleHandler";
 
 const themeManager = new StyleHandler();
 const csHandler = new ConfigStyleHandler();
@@ -24,20 +24,18 @@ interface ConfigFileEntry {
 const configFileNameArray: ConfigFileEntry[] = [
 	{
 		name: "SSL",
-		fileName: "ssl.cfg"
+		fileName: "ssl.cfg",
 	},
 	{
 		name: "Minecraft Parkour",
-		fileName: "minecraftParkour.cfg"
-	}
+		fileName: "minecraftParkour.cfg",
+	},
 ];
 
-themeArray.forEach(
-	item => themeManager.registerTheme(item)
-);
+themeArray.forEach((item) => themeManager.registerTheme(item));
 
-configFileNameArray.forEach(
-	item => csHandler.registerConfigStyle(item.name, item.fileName)
+configFileNameArray.forEach((item) =>
+	csHandler.registerConfigStyle(item.name, item.fileName),
 );
 
 export { themeManager, csHandler };
