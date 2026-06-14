@@ -6,7 +6,7 @@
 	import BottomMenuBind from "./BottomMenuItems/BottomMenuBind.svelte";
 	import { timeAdd, timeSubtract, toMs } from "$lib/stores/timerDown";
 	import BottomMenuPanel from "./BottomMenu/BottomMenuPanel.svelte";
-	import { mmssToMs } from "$lib/components/utils/TimerUtils";
+	import { mmssToSeconds } from "$lib/components/utils/TimerUtils";
 	import OpacityMouse from "./Wrappers/OpacityMouse.svelte";
 	import { togglePause } from "$lib/components/Pause";
 	import { toggleTimer } from "$lib/stores/timerDown";
@@ -74,9 +74,9 @@
 		placeHolder="MM:SS"
 		maxLength="5"
 		onApply={val => {
-			const ms = mmssToMs(val);
+			const seconds = mmssToSeconds(val);
 			timeSubtract(toMs());
-			timeAdd(ms);
+			timeAdd(seconds);
 			GlobalConfig.set("setTime", val);
 		}}
 	/>
@@ -89,13 +89,13 @@
 		placeHolder="MM:SS"
 		maxLength="5"
 		onIncrement={val => {
-			const ms = mmssToMs(val);
-			timeAdd(ms);
+			const seconds = mmssToSeconds(val);
+			timeAdd(seconds);
 			GlobalConfig.set("timeAddSubStep", val);
 		}}
 		onDecrement={val => {
-			const ms = mmssToMs(val);
-			timeSubtract(ms);
+			const seconds = mmssToSeconds(val);
+			timeSubtract(seconds);
 			GlobalConfig.set("timeAddSubStep", val);
 		}}
 	/>

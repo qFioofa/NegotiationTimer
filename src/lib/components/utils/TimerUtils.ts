@@ -1,4 +1,4 @@
-export function mmssToMs(timerStr: string): number {
+export function mmssToSeconds(timerStr: string): number {
     if (!timerStr || typeof timerStr !== "string") return 0;
 
     const parts = timerStr.split(":");
