@@ -34,12 +34,9 @@
 	let wasRunningBeforePause = false;
 	let wasStartedOnce = false;
 
-	let displayTime = GlobalConfig.get("timerDuration") || "00:00";
+	let displayTime = timerDisplay($timeMs);
 
-	$: {
-		displayTime = timerDisplay($timeMs);
-		console.log($timeMs);
-	}
+	$: displayTime = timerDisplay($timeMs);
 
 	$: if ($isPaused) {
 		if ($isRunning) {

@@ -98,7 +98,7 @@ export default class Config {
 				await this.setAllMedia(mediaCfg);
 			} catch (error) {
 				console.error(
-					"Ошибка при загрузке медиа-файлов в setConfig:",
+					"Failed to load media files in setConfig:",
 					error,
 				);
 			}
@@ -125,7 +125,7 @@ export default class Config {
 			const media = await this._loadMedia(key);
 			if (media) return media;
 		} catch (error) {
-			console.error(` "${key}":`, error);
+			console.error(`Failed to load media "${key}":`, error);
 		}
 		return undefined;
 	}
@@ -136,7 +136,7 @@ export default class Config {
 			this._notify(key, fileBlob);
 			return true;
 		} catch (error) {
-			console.error(`Ошибка в загрузке медиа "${key}":`, error);
+			console.error(`Failed to save media "${key}":`, error);
 			return false;
 		}
 	}
@@ -146,7 +146,7 @@ export default class Config {
 			await this._deleteMedia(key);
 			return true;
 		} catch (error) {
-			console.error(`Ошибка в удалении медиа "${key}":`, error);
+			console.error(`Failed to delete media "${key}":`, error);
 			return false;
 		}
 	}

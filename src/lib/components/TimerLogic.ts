@@ -12,7 +12,7 @@ export default class TimerLogic {
 	private updateCallbacks: TimeListener[];
 	private runningCallbacks: RunningListener[];
 	private isInverted: boolean;
-	private timerSpan: TimeListener;
+	private timerSnap: TimeListener;
 	private anchorTimestamp: number;
 	private anchorValue: number;
 
@@ -23,7 +23,7 @@ export default class TimerLogic {
 		this.updateCallbacks = [];
 		this.runningCallbacks = [];
 		this.isInverted = isInverted;
-		this.timerSpan = () => {};
+		this.timerSnap = () => {};
 		this.anchorTimestamp = 0;
 		this.anchorValue = 0;
 
@@ -54,7 +54,7 @@ export default class TimerLogic {
 	}
 
 	addTimerSnap(callback: TimeListener): void {
-		this.timerSpan = callback;
+		this.timerSnap = callback;
 	}
 
 	notifyUpdate(): void {
@@ -91,7 +91,7 @@ export default class TimerLogic {
 		if (this.isRunning) return;
 		if (!this.isInverted && this.time <= 0) return;
 
-		this.timerSpan(this.time);
+		this.timerSnap(this.time);
 		this.isRunning = true;
 		this.anchor();
 		this.notifyRunningChange();

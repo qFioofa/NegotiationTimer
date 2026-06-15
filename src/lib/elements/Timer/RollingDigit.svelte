@@ -69,7 +69,6 @@
 		const rotateX = diff * 100;
 		const translateZ = -Math.abs(diff) * (height * 0.3);
 		const scale = 1 - Math.abs(diff) * 0.1;
-		const opacity = Math.max(0.7, 1 - Math.abs(diff) * 0.6);
 
 		return `translateY(${y}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) scale(${scale})`;
 	}
