@@ -1,6 +1,6 @@
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-Light.ttf") format("truetype");
+	src: url("./fonts/Unbounded-Light.woff2") format("woff2");
 	font-weight: 300;
 	font-style: normal;
 	font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-Regular.ttf") format("truetype");
+	src: url("./fonts/Unbounded-Regular.woff2") format("woff2");
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-Medium.ttf") format("truetype");
+	src: url("./fonts/Unbounded-Medium.woff2") format("woff2");
 	font-weight: 500;
 	font-style: normal;
 	font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-SemiBold.ttf") format("truetype");
+	src: url("./fonts/Unbounded-SemiBold.woff2") format("woff2");
 	font-weight: 600;
 	font-style: normal;
 	font-display: swap;
@@ -32,7 +32,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-Bold.ttf") format("truetype");
+	src: url("./fonts/Unbounded-Bold.woff2") format("woff2");
 	font-weight: 700;
 	font-style: normal;
 	font-display: swap;
@@ -40,7 +40,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-ExtraBold.ttf") format("truetype");
+	src: url("./fonts/Unbounded-ExtraBold.woff2") format("woff2");
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
@@ -48,7 +48,7 @@
 
 @font-face {
 	font-family: "Unbounded";
-	src: url("./fonts/Unbounded-Black.ttf") format("truetype");
+	src: url("./fonts/Unbounded-Black.woff2") format("woff2");
 	font-weight: 900;
 	font-style: normal;
 	font-display: swap;
@@ -56,7 +56,7 @@
 
 @font-face {
 	font-family: "Dela Gothic One";
-	src: url("./fonts/DelaGothicOne-Regular.ttf") format("truetype");
+	src: url("./fonts/DelaGothicOne-Regular.woff2") format("woff2");
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
