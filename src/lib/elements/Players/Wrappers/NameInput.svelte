@@ -17,34 +17,46 @@
 	const MIN_FONT_SIZE = 1.2;
 	const MAX_FONT_SIZE = 3.0;
 	const HEIGHT_FONT_MULTIPLIER = 2.0;
-	const PLACEHOLDER_PADDING_CH = 1.5;
 	const INITIAL_WIDTH_CH = 11.5;
 	const INITIAL_HEIGHT_REM = 4;
 
+	// Font bounds scale with the viewport so the field stays readable and never
+	// overflows on small screens. Recomputed on resize.
+	function fontBounds() {
+		const vw = window.innerWidth;
+		if (vw <= 480) return { min: 1.0, max: 2.0 };
+		if (vw <= 768) return { min: 1.1, max: 2.5 };
+		return { min: MIN_FONT_SIZE, max: MAX_FONT_SIZE };
+	}
+
 	function updateWidth() {
-		if (!ghostRef || !inputRef) return;
+		if (!inputRef) return;
+		// Skip while not displayed (hidden / closed tab): measuring an element
+		// with no layout is wrong and wasteful — it recomputes once it's shown.
+		if (inputRef.offsetParent === null) return;
 
-		const isPlaceholderMode = !playerName;
+		const { min, max } = fontBounds();
 
-		if (isPlaceholderMode) {
-			inputRef.style.setProperty("--font-size-dynamic", "1.5rem");
+		if (!playerName) {
+			const placeholderFont = max * 0.5;
+			inputRef.style.setProperty(
+				"--font-size-dynamic",
+				`${placeholderFont}rem`,
+			);
 			inputRef.style.width = `${INITIAL_WIDTH_CH}ch`;
-			inputRef.style.height = `${INITIAL_HEIGHT_REM}rem`;
+			inputRef.style.height = `${INITIAL_HEIGHT_REM * (max / MAX_FONT_SIZE)}rem`;
 			inputRef.style.borderRadius = "1.5rem";
-			ghostRef.textContent = "";
 			return;
 		}
 
 		const currentText = playerName;
-		ghostRef.textContent = currentText;
 
 		const textLength = currentText.length;
 		const normalizedLength = Math.max(
 			0,
 			(maxlength - textLength) / maxlength,
 		);
-		const dynamicFontSize =
-			MIN_FONT_SIZE + normalizedLength * (MAX_FONT_SIZE - MIN_FONT_SIZE);
+		const dynamicFontSize = min + normalizedLength * (max - min);
 		inputRef.style.setProperty(
 			"--font-size-dynamic",
 			`${dynamicFontSize}rem`,
@@ -64,8 +76,19 @@
 		event.stopPropagation();
 	}
 
+	let resizeRaf = 0;
+	function onResize() {
+		cancelAnimationFrame(resizeRaf);
+		resizeRaf = requestAnimationFrame(updateWidth);
+	}
+
 	onMount(() => {
 		updateWidth();
+		window.addEventListener("resize", onResize);
+		return () => {
+			window.removeEventListener("resize", onResize);
+			cancelAnimationFrame(resizeRaf);
+		};
 	});
 </script>
 
@@ -79,7 +102,7 @@
 	onkeydown={handleInputKeydown}
 	{maxlength}
 />
-<span class="ghost" bind:this={ghostRef}></span>
+<span class="ghost" bind:this={ghostRef}>{playerName}</span>
 
 <style>
 	.name-input {
@@ -89,6 +112,7 @@
 		border-radius: 1.5rem;
 		padding: 0 0.5rem;
 		min-width: 6ch;
+		max-width: 100%;
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;

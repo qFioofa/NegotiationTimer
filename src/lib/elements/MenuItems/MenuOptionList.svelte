@@ -6,6 +6,7 @@
 		icon,
 		title,
 		tooltipText,
+		description,
 		options,
 		selectedOption = $bindable(),
 		onOptionSelect = () => {},
@@ -17,7 +18,7 @@
 	}
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		{#if options && options.length}
 			<div class="option-list">

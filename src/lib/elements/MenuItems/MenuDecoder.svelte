@@ -13,6 +13,7 @@
 		icon,
 		title,
 		tooltipText,
+		description,
 		delay = 500,
 		value = $bindable(),
 	} = $props();
@@ -58,7 +59,7 @@
 	}
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		<MediaUpload supportedTypes={[".cfg"]} onChange={decodeFromFile} />
 		<Message {value} />

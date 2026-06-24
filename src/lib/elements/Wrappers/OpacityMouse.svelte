@@ -108,4 +108,14 @@
 		box-shadow: none;
 		transition: none;
 	}
+
+	/* No-hover devices (touch): proximity reveal can't fire, so the trigger
+	   would stay invisible/untappable. Force it always visible & interactive.
+	   !important overrides the inline opacity/pointer-events bound to the mouse. */
+	@media (hover: none) {
+		.opacity-mouse-wrapper {
+			opacity: 1 !important;
+			pointer-events: auto !important;
+		}
+	}
 </style>

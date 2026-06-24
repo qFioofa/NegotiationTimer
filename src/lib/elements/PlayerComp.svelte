@@ -13,6 +13,17 @@
 	let playerBackground = GlobalConfig.get("playerBackground");
 
 	async function ShufflePlayers() {
+		// Respect reduced motion: skip the animated flip, apply a random result instantly.
+		if (
+			typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		) {
+			const result = Math.round(Math.random());
+			number1.textContent = result === 0 ? "1" : "2";
+			number2.textContent = result === 0 ? "2" : "1";
+			return;
+		}
+
 		const _f = shuffleMap.get(GlobalConfig.get("shuffleAnimation"));
 		if (_f) await _f(number1, number2);
 	}

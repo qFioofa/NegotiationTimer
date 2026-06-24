@@ -7,7 +7,8 @@
 	import Encoder from "$lib/components/Encoder";
 	import Common from "./Wrappers/Common.svelte";
 
-	let { icon, title, tooltipText, text, value = $bindable() } = $props();
+	let { icon, title, tooltipText, description, text, value = $bindable() } =
+		$props();
 	let error = $state();
 
 	function generateFilename() {
@@ -52,7 +53,7 @@
 	}
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		<ApplyButton bind:value {text} bind:error onApply={encode} />
 		<Message {value} />

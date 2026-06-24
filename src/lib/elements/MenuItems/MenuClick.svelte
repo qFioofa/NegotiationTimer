@@ -8,13 +8,14 @@
 		icon,
 		title,
 		tooltipText,
+		description,
 		text,
 		error,
 		onClick = () => {},
 	} = $props();
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		<ApplyButton {text} {error} onApply={onClick} />
 		<TextError {error} />

@@ -6,6 +6,7 @@
 		icon,
 		title,
 		tooltipText,
+		description,
 		isToggled = $bindable(),
 		onToggle = () => {},
 	} = $props();
@@ -16,7 +17,7 @@
 	}
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		<div class="toggle-wrapper">
 			<span class="toggle-label label-off" class:label-active={!isToggled}

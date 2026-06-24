@@ -20,8 +20,9 @@
 		position: fixed;
 		top: 0;
 		right: 0;
-		width: 36rem;
+		width: min(36rem, 92vw);
 		height: 100vh;
+		height: 100dvh; /* dynamic vh: no iOS URL-bar cut */
 		display: flex;
 		flex-direction: column;
 		transform: translateX(100%);
@@ -95,5 +96,24 @@
 	.menu-content,
 	.menu-items {
 		user-select: none;
+	}
+
+	@media (max-width: 480px) {
+		.menu-panel {
+			width: 100vw;
+			border-left: none;
+		}
+		.menu-content {
+			padding: var(--spacing-lg);
+		}
+		.menu-title {
+			font-size: var(--font-size-xl);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-panel {
+			transition: transform 0.01s linear;
+		}
 	}
 </style>

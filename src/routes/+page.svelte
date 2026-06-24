@@ -6,13 +6,15 @@
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import Timer from "$lib/elements/Timer.svelte";
-	import Menu from "$lib/elements/Menu.svelte";
+	import SettingsTrigger from "$lib/elements/Settings/SettingsTrigger.svelte";
+	import { registerBinds } from "$lib/elements/Settings/settingsRegistry";
 	import { onMount } from "svelte";
 
 	let hideUI = GlobalConfig.get("hideAllUI");
 
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
+		registerBinds();
 
 		return GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
 	});
@@ -30,4 +32,4 @@
 	<Timer />
 {/if}
 
-<Menu />
+<SettingsTrigger />

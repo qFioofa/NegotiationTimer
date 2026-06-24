@@ -7,6 +7,7 @@
 		icon,
 		title,
 		tooltipText,
+		description,
 		onHoldComplete = () => {},
 		holdDuration = 3000,
 	} = $props();
@@ -52,15 +53,16 @@
 	}
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
 	<InputGroup>
 		<div
 			class="progress-bar"
 			role="button"
 			tabindex="0"
-			onmousedown={handleHoldStart}
-			onmouseup={handleHoldCancel}
-			onmouseleave={handleHoldCancel}
+			onpointerdown={handleHoldStart}
+			onpointerup={handleHoldCancel}
+			onpointerleave={handleHoldCancel}
+			onpointercancel={handleHoldCancel}
 		>
 			<div class="bar" style="width: {holdProgress}%"></div>
 			<span class="bar-text">
@@ -80,6 +82,7 @@
 		height: 5vh;
 		position: relative;
 		border-radius: 12px;
+		touch-action: none;
 		overflow: hidden;
 	}
 

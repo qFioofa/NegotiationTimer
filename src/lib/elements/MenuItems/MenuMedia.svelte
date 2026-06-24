@@ -2,6 +2,7 @@
 	import {
 		handleFileUpload,
 		extractFilenameFromUrl,
+		fileTypeFromUrl,
 	} from "$lib/components/utils/MediaUtils";
 	import MediaUpload from "./General/MediaUpload.svelte";
 	import InputGroup from "./Wrappers/InputGroup.svelte";
@@ -12,7 +13,8 @@
 	import Common from "./Wrappers/Common.svelte";
 	import { onMount } from "svelte";
 
-	let { icon, title, tooltipText, supportedTypes, configKey } = $props();
+	let { icon, title, tooltipText, description, supportedTypes, configKey } =
+		$props();
 
 	let fileUrl = $state(null);
 	let fileName = null;
@@ -20,6 +22,10 @@
 	let loading = $state(false);
 	let loaded = $state(false);
 	let error = $state();
+
+	// Аудио воспроизводится под загрузкой (балансная колонка), а картинка/видео
+	// показываются в правой зоне-превью.
+	let isAudio = $derived(fileUrl ? fileTypeFromUrl(fileUrl) === "audio" : false);
 
 	async function onChange(event) {
 		loading = true;
@@ -49,7 +55,15 @@
 	});
 </script>
 
-<Common {icon} {title} {tooltipText}>
+<Common {icon} {title} {tooltipText} {description}>
+	{#snippet preview()}
+		{#if fileUrl && !isAudio}
+			<div class="file-info">
+				<MediaView {fileUrl}></MediaView>
+			</div>
+		{/if}
+	{/snippet}
+
 	<InputGroup>
 		<div class="media-upload">
 			<MediaUpload {supportedTypes} {onChange} />
@@ -59,7 +73,7 @@
 				<Message value="Файл загружен и сохранён" />
 			{/if}
 
-			{#if fileUrl}
+			{#if fileUrl && isAudio}
 				<div class="file-info">
 					<MediaView {fileUrl}></MediaView>
 				</div>

@@ -147,4 +147,14 @@
 			opacity 0.5s ease,
 			visibility 0.5s ease;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pause-title-wrapper,
+		.pause-content,
+		.pause-overlay.active .pause-title-wrapper,
+		.pause-overlay.active .pause-content {
+			transform: none !important;
+			transition: opacity 0.2s ease !important;
+		}
+	}
 </style>
