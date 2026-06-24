@@ -5,7 +5,7 @@
 	import Actions from "./Intro/Actions.svelte";
 	import { writable } from "svelte/store";
 
-	export let headerText;
+	let { headerText } = $props();
 
 	function close() {
 		IntroGuideVisiable.set(false);

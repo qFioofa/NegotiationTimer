@@ -2,29 +2,31 @@
 	import { fileTypeFromUrl } from "$lib/components/utils/MediaUtils";
 	import TextError from "$lib/elements/General/TextError.svelte";
 
-	export let fileUrl;
+	let { fileUrl } = $props();
 
-	let fileType = "unknown";
+	let fileType = $state("unknown");
 	let audio = null;
-	let isPlaying = false;
-	let error;
+	let isPlaying = $state(false);
+	let error = $state();
 
-	$: if (fileUrl) {
-		fileType = fileTypeFromUrl(fileUrl);
+	$effect(() => {
+		if (fileUrl) {
+			fileType = fileTypeFromUrl(fileUrl);
 
-		if (audio) {
-			audio.pause();
-			audio = null;
-			isPlaying = false;
+			if (audio) {
+				audio.pause();
+				audio = null;
+				isPlaying = false;
+			}
+
+			if (fileType === "audio") {
+				audio = new Audio(fileUrl);
+				audio.loop = true;
+				audio.onended = () => (isPlaying = false);
+				isPlaying = false;
+			}
 		}
-
-		if (fileType === "audio") {
-			audio = new Audio(fileUrl);
-			audio.loop = true;
-			audio.onended = () => (isPlaying = false);
-			isPlaying = false;
-		}
-	}
+	});
 
 	function playAudio() {
 		if (!audio) {
@@ -44,7 +46,7 @@
 </script>
 
 {#if fileType === "audio"}
-	<button class="play-button" on:click={playAudio}>
+	<button class="play-button" onclick={playAudio}>
 		{isPlaying ? "■ Остановить" : "▶ Воспроизвести"}
 	</button>
 {:else if fileType === "image"}

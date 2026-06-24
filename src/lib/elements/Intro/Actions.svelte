@@ -1,19 +1,19 @@
 <script>
-	export let forgetText;
-	export let closeText;
-
-	export let closeForever = () => {};
-	export let onClose = () => {};
+	let {
+		forgetText,
+		closeText,
+		closeForever = () => {},
+		onClose = () => {},
+	} = $props();
 </script>
 
 <div class="intro-actions">
 	{#if forgetText}
-		<button class="forget-intro" on:click={closeForever}
-			>{forgetText}</button
+		<button class="forget-intro" onclick={closeForever}>{forgetText}</button
 		>
 	{/if}
 	{#if closeText}
-		<button class="close-intro" on:click={onClose}>{closeText}</button>
+		<button class="close-intro" onclick={onClose}>{closeText}</button>
 	{/if}
 </div>
 

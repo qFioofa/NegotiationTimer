@@ -2,44 +2,51 @@
 	import { isPaused, setPause } from "$lib/components/Pause";
 	import { GlobalConfig } from "$lib/stores/parameters";
 
-	export let title;
-	export let isMenuOpen;
-	export let isTriggerHovered;
-	export let panelRef;
+	let {
+		title,
+		isMenuOpen = $bindable(),
+		isTriggerHovered,
+		panelRef = $bindable(),
+		handlePanelEnter = () => {
+			isPanelHovered = true;
+		},
+		handlePanelLeave = () => {
+			isPanelHovered = false;
+		},
+		children,
+	} = $props();
 
-	let isPanelHovered;
+	let isPanelHovered = $state(false);
 
-	export let handlePanelEnter = () => {
-		isPanelHovered = true;
-	};
-
-	export let handlePanelLeave = () => {
-		isPanelHovered = false;
-	};
-
-	$: if (isTriggerHovered) {
-		if (GlobalConfig.get("panelAutoOpen")) {
-			isMenuOpen = true;
-			if (GlobalConfig.get("panelAutoPause")) setPause(true);
+	$effect(() => {
+		if (isTriggerHovered) {
+			if (GlobalConfig.get("panelAutoOpen")) {
+				isMenuOpen = true;
+				if (GlobalConfig.get("panelAutoPause")) setPause(true);
+			}
 		}
-	}
+	});
 
-	$: if (!isPanelHovered) {
-		if (GlobalConfig.get("panelAutoOpen")) {
-			isMenuOpen = false;
-			if (GlobalConfig.get("panelAutoPause")) setPause(false);
+	$effect(() => {
+		if (!isPanelHovered) {
+			if (GlobalConfig.get("panelAutoOpen")) {
+				isMenuOpen = false;
+				if (GlobalConfig.get("panelAutoPause")) setPause(false);
+			}
 		}
-	}
+	});
 
-	$: if (isMenuOpen) {
-		if (!GlobalConfig.get("panelAutoOpen")) {
-			if (GlobalConfig.get("panelAutoPause")) setPause(true);
+	$effect(() => {
+		if (isMenuOpen) {
+			if (!GlobalConfig.get("panelAutoOpen")) {
+				if (GlobalConfig.get("panelAutoPause")) setPause(true);
+			}
+		} else {
+			if (!GlobalConfig.get("panelAutoOpen")) {
+				if (GlobalConfig.get("panelAutoPause")) setPause(false);
+			}
 		}
-	} else {
-		if (!GlobalConfig.get("panelAutoOpen")) {
-			if (GlobalConfig.get("panelAutoPause")) setPause(false);
-		}
-	}
+	});
 </script>
 
 <div
@@ -50,8 +57,8 @@
 	aria-orientation="vertical"
 	aria-labelledby="panel-title"
 	tabindex="-1"
-	on:mouseenter={handlePanelEnter}
-	on:mouseleave={handlePanelLeave}
+	onmouseenter={handlePanelEnter}
+	onmouseleave={handlePanelLeave}
 >
 	<div class="scroll-wrapper">
 		<div class="content-wrapper">
@@ -59,7 +66,7 @@
 				<h2 class="panel-title">{title}</h2>
 			{/if}
 			<hr class="panel-divider" />
-			<slot />
+			{@render children?.()}
 		</div>
 	</div>
 </div>

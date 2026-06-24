@@ -32,7 +32,7 @@
 		<p class="error-message">
 			Кажется, что нужно вернуться на главную страницу.
 		</p>
-		<button on:click={goHome}>Вернуться на главную</button>
+		<button onclick={goHome}>Вернуться на главную</button>
 	</div>
 </div>
 

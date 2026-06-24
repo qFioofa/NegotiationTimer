@@ -6,17 +6,17 @@
 	import Common from "./Wrappers/Common.svelte";
 	import { Minus, Plus } from "lucide-svelte";
 
-	export let icon;
-	export let title;
-	export let description;
-
-	export let value;
-	export let placeHolder;
-	export let maxLength;
-	export let error = "";
-
-	export let onIncrement = () => {};
-	export let onDecrement = () => {};
+	let {
+		icon,
+		title,
+		description,
+		value = $bindable(),
+		placeHolder,
+		maxLength,
+		error = $bindable(""),
+		onIncrement = () => {},
+		onDecrement = () => {},
+	} = $props();
 </script>
 
 <Common {icon} {title} {description}>
@@ -31,5 +31,5 @@
 			><Plus size={16} /></ApplyButton
 		>
 	</InputGroup>
-	<TextError bind:error />
+	<TextError {error} />
 </Common>

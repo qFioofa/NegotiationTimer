@@ -1,11 +1,9 @@
 <script>
 	import RollingDigit from "./RollingDigit.svelte";
 
-	export let value = "00:05";
-	export let fontSize = 64;
-	export let padding = 8;
+	let { value = "00:05", fontSize = 64, padding = 8 } = $props();
 
-	const height = fontSize + padding;
+	const height = $derived(fontSize + padding);
 
 	function parseDigits(str) {
 		return str.split("").map((c) => (/\d/.test(c) ? parseInt(c) : c));

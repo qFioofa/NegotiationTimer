@@ -4,15 +4,17 @@
 	import { tweened } from "svelte/motion";
 	import { cubicOut } from "svelte/easing";
 
-	export let handleClick = () => {};
-	export let handleTriggerEnter = () => {};
-	export let handleTriggerLeave = () => {};
-
-	export let isOpen = false;
-	export let MouseDistance = 0.25;
-	export let pointerEventsThreshold = 0.05;
-	export let targetRef = null;
-	export let zIndex = 3000;
+	let {
+		handleClick = () => {},
+		handleTriggerEnter = () => {},
+		handleTriggerLeave = () => {},
+		isOpen = false,
+		MouseDistance = 0.25,
+		pointerEventsThreshold = 0.05,
+		targetRef = null,
+		zIndex = 3000,
+		children,
+	} = $props();
 
 	let wrapperRef;
 
@@ -50,9 +52,9 @@
 <div
 	bind:this={wrapperRef}
 	class="opacity-mouse-wrapper"
-	on:mouseenter={handleTriggerEnter}
-	on:mouseleave={handleTriggerLeave}
-	on:click={handleClick}
+	onmouseenter={handleTriggerEnter}
+	onmouseleave={handleTriggerLeave}
+	onclick={handleClick}
 	tabindex="0"
 	role="button"
 	aria-pressed={isOpen ? "true" : "false"}
@@ -64,7 +66,7 @@
         z-index: {zIndex};
     "
 >
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

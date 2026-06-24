@@ -2,14 +2,12 @@
 	import { onMount } from "svelte";
 	import { spring } from "svelte/motion";
 
-	export let digit = 0;
-	export let fontSize = 100;
-	export let maxDigit = 10;
+	let { digit = 0, fontSize = 100, maxDigit = 10 } = $props();
 
-	let springValue;
-	let lastSetDigit = digit;
-	let rotations = 0;
-	const height = fontSize;
+	let springValue = $state(null);
+	let lastSetDigit = $state(0); // synced to `digit` in onMount before first animation
+	let rotations = $state(0);
+	const height = $derived(fontSize);
 
 	onMount(() => {
 		springValue = spring(digit, {
@@ -19,27 +17,29 @@
 		lastSetDigit = digit;
 	});
 
-	$: if (springValue && digit !== lastSetDigit) {
-		let diff = digit - lastSetDigit;
+	$effect(() => {
+		if (springValue && digit !== lastSetDigit) {
+			let diff = digit - lastSetDigit;
 
-		if (diff > 5) diff -= 10;
-		if (diff < -5) diff += 10;
+			if (diff > 5) diff -= 10;
+			if (diff < -5) diff += 10;
 
-		if (diff === 1 && lastSetDigit === 9) {
-			rotations += 1;
-		} else if (diff === -1 && lastSetDigit === 0) {
-			rotations -= 1;
-		} else if (diff === 9 && lastSetDigit === 9) {
-			rotations -= 1;
-		} else if (diff === -9 && lastSetDigit === 0) {
-			rotations += 1;
+			if (diff === 1 && lastSetDigit === 9) {
+				rotations += 1;
+			} else if (diff === -1 && lastSetDigit === 0) {
+				rotations -= 1;
+			} else if (diff === 9 && lastSetDigit === 9) {
+				rotations -= 1;
+			} else if (diff === -9 && lastSetDigit === 0) {
+				rotations += 1;
+			}
+
+			const targetValue = digit + rotations * 10;
+
+			springValue.set(targetValue);
+			lastSetDigit = digit;
 		}
-
-		const targetValue = digit + rotations * 10;
-
-		springValue.set(targetValue);
-		lastSetDigit = digit;
-	}
+	});
 
 	function getOpacity(animatedValue, number) {
 		const effectiveValue = animatedValue - rotations * 10;

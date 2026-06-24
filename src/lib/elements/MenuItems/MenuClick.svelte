@@ -4,13 +4,14 @@
 	import TextError from "../General/TextError.svelte";
 	import Common from "./Wrappers/Common.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
-	export let text;
-	export let error;
-
-	export let onClick = () => {};
+	let {
+		icon,
+		title,
+		tooltipText,
+		text,
+		error,
+		onClick = () => {},
+	} = $props();
 </script>
 
 <Common {icon} {title} {tooltipText}>

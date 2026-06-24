@@ -8,7 +8,7 @@
 
 <Pause />
 
-<button on:click={togglePause} class="pause-button">
+<button onclick={togglePause} class="pause-button">
 	{$isPaused ? "Продолжить" : "Пауза"}
 </button>
 

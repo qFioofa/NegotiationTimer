@@ -2,12 +2,13 @@
 	import InputGroup from "./Wrappers/InputGroup.svelte";
 	import Common from "./Wrappers/Common.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
-	export let isToggled;
-
-	export let onToggle = () => {};
+	let {
+		icon,
+		title,
+		tooltipText,
+		isToggled = $bindable(),
+		onToggle = () => {},
+	} = $props();
 
 	function toggleSwitch() {
 		isToggled = !isToggled;
@@ -25,7 +26,7 @@
 				class="toggle"
 				class:toggle-on={isToggled}
 				aria-label={isToggled ? "Отключить" : "Включить"}
-				on:click={toggleSwitch}
+				onclick={toggleSwitch}
 			>
 				<div class="circle"></div>
 			</button>

@@ -13,18 +13,16 @@
 	import { isPaused } from "$lib/components/Pause";
 	import { onMount } from "svelte";
 
-	let displayUpTime = "00:00";
+	let displayUpTime = $derived(timerDisplay($upTimeMs));
 
-	$: {
-		displayUpTime = timerDisplay($upTimeMs);
-	}
+	$effect(() => {
+		if (!$isPaused) {
+			resetUpTimer();
+		}
+	});
 
-	$: if (!$isPaused) {
-		resetUpTimer();
-	}
-
-	let panelAutoOpen = GlobalConfig.get("panelAutoOpen");
-	let extraButtonsPauseOn = GlobalConfig.get("extraButtonsPauseOn");
+	let panelAutoOpen = $state(GlobalConfig.get("panelAutoOpen"));
+	let extraButtonsPauseOn = $state(GlobalConfig.get("extraButtonsPauseOn"));
 
 	onMount(() => {
 		GlobalConfig.subscribe("panelAutoOpen", (v) => (panelAutoOpen = v));

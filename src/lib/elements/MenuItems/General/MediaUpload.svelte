@@ -1,6 +1,5 @@
 <script>
-	export let supportedTypes = [];
-	export let onChange = async () => {};
+	let { supportedTypes = [], onChange = async () => {} } = $props();
 </script>
 
 <div class="media-upload-wrapper">
@@ -9,7 +8,7 @@
 			class="media-upload-input"
 			type="file"
 			accept={supportedTypes.join(",")}
-			on:change={onChange}
+			onchange={onChange}
 		/>
 		<div class="media-upload-button">
 			<span class="upload-icon">📁</span>

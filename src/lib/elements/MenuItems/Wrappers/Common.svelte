@@ -2,9 +2,7 @@
 	import Devider from "$lib/elements/General/Devider.svelte";
 	import ToolTip from "./ToolTip.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
+	let { icon, title, tooltipText, children } = $props();
 </script>
 
 <div class="menu-item">
@@ -23,7 +21,7 @@
 	<Devider />
 
 	<div class="menu-slot">
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
 

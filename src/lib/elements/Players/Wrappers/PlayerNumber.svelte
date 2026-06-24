@@ -1,6 +1,5 @@
 <script>
-	export let text;
-	export let ref;
+	let { text, ref = $bindable() } = $props();
 </script>
 
 <div class="number" bind:this={ref}>{text}</div>

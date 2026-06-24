@@ -1,7 +1,7 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
 
-	export let url;
+	let { url } = $props();
 
 	const originalStyles = {
 		backgroundImage: "",
@@ -28,7 +28,10 @@
 		document.body.classList.add("background-active");
 	}
 
-	$: (url, applyBackground());
+	$effect(() => {
+		url;
+		applyBackground();
+	});
 
 	onMount(() => {
 		originalStyles.backgroundImage = document.body.style.backgroundImage;

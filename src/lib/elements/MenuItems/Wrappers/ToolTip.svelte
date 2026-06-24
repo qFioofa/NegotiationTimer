@@ -1,5 +1,5 @@
 <script>
-	export let tooltipText;
+	let { tooltipText } = $props();
 </script>
 
 {#if tooltipText}

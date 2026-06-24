@@ -9,13 +9,14 @@
 	import Encoder from "$lib/components/Encoder";
 	import Common from "./Wrappers/Common.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
-	export let delay = 500;
-
-	export let value;
-	let error;
+	let {
+		icon,
+		title,
+		tooltipText,
+		delay = 500,
+		value = $bindable(),
+	} = $props();
+	let error = $state();
 
 	async function reloadPage() {
 		if (delay > 0) {
@@ -60,7 +61,7 @@
 <Common {icon} {title} {tooltipText}>
 	<InputGroup>
 		<MediaUpload supportedTypes={[".cfg"]} onChange={decodeFromFile} />
-		<Message bind:value />
+		<Message {value} />
 		<TextError {error} />
 	</InputGroup>
 </Common>

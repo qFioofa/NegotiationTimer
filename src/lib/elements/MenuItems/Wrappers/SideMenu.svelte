@@ -1,6 +1,5 @@
 <script>
-	export let isOpen;
-	export let title;
+	let { isOpen, title, children } = $props();
 </script>
 
 <div class="menu-panel" class:open={isOpen}>
@@ -11,7 +10,7 @@
 	</div>
 	<div class="menu-content">
 		<ul class="menu-items">
-			<slot />
+			{@render children?.()}
 		</ul>
 	</div>
 </div>

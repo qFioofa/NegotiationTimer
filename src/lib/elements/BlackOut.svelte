@@ -3,14 +3,18 @@
 	import { fade } from "svelte/transition";
 	import { onDestroy } from "svelte";
 
-	export let blackoutTitle = "Время вышло!";
-	export let exitTip = "Нажми чтобы закрыть";
-	export let configKey = "audioTimerEnd";
+	let {
+		blackoutTitle = "Время вышло!",
+		exitTip = "Нажми чтобы закрыть",
+		configKey = "audioTimerEnd",
+	} = $props();
 	let audio;
 
-	$: if ($isBlackout && GlobalConfig.get("timerBlackOut")) {
-		loadBlackoutAudio();
-	}
+	$effect(() => {
+		if ($isBlackout && GlobalConfig.get("timerBlackOut")) {
+			loadBlackoutAudio();
+		}
+	});
 
 	async function loadBlackoutAudio() {
 		if (!GlobalConfig.get("afterSound")) return;
@@ -44,7 +48,7 @@
 </script>
 
 {#if $isBlackout && GlobalConfig.get("timerBlackOut")}
-	<button class="blackout-overlay" on:click={hideBlackout} transition:fade>
+	<button class="blackout-overlay" onclick={hideBlackout} transition:fade>
 		<div class="blackout-content">
 			<h1 class="blackout-title">{blackoutTitle}</h1>
 			<p class="exit-tip">{exitTip}</p>

@@ -1,14 +1,17 @@
 <script>
-	export let value;
-	export let text;
-	export let error;
-	export let onApply = async () => {};
+	let {
+		value = $bindable(),
+		text,
+		error = $bindable(),
+		onApply = async () => {},
+		children,
+	} = $props();
 </script>
 
 <button
 	class="bottom-item-apply-button"
 	disabled={error}
-	on:click={async () => {
+	onclick={async () => {
 		const _result = await onApply(value);
 		if (_result == null) return;
 
@@ -25,7 +28,7 @@
 	{#if text}
 		{text}
 	{:else}
-		<slot />
+		{@render children?.()}
 	{/if}
 </button>
 

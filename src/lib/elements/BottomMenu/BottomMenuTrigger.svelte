@@ -1,6 +1,5 @@
 <script>
-	export let text = "";
-	export let ref;
+	let { text = "", ref = $bindable() } = $props();
 </script>
 
 <div bind:this={ref} class="panel-trigger">{text}</div>

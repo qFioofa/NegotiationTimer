@@ -12,19 +12,14 @@
 	import Common from "./Wrappers/Common.svelte";
 	import { onMount } from "svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
+	let { icon, title, tooltipText, supportedTypes, configKey } = $props();
 
-	export let supportedTypes;
-	export let configKey;
-
-	let fileUrl = null;
+	let fileUrl = $state(null);
 	let fileName = null;
 
-	let loading = false;
-	let loaded = false;
-	let error;
+	let loading = $state(false);
+	let loaded = $state(false);
+	let error = $state();
 
 	async function onChange(event) {
 		loading = true;

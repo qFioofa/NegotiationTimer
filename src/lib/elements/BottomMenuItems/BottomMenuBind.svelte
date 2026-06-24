@@ -13,18 +13,19 @@
 		codeToLabel,
 	} from "$lib/components/utils/BindUtils";
 
-	export let icon;
-	export let title;
-	export let description;
-	export let configKey;
-	export let bindKey = "";
-	export let error = "";
+	let {
+		icon,
+		title,
+		description,
+		configKey,
+		bindKey = $bindable(""),
+		error = $bindable(""),
+		onApply = () => {},
+		onBindTrigger = () => {},
+	} = $props();
 
-	export let onApply = () => {};
-	export let onBindTrigger = () => {};
-
-	let previousKey = "";
-	let localIsListeningBind = false;
+	let previousKey = $state("");
+	let localIsListeningBind = $state(false);
 
 	function listenForKey() {
 		if (localIsListeningBind) return;
@@ -37,15 +38,17 @@
 		});
 	}
 
-	$: if (bindKey && typeof onBindTrigger === "function") {
-		if (previousKey && previousKey !== bindKey) {
-			removeBindListener(previousKey);
-		}
+	$effect(() => {
+		if (bindKey && typeof onBindTrigger === "function") {
+			if (previousKey && previousKey !== bindKey) {
+				removeBindListener(previousKey);
+			}
 
-		setBindListener(bindKey, onBindTrigger);
-		GlobalConfig.set(configKey, bindKey);
-		previousKey = bindKey;
-	}
+			setBindListener(bindKey, onBindTrigger);
+			GlobalConfig.set(configKey, bindKey);
+			previousKey = bindKey;
+		}
+	});
 
 	onDestroy(() => {
 		if (bindKey) removeBindListener(bindKey);
@@ -56,7 +59,7 @@
 	<InputGroup>
 		<div class="bind-input-wrapper">
 			<div class="bind-input">
-				<button class="bind-button" on:click={listenForKey}>
+				<button class="bind-button" onclick={listenForKey}>
 					<Keyboard size={14} />
 					{#if localIsListeningBind}
 						<span class="bind-label">Нажмите клавишу...</span>
@@ -75,7 +78,7 @@
 			</div>
 		</div>
 	</InputGroup>
-	<TextError bind:error />
+	<TextError {error} />
 </Common>
 
 <style>

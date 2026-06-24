@@ -6,18 +6,17 @@
 	import TextError from "$lib/elements/General/TextError.svelte";
 	import { Check } from "lucide-svelte";
 
-	export let icon;
-	export let title;
-	export let description;
-
-	export let value;
-	export let placeHolder;
-	export let maxLength;
-
-	export let applyButton = true;
-	export let error = "";
-
-	export let onApply = () => {};
+	let {
+		icon,
+		title,
+		description,
+		value = $bindable(),
+		placeHolder,
+		maxLength,
+		applyButton = true,
+		error = $bindable(""),
+		onApply = () => {},
+	} = $props();
 </script>
 
 <Common {icon} {title} {description}>
@@ -29,5 +28,5 @@
 			</ApplyButton>
 		{/if}
 	</InputGroup>
-	<TextError bind:error />
+	<TextError {error} />
 </Common>

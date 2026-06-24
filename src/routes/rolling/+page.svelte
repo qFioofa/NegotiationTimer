@@ -24,14 +24,14 @@
 <div class="demo-container">
 	<div class="display-area">
 		<div class="digit-wrapper">
-			<RollingDigit bind:digit={currentDigit} bind:fontSize />
+			<RollingDigit digit={currentDigit} {fontSize} />
 		</div>
 	</div>
 
 	<div class="controls">
-		<button on:click={decrement} class="btn">−</button>
-		<button on:click={randomDigit} class="btn">🎲</button>
-		<button on:click={increment} class="btn">+</button>
+		<button onclick={decrement} class="btn">−</button>
+		<button onclick={randomDigit} class="btn">🎲</button>
+		<button onclick={increment} class="btn">+</button>
 	</div>
 </div>
 

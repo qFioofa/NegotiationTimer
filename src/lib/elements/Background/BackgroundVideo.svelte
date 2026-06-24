@@ -1,7 +1,7 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
 
-	export let url;
+	let { url } = $props();
 
 	let videoElement = null;
 	let styleElement = null;
@@ -68,11 +68,13 @@
 		document.body.classList.add("background-active");
 	}
 
-	$: if (url) {
-		createBackground();
-	} else {
-		removeBackground();
-	}
+	$effect(() => {
+		if (url) {
+			createBackground();
+		} else {
+			removeBackground();
+		}
+	});
 
 	onMount(() => {
 		injectStyles();

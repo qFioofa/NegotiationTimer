@@ -1,10 +1,9 @@
 <script>
-	export let icon;
-	export let onClick = () => {};
+	let { icon, onClick = () => {} } = $props();
 </script>
 
 {#if icon}
-	<button class="item-icon" on:click={onClick}>{icon}</button>
+	<button class="item-icon" onclick={onClick}>{icon}</button>
 {/if}
 
 <style>

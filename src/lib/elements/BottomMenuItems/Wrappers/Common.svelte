@@ -1,7 +1,5 @@
 <script>
-	export let icon;
-	export let title;
-	export let description;
+	let { icon, title, description, children } = $props();
 </script>
 
 <div class="bottom-menu-item">
@@ -20,7 +18,7 @@
 			</p>
 		{/if}
 	</div>
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

@@ -1,12 +1,18 @@
 <script>
 	import { onMount } from "svelte";
 
-	export let inputRef;
-	export let playerName;
-	export let ghostRef;
-	export let defaultText = "Имя игрока";
-	export let maxlength = 20;
-	export let paddingRem = 1;
+	let {
+		inputRef = $bindable(),
+		playerName = $bindable(),
+		ghostRef = $bindable(),
+		defaultText = "Имя игрока",
+		maxlength = 20,
+		paddingRem = 1,
+		updatePlayerName = (e) => {
+			playerName = e.target.value.slice(0, maxlength);
+			updateWidth();
+		},
+	} = $props();
 
 	const MIN_FONT_SIZE = 1.2;
 	const MAX_FONT_SIZE = 3.0;
@@ -54,11 +60,6 @@
 		inputRef.style.borderRadius = `${dynamicHeight / 2}rem`;
 	}
 
-	export let updatePlayerName = (e) => {
-		playerName = e.target.value.slice(0, maxlength);
-		updateWidth();
-	};
-
 	function handleInputKeydown(event) {
 		event.stopPropagation();
 	}
@@ -74,8 +75,8 @@
 	bind:this={inputRef}
 	placeholder={defaultText}
 	value={playerName}
-	on:input={updatePlayerName}
-	on:keydown={handleInputKeydown}
+	oninput={updatePlayerName}
+	onkeydown={handleInputKeydown}
 	{maxlength}
 />
 <span class="ghost" bind:this={ghostRef}></span>

@@ -31,34 +31,38 @@
 		if (ShufflePlayers) await ShufflePlayers();
 	}
 
-	let wasRunningBeforePause = false;
-	let wasStartedOnce = false;
+	let wasRunningBeforePause = $state(false);
+	let wasStartedOnce = $state(false);
 
-	let displayTime = timerDisplay($timeMs);
+	let displayTime = $derived(timerDisplay($timeMs));
 
-	$: displayTime = timerDisplay($timeMs);
+	$effect(() => {
+		if ($isPaused) {
+			if ($isRunning) {
+				wasRunningBeforePause = true;
+				toggleTimer();
+			}
+		} else {
+			if (wasRunningBeforePause) {
+				startTimer();
+				wasRunningBeforePause = false;
+			}
+		}
+	});
 
-	$: if ($isPaused) {
+	$effect(() => {
 		if ($isRunning) {
-			wasRunningBeforePause = true;
-			toggleTimer();
+			wasStartedOnce = true;
 		}
-	} else {
-		if (wasRunningBeforePause) {
-			startTimer();
-			wasRunningBeforePause = false;
+	});
+
+	$effect(() => {
+		if (wasStartedOnce && $timeMs === 0 && $isRunning === false) {
+			isBlackout.set(true);
 		}
-	}
+	});
 
-	$: if ($isRunning) {
-		wasStartedOnce = true;
-	}
-
-	$: if (wasStartedOnce && $timeMs === 0 && $isRunning === false) {
-		isBlackout.set(true);
-	}
-
-	let extraButtonsOn = GlobalConfig.get("extraButtonsOn");
+	let extraButtonsOn = $state(GlobalConfig.get("extraButtonsOn"));
 
 	onMount(() => {
 		// initTimer();
@@ -70,7 +74,7 @@
 
 <div class="timer-wrapper">
 	<div class="timer-container">
-		<TimerButton bind:displayTime onClick={toggleTimer} />
+		<TimerButton {displayTime} onClick={toggleTimer} />
 		{#if extraButtonsOn}
 			<ExtraButtonsWrapper>
 				<ExtraButtons

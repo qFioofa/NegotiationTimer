@@ -16,13 +16,13 @@
 </script>
 
 <div>
-	<button on:click={() => switchTheme("green")}>Зелёная тема</button>
-	<button on:click={() => switchTheme("brown")}>Оранжевая тема</button>
-	<button on:click={() => switchTheme("red")}>Красная тема</button>
-	<button on:click={() => switchTheme("blue")}>Синяя тема</button>
-	<button on:click={() => switchTheme("cyan")}>Голубая тема</button>
-	<button on:click={() => switchTheme("pink")}>Розовая тема</button>
-	<button on:click={() => switchTheme("grey")}>Серая тема</button>
+	<button onclick={() => switchTheme("green")}>Зелёная тема</button>
+	<button onclick={() => switchTheme("brown")}>Оранжевая тема</button>
+	<button onclick={() => switchTheme("red")}>Красная тема</button>
+	<button onclick={() => switchTheme("blue")}>Синяя тема</button>
+	<button onclick={() => switchTheme("cyan")}>Голубая тема</button>
+	<button onclick={() => switchTheme("pink")}>Розовая тема</button>
+	<button onclick={() => switchTheme("grey")}>Серая тема</button>
 </div>
 
 <Timer />

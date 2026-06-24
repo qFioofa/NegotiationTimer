@@ -1,12 +1,13 @@
 <script>
 	import { onTimerInputChange } from "$lib/components/utils/TimerUtils";
 
-	export let value;
-	export let placeHolder;
-	export let maxLength;
-
-	export let error;
-	export let onInputChange = onTimerInputChange;
+	let {
+		value = $bindable(),
+		placeHolder,
+		maxLength,
+		error = $bindable(),
+		onInputChange = onTimerInputChange,
+	} = $props();
 </script>
 
 <input
@@ -15,7 +16,7 @@
 	class:error
 	aria-invalid={error ? "true" : "false"}
 	bind:value
-	on:input={(e) => {
+	oninput={(e) => {
 		const _result = onInputChange(e.target.value);
 		if (_result == null) return;
 

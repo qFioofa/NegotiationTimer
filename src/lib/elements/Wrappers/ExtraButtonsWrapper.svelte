@@ -1,5 +1,9 @@
+<script>
+	let { children } = $props();
+</script>
+
 <div class="extra-buttons-wrapper">
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

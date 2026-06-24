@@ -1,5 +1,9 @@
+<script>
+	let { children } = $props();
+</script>
+
 <div class="input-group">
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

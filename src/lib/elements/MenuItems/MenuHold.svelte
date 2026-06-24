@@ -3,18 +3,19 @@
 	import Common from "./Wrappers/Common.svelte";
 	import { tick } from "svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
+	let {
+		icon,
+		title,
+		tooltipText,
+		onHoldComplete = () => {},
+		holdDuration = 3000,
+	} = $props();
 
-	export let onHoldComplete = () => {};
-	export let holdDuration = 3000;
-
-	let holdProgress = 0;
+	let holdProgress = $state(0);
 	let holding = false;
 	let holdTimeout;
 	let progressInterval;
-	let holdText = "";
+	let holdText = $state("");
 
 	async function handleHoldStart() {
 		holding = true;
@@ -57,9 +58,9 @@
 			class="progress-bar"
 			role="button"
 			tabindex="0"
-			on:mousedown={handleHoldStart}
-			on:mouseup={handleHoldCancel}
-			on:mouseleave={handleHoldCancel}
+			onmousedown={handleHoldStart}
+			onmouseup={handleHoldCancel}
+			onmouseleave={handleHoldCancel}
 		>
 			<div class="bar" style="width: {holdProgress}%"></div>
 			<span class="bar-text">

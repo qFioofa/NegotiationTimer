@@ -1,15 +1,12 @@
 <script>
-	export let isOpen;
-	export let ref;
-
-	export let handleOpen = () => {};
+	let { isOpen, ref = $bindable(), handleOpen = () => {} } = $props();
 </script>
 
 <div class="menu-container">
 	<button
 		bind:this={ref}
 		class="menu-button {isOpen ? 'menu-open' : ''}"
-		on:click={handleOpen}
+		onclick={handleOpen}
 		aria-label={isOpen ? "Close menu" : "Open menu"}
 	>
 		<div class="menu-line"></div>

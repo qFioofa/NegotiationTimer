@@ -1,9 +1,11 @@
 <script>
 	import "$lib/cssStyles/global.css";
 	import "$lib/cssStyles/themes.css";
+
+	let { children } = $props();
 </script>
 
-<slot />
+{@render children()}
 
 <svelte:head>
 	<link

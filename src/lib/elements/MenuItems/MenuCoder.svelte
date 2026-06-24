@@ -7,14 +7,8 @@
 	import Encoder from "$lib/components/Encoder";
 	import Common from "./Wrappers/Common.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
-
-	export let text;
-
-	export let value;
-	let error;
+	let { icon, title, tooltipText, text, value = $bindable() } = $props();
+	let error = $state();
 
 	function generateFilename() {
 		return `nTimerCfg${Encoder.generateRandomId()}.cfg`;
@@ -61,7 +55,7 @@
 <Common {icon} {title} {tooltipText}>
 	<InputGroup>
 		<ApplyButton bind:value {text} bind:error onApply={encode} />
-		<Message bind:value />
+		<Message {value} />
 		<TextError {error} />
 	</InputGroup>
 </Common>

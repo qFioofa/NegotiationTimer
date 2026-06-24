@@ -2,13 +2,14 @@
 	import InputGroup from "./Wrappers/InputGroup.svelte";
 	import Common from "./Wrappers/Common.svelte";
 
-	export let icon;
-	export let title;
-	export let tooltipText;
-	export let options;
-	export let selectedOption;
-
-	export let onOptionSelect = () => {};
+	let {
+		icon,
+		title,
+		tooltipText,
+		options,
+		selectedOption = $bindable(),
+		onOptionSelect = () => {},
+	} = $props();
 
 	function selectOption(option) {
 		selectedOption = option;
@@ -24,7 +25,7 @@
 					<button
 						class:option
 						class:active={option === selectedOption}
-						on:click={() => selectOption(option)}
+						onclick={() => selectOption(option)}
 					>
 						{option}
 					</button>

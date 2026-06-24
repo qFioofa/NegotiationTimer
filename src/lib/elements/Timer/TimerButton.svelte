@@ -1,11 +1,10 @@
 <script>
 	import RollingCounter from "./RollingCounter.svelte";
 
-	export let displayTime;
-	export let onClick = () => {};
+	let { displayTime, onClick = () => {} } = $props();
 </script>
 
-<button class="timer" on:click={onClick}>
+<button class="timer" onclick={onClick}>
 	<RollingCounter value={displayTime} />
 </button>
 
