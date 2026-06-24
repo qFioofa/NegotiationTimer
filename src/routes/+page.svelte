@@ -14,7 +14,7 @@
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
 
-		GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
+		return GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
 	});
 </script>
 

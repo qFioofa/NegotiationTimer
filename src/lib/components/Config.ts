@@ -43,11 +43,12 @@ export default class Config {
 		});
 	}
 
-	subscribe(key: string, callback: ConfigSubscriber): void {
+	subscribe(key: string, callback: ConfigSubscriber): () => void {
 		if (!this._subscribers[key]) {
 			this._subscribers[key] = [];
 		}
 		this._subscribers[key].push(callback);
+		return () => this.unsubscribe(key, callback);
 	}
 
 	unsubscribe(key: string, callback: ConfigSubscriber): void {
@@ -87,15 +88,26 @@ export default class Config {
 	set(key: string, value: unknown): this {
 		this._settings[key] = value;
 		this._notify(key, value);
+		// ponytail: write-through persist; add debounce if set() ever goes per-keystroke
+		this.save();
 		return this;
 	}
 
 	async setConfig(cfg?: ConfigSettings, mediaCfg?: MediaMap): Promise<void> {
-		if (cfg) this._settings = cfg;
+		if (cfg) {
+			this._settings = { ...this._defaultSettings, ...cfg };
+			for (const [key, value] of Object.entries(this._settings)) {
+				this._notify(key, value);
+			}
+			this.save();
+		}
 
 		if (mediaCfg && typeof mediaCfg === "object") {
 			try {
 				await this.setAllMedia(mediaCfg);
+				for (const [key, blob] of Object.entries(mediaCfg)) {
+					this._notify(key, blob);
+				}
 			} catch (error) {
 				console.error(
 					"Failed to load media files in setConfig:",
@@ -214,31 +226,19 @@ export default class Config {
 		return new Promise((resolve, reject) => {
 			const tx = db.transaction("media", "readonly");
 			const store = tx.objectStore("media");
-			const request = store.getAllKeys();
+			// getAllKeys() and getAll() iterate in the same key order, so pair by index
+			const keysReq = store.getAllKeys();
+			const valsReq = store.getAll();
 
-			request.onsuccess = () => {
-				const keys = request.result;
+			tx.oncomplete = () => {
 				const result: MediaMap = {};
-
-				const valueTx = db.transaction("media", "readonly");
-				const valueStore = valueTx.objectStore("media");
-
-				let pending = keys.length;
-				if (pending === 0) return resolve(result);
-
-				for (const key of keys) {
-					const getReq = valueStore.get(key);
-					getReq.onsuccess = () => {
-						result[key as string] = getReq.result;
-						if (--pending === 0) resolve(result);
-					};
-					getReq.onerror = () => {
-						reject(getReq.error);
-					};
-				}
+				keysReq.result.forEach((key, i) => {
+					result[key as string] = valsReq.result[i] as Blob;
+				});
+				resolve(result);
 			};
 
-			request.onerror = () => reject(request.error);
+			tx.onerror = () => reject(tx.error);
 		});
 	}
 

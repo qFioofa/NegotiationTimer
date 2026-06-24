@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import {
 		detectFileTypeFromBase64,
@@ -35,17 +35,19 @@
 		}
 	}
 
-	onMount(async () => {
-		GlobalConfig.subscribe(
-			"backgroundImage",
-			async (v) => await setBackgroundSrc(),
-		);
-		GlobalConfig.subscribe(
-			"usingBackroundImage",
-			(v) => (usingBackroundImage = v),
-		);
-		await setBackgroundSrc();
+	const offBg = GlobalConfig.subscribe("backgroundImage", () =>
+		setBackgroundSrc(),
+	);
+	const offUsing = GlobalConfig.subscribe(
+		"usingBackroundImage",
+		(v) => (usingBackroundImage = v),
+	);
+	onDestroy(() => {
+		offBg();
+		offUsing();
 	});
+
+	onMount(setBackgroundSrc);
 </script>
 
 {#if isBackgroundLoading}
@@ -68,9 +70,9 @@
 
 {#if !isBackgroundLoading && mediaUrl && usingBackroundImage}
 	{#if mediaType === "video"}
-		<BackgroundVideo bind:url={mediaUrl} />
+		<BackgroundVideo url={mediaUrl} />
 	{:else if mediaType === "image"}
-		<BackgroundImage bind:url={mediaUrl} />
+		<BackgroundImage url={mediaUrl} />
 	{/if}
 {/if}
 

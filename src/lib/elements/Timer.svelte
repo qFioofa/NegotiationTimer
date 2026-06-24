@@ -66,7 +66,10 @@
 
 	onMount(() => {
 		// initTimer();
-		GlobalConfig.subscribe("extraButtonsOn", (v) => (extraButtonsOn = v));
+		return GlobalConfig.subscribe(
+			"extraButtonsOn",
+			(v) => (extraButtonsOn = v),
+		);
 	});
 </script>
 

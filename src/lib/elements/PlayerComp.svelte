@@ -18,11 +18,12 @@
 	}
 
 	onMount(() => {
-		GlobalConfig.subscribe(
+		const off = GlobalConfig.subscribe(
 			"playerBackground",
 			(v) => (playerBackground = v),
 		);
 		ShuffleFunction.set(ShufflePlayers);
+		return off;
 	});
 </script>
 

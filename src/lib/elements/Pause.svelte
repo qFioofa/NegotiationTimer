@@ -25,11 +25,18 @@
 	let extraButtonsPauseOn = $state(GlobalConfig.get("extraButtonsPauseOn"));
 
 	onMount(() => {
-		GlobalConfig.subscribe("panelAutoOpen", (v) => (panelAutoOpen = v));
-		GlobalConfig.subscribe(
+		const off1 = GlobalConfig.subscribe(
+			"panelAutoOpen",
+			(v) => (panelAutoOpen = v),
+		);
+		const off2 = GlobalConfig.subscribe(
 			"extraButtonsPauseOn",
 			(v) => (extraButtonsPauseOn = v),
 		);
+		return () => {
+			off1();
+			off2();
+		};
 	});
 </script>
 
