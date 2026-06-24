@@ -1,3 +1,7 @@
+<!--
+	@deprecated НЕ ИСПОЛЬЗУЕТСЯ. Старая выезжающая слева панель с hover/autopause-логикой.
+	Заменена выпадающей плашкой в BottomMenu.svelte. Удалить при чистке легаси.
+-->
 <script>
 	import { isPaused, setPause } from "$lib/components/Pause";
 	import { GlobalConfig } from "$lib/stores/parameters";

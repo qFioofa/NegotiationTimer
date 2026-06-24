@@ -27,9 +27,11 @@
 {#if !hideUI}
 	<PlayerComp />
 
-	<BottomMenu />
-
 	<Timer />
 {/if}
+
+<!-- Угловые триггеры живут вместе и не прячутся под hideAllUI: иначе шестерёнка
+     осталась бы одна, а часы исчезли. BottomMenu сам рендерит Pause + плашку. -->
+<BottomMenu />
 
 <SettingsTrigger />

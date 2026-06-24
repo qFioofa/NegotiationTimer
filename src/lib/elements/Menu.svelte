@@ -1,3 +1,8 @@
+<!--
+	@deprecated ЛЕГАСИ. Старое боковое меню-«гамбургер». Заменено системой настроек
+	(SettingsTrigger / SettingsModal / settingsRegistry). Сейчас подключено только в
+	dev-роуте /menu (в проде 404). Удалить вместе с /menu и OpacityMouse.svelte.
+-->
 <script>
 	import { GlobalConfig, IntroGuideVisiable } from "$lib/stores/parameters";
 	import { themeManager, csHandler } from "$lib/cssStyles/themeHanager";

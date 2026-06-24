@@ -60,7 +60,8 @@
 
 		videoElement.onloadeddata = () => {
 			videoElement.play().catch((e) => {
-				console.warn("Autoplay blocked:", e);
+				// Ожидаемое поведение (политика автоплея), не ошибка — шумим только в dev.
+				if (import.meta.env.DEV) console.warn("Autoplay blocked:", e);
 			});
 		};
 

@@ -112,6 +112,14 @@
 		cursor: pointer;
 	}
 
+	/* Гасим глобальный button:hover (accent-фон/transform) — backdrop должен
+	   оставаться тёмной полупрозрачной подложкой, а не краситься в accent. */
+	.backdrop:hover {
+		background: var(--shadow, rgba(0, 0, 0, 0.5));
+		transform: none;
+		box-shadow: none;
+	}
+
 	.panel {
 		position: relative;
 		display: flex;

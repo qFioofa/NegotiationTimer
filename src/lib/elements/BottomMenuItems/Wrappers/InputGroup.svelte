@@ -9,7 +9,7 @@
 <style>
 	.input-group {
 		display: flex;
-		gap: 0.4rem;
+		gap: 0.6rem;
 		align-items: center;
 		user-select: none;
 	}

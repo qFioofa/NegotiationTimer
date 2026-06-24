@@ -5,12 +5,15 @@ export type AppConfig = {
 	shuffleKey: string;
 	toggleTimer: string;
 	pauseKey: string;
+	addTimeKey: string;
+	subTimeKey: string;
 	theme: string;
 	shuffleAnimation: string;
 	hideAllUI: boolean;
 	extraButtonsOn: boolean;
 	extraButtonsPauseOn: boolean;
 	panelAutoPause: boolean;
+	/** @deprecated Не влияет ни на что после перехода на выпадающую плашку времени. */
 	panelAutoOpen: boolean;
 	menuAutoPause: boolean;
 	timerBlackOut: boolean;
@@ -30,6 +33,8 @@ export const dConfig: AppConfig = {
 	shuffleKey: "KeyR",
 	toggleTimer: "KeyW",
 	pauseKey: "Space",
+	addTimeKey: "ArrowUp",
+	subTimeKey: "ArrowDown",
 	theme: "green",
 	shuffleAnimation: "Replace",
 	hideAllUI: false,

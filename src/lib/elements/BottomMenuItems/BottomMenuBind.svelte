@@ -1,3 +1,7 @@
+<!--
+	@deprecated НЕ ИСПОЛЬЗУЕТСЯ. Бинды переехали в настройки (type "bind" в
+	settingsRegistry.ts, рендер — MenuBind.svelte). Удалить при чистке легаси.
+-->
 <script>
 	import ApplyButton from "$lib/elements/BottomMenuItems/General/ApplyButton.svelte";
 	import InputGroup from "$lib/elements/BottomMenuItems/Wrappers/InputGroup.svelte";

@@ -1,3 +1,7 @@
+<!--
+	@deprecated НЕ ИСПОЛЬЗУЕТСЯ в проде. Обёртка proximity-reveal для триггеров старого
+	меню. Осталась только зависимость из легаси Menu.svelte. Удалить вместе с ним.
+-->
 <!-- OpacityMouse.svelte -->
 <script>
 	import { onMount } from "svelte";

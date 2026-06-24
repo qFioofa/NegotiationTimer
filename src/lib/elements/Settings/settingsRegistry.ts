@@ -7,9 +7,10 @@ import {
 import { getShuffleNames } from "$lib/components/Shuffle";
 import { dConfig } from "$lib/stores/defaultConfig";
 import { togglePause, isPaused } from "$lib/components/Pause";
-import { toggleTimer } from "$lib/stores/timerDown";
+import { toggleTimer, timeAdd, timeSubtract } from "$lib/stores/timerDown";
 import { toggleUpTimer } from "$lib/stores/timerUp";
 import { setBindListener } from "$lib/components/utils/BindUtils";
+import { mmssToSeconds } from "$lib/components/utils/TimerUtils";
 import { get } from "svelte/store";
 
 // Действия биндов — перенесены из BottomMenu.svelte дословно.
@@ -24,6 +25,11 @@ function anyTimerToggle() {
 		return;
 	}
 	toggleTimer();
+}
+
+// Шаг ±времени берётся из той же настройки, что и кнопки в плашке (timeAddSubStep).
+function stepSeconds(): number {
+	return mmssToSeconds(GlobalConfig.get("timeAddSubStep") as string);
 }
 
 // Категории из ТЗ. `all` — виртуальная: показывает всё, выделяется отдельным фоном.
@@ -70,6 +76,8 @@ export const settings = [
 		configKey: "afterSound",
 	},
 	{
+		// @deprecated Мёртвая настройка: после перехода на выпадающую плашку времени
+		// (иконка-часы) hover-открытие больше не реализовано. Тумблер ни на что не влияет.
 		id: "panelAutoOpen",
 		category: "interaction",
 		type: "toggle",
@@ -327,6 +335,32 @@ export const settings = [
 		keywords: ["таймер", "бинд", "клавиша", "старт", "хоткей"],
 		configKey: "toggleTimer",
 		action: anyTimerToggle,
+	},
+	{
+		id: "addTimeKey",
+		category: "layout",
+		type: "bind",
+		icon: "⏫",
+		title: "Добавить время: клавиша",
+		description:
+			"Назначьте клавишу, по нажатию которой к таймеру прибавляется шаг времени. Размер шага задаётся настройкой «Добавить/убавить время» в плашке времени. Удобно докидывать минуты прямо во время переговоров, не открывая панель.",
+		tooltip: "Назначьте клавишу для добавления шага времени",
+		keywords: ["время", "бинд", "клавиша", "добавить", "плюс", "хоткей"],
+		configKey: "addTimeKey",
+		action: () => timeAdd(stepSeconds()),
+	},
+	{
+		id: "subTimeKey",
+		category: "layout",
+		type: "bind",
+		icon: "⏬",
+		title: "Убавить время: клавиша",
+		description:
+			"Назначьте клавишу, по нажатию которой от таймера отнимается шаг времени. Размер шага общий с кнопками «+/−» в плашке времени. Позволяет быстро срезать время без мыши.",
+		tooltip: "Назначьте клавишу для вычитания шага времени",
+		keywords: ["время", "бинд", "клавиша", "убавить", "минус", "хоткей"],
+		configKey: "subTimeKey",
+		action: () => timeSubtract(stepSeconds()),
 	},
 ];
 

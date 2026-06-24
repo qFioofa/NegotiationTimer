@@ -25,24 +25,21 @@
 	.bottom-menu-item {
 		display: flex;
 		flex-direction: column;
-		gap: 0.6rem;
-		padding: 1rem;
+		gap: 1.1rem;
+		padding: 2rem 1.5rem;
 		border-radius: var(--radius-lg);
-		transform: translateY(0);
 		background: var(--bg-card);
-		box-shadow: none;
+		box-shadow: inset 0 0 0 0 transparent;
 		transition:
 			background-color 0.3s ease,
-			box-shadow 0.3s ease,
-			transform 0.3s ease,
-			padding 0.3s ease;
+			box-shadow 0.3s ease;
 	}
 
+	/* Inset-ring вместо outset+scale: ничего не торчит за карточку, поэтому
+	   не обрезается overflow-ом прокручиваемого тела плашки. */
 	.bottom-menu-item:hover {
 		background: var(--bg);
-		box-shadow: 0 0 0 2px var(--accent);
-		transform: translateY(2px) scale(1.02);
-		padding: 1.1rem;
+		box-shadow: inset 0 0 0 2px var(--accent);
 	}
 
 	.top {

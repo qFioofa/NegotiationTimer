@@ -38,14 +38,14 @@
 	/* Стиль кнопок таймера (TimerButton): рамка accent, blur, тень-сдвиг. */
 	.settings-trigger {
 		position: fixed;
-		top: 1.5rem;
-		right: 1.5rem;
+		top: var(--trigger-edge);
+		right: var(--trigger-edge);
 		z-index: 1001;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 4rem;
-		height: 4rem;
+		width: var(--trigger-size);
+		height: var(--trigger-size);
 		padding: 0;
 		border-radius: var(--radius-xxl);
 		border: 2px solid var(--accent);
@@ -64,7 +64,7 @@
 	}
 
 	.settings-trigger:hover {
-		transform: scale(1.08) rotate(30deg);
+		transform: scale(1.08);
 		box-shadow: 6px 6px 0 var(--accent-dark);
 	}
 
@@ -74,11 +74,8 @@
 	}
 
 	@media (max-width: 480px) {
+		/* Размер/позиция приходят из --trigger-* (мобильный оверрайд в global.css). */
 		.settings-trigger {
-			top: 1rem;
-			right: 1rem;
-			width: 3.2rem;
-			height: 3.2rem;
 			font-size: 1.6rem;
 		}
 	}

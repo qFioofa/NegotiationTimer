@@ -120,6 +120,21 @@ html[class^="theme-"] {
 	--blackout-backround: rgba(0, 0, 0, 0.95);
 	--error-text: #ff5555;
 	--error-black: #8b0000;
+
+	/* Геометрия угловых триггеров (шестерёнка + часы) — единый источник правды.
+	   Позиции часов, плашки и её «хвостика» считаются из этих значений, чтобы не
+	   было рассинхрона при сдвиге кнопок. */
+	--trigger-size: 4rem;
+	--trigger-edge: 1.5rem;
+	--trigger-gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+	:root {
+		--trigger-size: 3.2rem;
+		--trigger-edge: 1rem;
+		--trigger-gap: 0.6rem;
+	}
 }
 
 html,
