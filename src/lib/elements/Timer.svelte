@@ -82,6 +82,7 @@
 			<ExtraButtonsWrapper>
 				<ExtraButtons
 					icon="🔄"
+					tooltip="Сбросить время к стартовому"
 					onClick={() => {
 						timeSubtract(toMs());
 						timeAdd($downTimerSnap);
@@ -90,12 +91,14 @@
 				/>
 				<ExtraButtons
 					icon="⏯️"
+					tooltip="Поставить на паузу"
 					onClick={() => {
 						isPaused.set(true);
 					}}
 				/>
 				<ExtraButtons
 					icon="🔃"
+					tooltip="Жеребьёвка игроков"
 					onClick={() => {
 						handleShuffle();
 					}}

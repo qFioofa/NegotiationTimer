@@ -1,26 +1,78 @@
 <script>
 	let { tooltipText } = $props();
+
+	let iconEl = $state(null);
+	let tipEl = $state(null);
+	let visible = $state(false);
+	let ready = $state(false);
+	let style = $state("");
+
+	// Render the tooltip on <body> so it escapes the menu's scroll container
+	// (overflow) and the panel's transform — both of which otherwise clip it.
+	function portal(node) {
+		document.body.appendChild(node);
+		return { destroy: () => node.remove() };
+	}
+
+	// Position relative to the icon, in viewport coords. Default above & centered,
+	// flip below if it would clip the top, clamp into the viewport on both axes.
+	function place() {
+		if (!iconEl || !tipEl) return;
+		const r = iconEl.getBoundingClientRect();
+		const t = tipEl.getBoundingClientRect();
+		const m = 8;
+
+		let top = r.top - t.height - m;
+		if (top < m) top = r.bottom + m;
+		top = Math.max(m, Math.min(top, window.innerHeight - t.height - m));
+
+		let left = r.left + r.width / 2 - t.width / 2;
+		left = Math.max(m, Math.min(left, window.innerWidth - t.width - m));
+
+		style = `top: ${top}px; left: ${left}px;`;
+	}
+
+	const show = () => (visible = true);
+	const hide = () => (visible = false);
+
+	$effect(() => {
+		if (visible && tipEl) {
+			place();
+			ready = true;
+		} else {
+			ready = false;
+		}
+	});
 </script>
 
 {#if tooltipText}
-	<div class="tooltip-wrapper">
-		<span
-			class="info-icon"
-			tabindex="0"
-			role="button"
-			aria-label="Показать подсказку">?</span
+	<span
+		class="info-icon"
+		bind:this={iconEl}
+		tabindex="0"
+		role="button"
+		aria-label="Показать подсказку"
+		onmouseenter={show}
+		onmouseleave={hide}
+		onfocus={show}
+		onblur={hide}>?</span
+	>
+
+	{#if visible}
+		<div
+			class="tooltip"
+			class:ready
+			bind:this={tipEl}
+			use:portal
+			role="tooltip"
+			{style}
 		>
-		<div class="tooltip" role="tooltip">{tooltipText}</div>
-	</div>
+			{tooltipText}
+		</div>
+	{/if}
 {/if}
 
 <style>
-	.tooltip-wrapper {
-		position: relative;
-		display: inline-block;
-		isolation: isolate;
-	}
-
 	.info-icon {
 		width: 18px;
 		height: 18px;
@@ -28,52 +80,10 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 50%;
-		position: relative;
-		z-index: 1;
-	}
-
-	.tooltip {
-		position: absolute;
-		bottom: 140%;
-		left: 50%;
-		transform: translateX(-50%);
-		padding: var(--spacing-xs) var(--spacing-sm);
-		border-radius: var(--radius-sm);
-		max-width: 320px;
-		text-align: center;
-		white-space: normal;
-		opacity: 0;
-		visibility: hidden;
-		pointer-events: none;
-		z-index: 2;
-	}
-
-	.tooltip::after {
-		content: "";
-		position: absolute;
-		top: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		border-width: 6px;
-		border-style: solid;
-		border-color: var(--tooltip-bg, #222) transparent transparent
-			transparent;
-	}
-
-	.info-icon {
 		background: var(--accent);
 		color: var(--input-bg);
 		box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 		cursor: help;
-	}
-
-	.tooltip {
-		background: var(--tooltip-bg, #222);
-		color: var(--tooltip-fg, #fff);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-	}
-
-	.info-icon {
 		font-family: var(--font-family-base);
 		font-size: 1rem;
 		font-weight: var(--font-weight-bold);
@@ -81,23 +91,39 @@
 	}
 
 	.tooltip {
+		position: fixed;
+		max-width: 320px;
+		padding: var(--spacing-xs) var(--spacing-sm);
+		border-radius: var(--radius-sm);
+		text-align: center;
+		white-space: normal;
+		background: var(--tooltip-bg, #222);
+		color: var(--tooltip-fg, #fff);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 		font-family: var(--font-family-base);
 		font-size: 1.1rem;
 		font-weight: var(--font-weight-normal);
 		line-height: var(--line-height-base);
-	}
-
-	.tooltip {
+		pointer-events: none;
+		/* above menu/pause/blackout panels so it is never hidden behind UI */
+		z-index: 4000;
+		opacity: 0;
+		transform: translateY(4px);
 		transition:
 			opacity 0.2s ease,
-			visibility 0.2s ease,
 			transform 0.2s ease;
 	}
 
-	.tooltip-wrapper:hover .tooltip,
-	.tooltip-wrapper:focus-within .tooltip {
+	.tooltip.ready {
 		opacity: 1;
-		visibility: visible;
-		transform: translateX(-50%) translateY(-4px);
+		transform: translateY(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tooltip,
+		.tooltip.ready {
+			transform: none;
+			transition: opacity 0.15s ease;
+		}
 	}
 </style>
