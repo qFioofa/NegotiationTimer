@@ -13,7 +13,6 @@
 	let playerBackground = GlobalConfig.get("playerBackground");
 
 	async function ShufflePlayers() {
-		// Respect reduced motion: skip the animated flip, apply a random result instantly.
 		if (
 			typeof window !== "undefined" &&
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches

@@ -27,8 +27,6 @@
 		flex-direction: column;
 		gap: 0.6rem;
 		padding: 1rem;
-		margin-left: 50px;
-		margin-bottom: 1rem;
 		border-radius: var(--radius-lg);
 		transform: translateY(0);
 		background: var(--bg-card);
