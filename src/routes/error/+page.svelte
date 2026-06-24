@@ -10,8 +10,6 @@
 		document.body.style.background =
 			"linear-gradient(135deg, #8B0000 0%, #450000 100%)";
 
-		createParticles();
-
 		return () => {
 			document.body.style.backgroundColor = "";
 			document.body.style.background = "";
@@ -184,15 +182,6 @@
 		100% {
 			opacity: 1;
 			transform: translateX(0);
-		}
-	}
-
-	@keyframes float {
-		0% {
-			transform: translate(0, 0) rotate(0deg);
-		}
-		100% {
-			transform: translate(100px, 100vh) rotate(360deg);
 		}
 	}
 

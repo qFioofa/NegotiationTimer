@@ -12,6 +12,8 @@
 <input
 	type="text"
 	class="timer-text-input"
+	class:error
+	aria-invalid={error ? "true" : "false"}
 	bind:value
 	on:input={(e) => {
 		const _result = onInputChange(e.target.value);
