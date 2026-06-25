@@ -8,6 +8,8 @@ export type AppConfig = {
 	addTimeKey: string;
 	subTimeKey: string;
 	theme: string;
+	/** Кастомный акцентный цвет поверх пресета. null = использовать цвет темы. */
+	accentColor: string | null;
 	shuffleAnimation: string;
 	hideAllUI: boolean;
 	extraButtonsOn: boolean;
@@ -36,6 +38,7 @@ export const dConfig: AppConfig = {
 	addTimeKey: "ArrowUp",
 	subTimeKey: "ArrowDown",
 	theme: "green",
+	accentColor: null,
 	shuffleAnimation: "Replace",
 	hideAllUI: false,
 	extraButtonsOn: true,

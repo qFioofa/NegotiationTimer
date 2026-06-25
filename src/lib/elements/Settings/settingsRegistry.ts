@@ -178,6 +178,19 @@ export const settings = [
 		onSelect: (opt: string) => themeManager.setTheme(opt),
 	},
 	{
+		id: "accentColor",
+		category: "appearance",
+		type: "color",
+		icon: "🎨",
+		title: "Цвет акцента",
+		description:
+			"Переопределяет акцентный (внутренний) цвет выбранной темы своим цветом. Сам пресет темы остаётся прежним — меняется только основной цвет. «Сброс» возвращает родной цвет темы. Выбор сохраняется между запусками.",
+		tooltip: "Свой акцентный цвет поверх текущей темы",
+		keywords: ["цвет", "акцент", "color", "тема", "пресет"],
+		configKey: "accentColor",
+		onSelect: (color: string | null) => themeManager.setAccent(color),
+	},
+	{
 		id: "presetConfig",
 		category: "profile",
 		type: "optionList",

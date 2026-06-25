@@ -48,6 +48,14 @@
 		error = "";
 	}
 
+	async function onDelete() {
+		await GlobalConfig.deleteMedia(configKey);
+		fileUrl = null;
+		fileName = null;
+		loaded = false;
+		error = "";
+	}
+
 	onMount(async () => {
 		const media = await GlobalConfig.getMedia(configKey);
 		if (!media) return;
@@ -67,6 +75,11 @@
 	<InputGroup>
 		<div class="media-upload">
 			<MediaUpload {supportedTypes} {onChange} />
+			{#if fileUrl}
+				<button class="delete-media" onclick={onDelete}>
+					🗑 Удалить медиа
+				</button>
+			{/if}
 			{#if loading}
 				<div class="loading">Загрузка...</div>
 			{:else if loaded}
@@ -91,6 +104,22 @@
 		gap: 0.5rem;
 		word-break: break-word;
 		overflow-wrap: anywhere;
+	}
+
+	.delete-media {
+		padding: var(--spacing-xs) var(--spacing-xs);
+		border: 1px solid var(--danger, #a04e4e);
+		border-radius: var(--radius-lg);
+		background: var(--input-bg);
+		color: var(--danger, #a04e4e);
+		font-family: var(--font-family-base);
+		font-size: 1rem;
+		cursor: pointer;
+		transition: var(--transition);
+	}
+
+	.delete-media:hover {
+		background: var(--bg-hover);
 	}
 
 	.loading {

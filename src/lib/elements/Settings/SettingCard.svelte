@@ -6,6 +6,7 @@
 	import MenuToggle from "../MenuItems/MenuToggle.svelte";
 	import MenuCoder from "../MenuItems/MenuCoder.svelte";
 	import MenuMedia from "../MenuItems/MenuMedia.svelte";
+	import MenuColor from "../MenuItems/MenuColor.svelte";
 	import MenuClick from "../MenuItems/MenuClick.svelte";
 	import MenuHold from "../MenuItems/MenuHold.svelte";
 	import MenuBind from "../MenuItems/MenuBind.svelte";
@@ -51,6 +52,19 @@
 			onOptionSelect={(opt) => {
 				if (setting.configKey) set(setting.configKey, opt);
 				setting.onSelect?.(opt);
+				flash();
+			}}
+		/>
+	{:else if setting.type === "color"}
+		<MenuColor
+			icon={setting.icon}
+			title={setting.title}
+			description={setting.description}
+			tooltipText={setting.tooltip}
+			value={get(setting.configKey)}
+			onChange={(v) => {
+				set(setting.configKey, v);
+				setting.onSelect?.(v);
 				flash();
 			}}
 		/>

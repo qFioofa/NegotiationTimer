@@ -14,6 +14,7 @@
 
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
+		themeManager.setAccent(GlobalConfig.get("accentColor"));
 		registerBinds();
 
 		return GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
@@ -30,8 +31,6 @@
 	<Timer />
 {/if}
 
-<!-- Угловые триггеры живут вместе и не прячутся под hideAllUI: иначе шестерёнка
-     осталась бы одна, а часы исчезли. BottomMenu сам рендерит Pause + плашку. -->
 <BottomMenu />
 
 <SettingsTrigger />

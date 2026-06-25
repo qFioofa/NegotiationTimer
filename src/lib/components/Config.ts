@@ -156,6 +156,8 @@ export default class Config {
 	async deleteMedia(key: string): Promise<boolean> {
 		try {
 			await this._deleteMedia(key);
+			// Уведомляем подписчиков (фон/звук), чтобы превью обновилось без перезагрузки.
+			this._notify(key, undefined);
 			return true;
 		} catch (error) {
 			console.error(`Failed to delete media "${key}":`, error);
