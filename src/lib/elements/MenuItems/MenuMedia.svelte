@@ -11,6 +11,7 @@
 	import MediaView from "./General/MediaView.svelte";
 	import Message from "./General/Message.svelte";
 	import Common from "./Wrappers/Common.svelte";
+	import { Trash2 } from "lucide-svelte";
 	import { onMount } from "svelte";
 
 	let { icon, title, tooltipText, description, supportedTypes, configKey } =
@@ -77,7 +78,7 @@
 			<MediaUpload {supportedTypes} {onChange} />
 			{#if fileUrl}
 				<button class="delete-media" onclick={onDelete}>
-					🗑 Удалить медиа
+					<Trash2 size={18} /> Удалить медиа
 				</button>
 			{/if}
 			{#if loading}
@@ -107,6 +108,10 @@
 	}
 
 	.delete-media {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
 		padding: var(--spacing-xs) var(--spacing-xs);
 		border: 1px solid var(--danger, #a04e4e);
 		border-radius: var(--radius-lg);

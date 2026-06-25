@@ -16,6 +16,7 @@
 
 <div class="categories" role="tablist" aria-label="Категории настроек">
 	{#each categories as cat, i}
+		{@const Icon = cat.icon}
 		<button
 			id="cat-{cat.id}"
 			role="tab"
@@ -27,7 +28,7 @@
 			onclick={() => (selected = cat.id)}
 			onkeydown={(e) => onKeydown(e, i)}
 		>
-			<span class="cat-icon" aria-hidden="true">{cat.icon}</span>
+			<span class="cat-icon" aria-hidden="true"><Icon size={18} /></span>
 			<span class="cat-label">{cat.label}</span>
 		</button>
 	{/each}

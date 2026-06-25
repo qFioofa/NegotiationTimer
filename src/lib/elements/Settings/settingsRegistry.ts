@@ -1,3 +1,32 @@
+import {
+	LayoutGrid,
+	Palette,
+	MousePointerClick,
+	Film,
+	Keyboard,
+	Image,
+	Volume2,
+	User,
+	Sparkles,
+	MonitorOff,
+	Music,
+	Wrench,
+	ChevronsDown,
+	ChevronsUp,
+	Pause,
+	Play,
+	Layers,
+	EyeOff,
+	Pipette,
+	Package,
+	Shuffle,
+	Video,
+	FileAudio,
+	ClipboardCopy,
+	Upload,
+	RotateCcw,
+	CircleQuestionMark,
+} from "lucide-svelte";
 import { themeManager, csHandler } from "$lib/cssStyles/themeHanager";
 import {
 	GlobalConfig,
@@ -36,15 +65,15 @@ function stepSeconds(): number {
 export const ALL_CATEGORY = "all";
 
 export const categories = [
-	{ id: ALL_CATEGORY, label: "Все", icon: "🗂" },
-	{ id: "appearance", label: "Внешний вид", icon: "🎨" },
-	{ id: "interaction", label: "Взаимодействие", icon: "🖱" },
-	{ id: "animations", label: "Анимации", icon: "🎬" },
-	{ id: "layout", label: "Раскладка", icon: "🧩" },
-	{ id: "media", label: "Медиа", icon: "🖼" },
-	{ id: "sound", label: "Звук", icon: "🔊" },
-	{ id: "profile", label: "Профиль", icon: "👤" },
-	{ id: "other", label: "Другое", icon: "✨" },
+	{ id: ALL_CATEGORY, label: "Все", icon: LayoutGrid },
+	{ id: "appearance", label: "Внешний вид", icon: Palette },
+	{ id: "interaction", label: "Взаимодействие", icon: MousePointerClick },
+	{ id: "animations", label: "Анимации", icon: Film },
+	{ id: "layout", label: "Раскладка", icon: Keyboard },
+	{ id: "media", label: "Медиа", icon: Image },
+	{ id: "sound", label: "Звук", icon: Volume2 },
+	{ id: "profile", label: "Профиль", icon: User },
+	{ id: "other", label: "Другое", icon: Sparkles },
 ];
 
 // Единый источник правды. Каждый дескриптор: метаданные для поиска/категорий +
@@ -55,7 +84,7 @@ export const settings = [
 		id: "timerBlackOut",
 		category: "appearance",
 		type: "toggle",
-		icon: "🖥",
+		icon: MonitorOff,
 		title: "Чёрный экран",
 		description:
 			"Когда таймер доходит до нуля, весь экран заливается чёрным цветом. Это резко обозначает конец раунда и переключает внимание участников. Удобно для презентаций и переговоров, где нужен явный сигнал окончания.",
@@ -67,7 +96,7 @@ export const settings = [
 		id: "afterSound",
 		category: "sound",
 		type: "toggle",
-		icon: "🎵",
+		icon: Music,
 		title: "Звук",
 		description:
 			"По окончании отсчёта проигрывается звуковой сигнал. Так о завершении времени можно узнать, даже не глядя на экран. Собственный звук загружается в разделе «Звук».",
@@ -81,7 +110,7 @@ export const settings = [
 		id: "panelAutoOpen",
 		category: "interaction",
 		type: "toggle",
-		icon: "🛠",
+		icon: Wrench,
 		title: "Выдвигать панель",
 		description:
 			"Боковая панель выезжает сама, как только курсор оказывается над её иконкой. Не нужно кликать — достаточно навести мышь. Если выключено, панель открывается только по клику.",
@@ -93,7 +122,7 @@ export const settings = [
 		id: "extraButtonsOn",
 		category: "interaction",
 		type: "toggle",
-		icon: "⏬",
+		icon: ChevronsDown,
 		title: "Доп. кнопки: меню",
 		description:
 			"Показывает в меню дополнительные кнопки: сброс таймера до начального значения и постановку на паузу. Это ускоряет управление во время сессии без захода в настройки. Полезно, когда нужно часто перезапускать или приостанавливать отсчёт.",
@@ -106,7 +135,7 @@ export const settings = [
 		id: "extraButtonsPauseOn",
 		category: "interaction",
 		type: "toggle",
-		icon: "⏬",
+		icon: ChevronsDown,
 		title: "Доп. кнопки: пауза",
 		description:
 			"Добавляет на экран паузы кнопки сброса таймера и закрытия паузы. Так отсчётом можно управлять прямо из режима паузы. Удобно для быстрого возврата к работе или перезапуска раунда.",
@@ -118,7 +147,7 @@ export const settings = [
 		id: "menuAutoPause",
 		category: "interaction",
 		type: "toggle",
-		icon: "⏸️",
+		icon: Pause,
 		title: "Автопауза: меню",
 		description:
 			"Пока открыто меню настроек, таймер автоматически приостанавливается. Время не расходуется, пока вы что-то настраиваете. При закрытии меню отсчёт продолжается с того же места.",
@@ -130,7 +159,7 @@ export const settings = [
 		id: "playerBackground",
 		category: "appearance",
 		type: "toggle",
-		icon: "🖼️",
+		icon: Layers,
 		title: "Фон игроков",
 		description:
 			"Включает отдельную подложку под карточками игроков, выделяя их на общем фоне. Это улучшает читаемость имён и результатов. Без неё игроки отображаются прямо поверх основного фона.",
@@ -142,7 +171,7 @@ export const settings = [
 		id: "hideAllUI",
 		category: "appearance",
 		type: "toggle",
-		icon: "🖼️",
+		icon: EyeOff,
 		title: "Скрыть элементы интерфейса",
 		description:
 			"Убирает с экрана все видимые элементы: игроков, таймер и панели управления. Остаётся только чистый фон. Полезно для скриншотов, демонстраций или когда нужен полностью свободный экран.",
@@ -155,7 +184,7 @@ export const settings = [
 		id: "usingBackroundImage",
 		category: "appearance",
 		type: "toggle",
-		icon: "🖼️",
+		icon: Image,
 		title: "Свой задний фон",
 		description:
 			"Использует загруженное вами изображение или видео в качестве заднего фона. Сам файл задаётся в разделе «Медиа». Если выключено, применяется стандартный фон темы.",
@@ -167,7 +196,7 @@ export const settings = [
 		id: "theme",
 		category: "appearance",
 		type: "optionList",
-		icon: "🎨",
+		icon: Palette,
 		title: "Тема",
 		description:
 			"Меняет цветовую схему и общий стиль оформления интерфейса. Доступные темы подгружаются автоматически и применяются мгновенно. Выбор сохраняется и восстанавливается при следующем запуске.",
@@ -181,7 +210,7 @@ export const settings = [
 		id: "accentColor",
 		category: "appearance",
 		type: "color",
-		icon: "🎨",
+		icon: Pipette,
 		title: "Цвет акцента",
 		description:
 			"Переопределяет акцентный (внутренний) цвет выбранной темы своим цветом. Сам пресет темы остаётся прежним — меняется только основной цвет. «Сброс» возвращает родной цвет темы. Выбор сохраняется между запусками.",
@@ -194,7 +223,7 @@ export const settings = [
 		id: "presetConfig",
 		category: "profile",
 		type: "optionList",
-		icon: "🎨",
+		icon: Package,
 		title: "Готовые конфиги",
 		description:
 			"Применяет один из встроенных готовых наборов настроек целиком. После выбора страница автоматически перезагружается, чтобы изменения вступили в силу. Это быстрый способ переключаться между заранее подготовленными конфигурациями.",
@@ -214,7 +243,7 @@ export const settings = [
 		id: "shuffleAnimation",
 		category: "animations",
 		type: "optionList",
-		icon: "🔂",
+		icon: Shuffle,
 		title: "Анимации жеребьёвки",
 		description:
 			"Задаёт, как именно анимируются игроки во время жеребьёвки. Разные варианты по-разному показывают процесс случайного выбора. Это чисто визуальная настройка — на сам результат жеребьёвки она не влияет.",
@@ -227,7 +256,7 @@ export const settings = [
 		id: "backgroundImage",
 		category: "media",
 		type: "media",
-		icon: "🎥",
+		icon: Video,
 		title: "Фоновое медиа",
 		description:
 			"Загружает изображение или видео, которое используется как фон приложения. Поддерживаются форматы png, jpeg, webp, а также видео mp4, webm и ogg. Файл сохраняется локально и подгружается при следующем запуске.",
@@ -248,7 +277,7 @@ export const settings = [
 		id: "audioTimerEnd",
 		category: "sound",
 		type: "media",
-		icon: "🔊",
+		icon: FileAudio,
 		title: "Аудио: загрузить файл",
 		description:
 			"Загружает собственный звук, который проигрывается по окончании отсчёта. Поддерживаются форматы mp3 и ogg. Чтобы звук был слышен, должна быть включена настройка «Звук».",
@@ -261,7 +290,7 @@ export const settings = [
 		id: "saveConfig",
 		category: "profile",
 		type: "coder",
-		icon: "📋",
+		icon: ClipboardCopy,
 		title: "Сохранить конфиг",
 		description:
 			"Сохраняет текущие настройки и загруженные медиа в файл .cfg. Этот файл можно перенести на другое устройство или оставить как резервную копию. Позже его легко загрузить обратно через «Загрузить конфиг».",
@@ -273,7 +302,7 @@ export const settings = [
 		id: "loadConfig",
 		category: "profile",
 		type: "decoder",
-		icon: "📥",
+		icon: Upload,
 		title: "Загрузить конфиг",
 		description:
 			"Восстанавливает настройки и медиа из ранее сохранённого файла .cfg. После загрузки страница перезагружается, чтобы применить изменения. Подходит для переноса конфигурации между устройствами или отката к резервной копии.",
@@ -284,7 +313,7 @@ export const settings = [
 		id: "resetConfig",
 		category: "profile",
 		type: "hold",
-		icon: "💾",
+		icon: RotateCcw,
 		title: "Сбросить настройки",
 		description:
 			"Сбрасывает все настройки к значениям по умолчанию и удаляет загруженные медиафайлы. Чтобы случайно ничего не стереть, кнопку нужно удерживать несколько секунд. После сброса страница перезагрузится.",
@@ -301,7 +330,7 @@ export const settings = [
 		id: "openGuide",
 		category: "other",
 		type: "click",
-		icon: "📍",
+		icon: CircleQuestionMark,
 		title: "Открыть гайд",
 		description:
 			"Запускает пошаговый гайд по основным возможностям приложения. Он показывает, как пользоваться таймером, панелями и настройками. Полезно при первом знакомстве или чтобы вспомнить забытые функции.",
@@ -314,7 +343,7 @@ export const settings = [
 		id: "shuffleKey",
 		category: "layout",
 		type: "bind",
-		icon: "🔀",
+		icon: Shuffle,
 		title: "Жеребьёвка: клавиша",
 		description:
 			"Назначьте клавишу, по нажатию которой запускается жеребьёвка игроков. Нажмите «Установить клавишу» и затем нужную кнопку на клавиатуре. Бинд работает на любой странице и не требует открытой панели.",
@@ -327,7 +356,7 @@ export const settings = [
 		id: "pauseKey",
 		category: "layout",
 		type: "bind",
-		icon: "⏸️",
+		icon: Pause,
 		title: "Пауза: клавиша",
 		description:
 			"Назначьте клавишу для постановки таймера на паузу и снятия с неё. Одно нажатие переключает состояние паузы. Удобно быстро останавливать отсчёт во время переговоров, не отвлекаясь на мышь.",
@@ -340,7 +369,7 @@ export const settings = [
 		id: "toggleTimer",
 		category: "layout",
 		type: "bind",
-		icon: "▶️",
+		icon: Play,
 		title: "Таймер: клавиша",
 		description:
 			"Назначьте клавишу, которая запускает или останавливает таймер. Если включена пауза, та же клавиша управляет таймером отсчёта вверх. Это основной горячий бинд для управления временем без мыши.",
@@ -353,7 +382,7 @@ export const settings = [
 		id: "addTimeKey",
 		category: "layout",
 		type: "bind",
-		icon: "⏫",
+		icon: ChevronsUp,
 		title: "Добавить время: клавиша",
 		description:
 			"Назначьте клавишу, по нажатию которой к таймеру прибавляется шаг времени. Размер шага задаётся настройкой «Добавить/убавить время» в плашке времени. Удобно докидывать минуты прямо во время переговоров, не открывая панель.",
@@ -366,7 +395,7 @@ export const settings = [
 		id: "subTimeKey",
 		category: "layout",
 		type: "bind",
-		icon: "⏬",
+		icon: ChevronsDown,
 		title: "Убавить время: клавиша",
 		description:
 			"Назначьте клавишу, по нажатию которой от таймера отнимается шаг времени. Размер шага общий с кнопками «+/−» в плашке времени. Позволяет быстро срезать время без мыши.",

@@ -4,6 +4,7 @@
 	import RollingCounter from "./Timer/RollingCounter.svelte";
 	import ExtraButtons from "./General/ExtraButtons.svelte";
 	import TimerButton from "./Timer/TimerButton.svelte";
+	import { RotateCcw, Pause, Shuffle } from "lucide-svelte";
 	import { isPaused } from "$lib/components/Pause";
 	import BlackOut from "./BlackOut.svelte";
 	import { get } from "svelte/store";
@@ -81,7 +82,7 @@
 		{#if extraButtonsOn}
 			<ExtraButtonsWrapper>
 				<ExtraButtons
-					icon="🔄"
+					icon={RotateCcw}
 					tooltip="Сбросить время к стартовому"
 					onClick={() => {
 						timeSubtract(toMs());
@@ -90,14 +91,14 @@
 					}}
 				/>
 				<ExtraButtons
-					icon="⏯️"
+					icon={Pause}
 					tooltip="Поставить на паузу"
 					onClick={() => {
 						isPaused.set(true);
 					}}
 				/>
 				<ExtraButtons
-					icon="🔃"
+					icon={Shuffle}
 					tooltip="Жеребьёвка игроков"
 					onClick={() => {
 						handleShuffle();

@@ -1,6 +1,7 @@
 <script>
 	import { fade, scale } from "svelte/transition";
 	import { tick } from "svelte";
+	import { X } from "lucide-svelte";
 
 	import SettingsCategories from "./SettingsCategories.svelte";
 	import { ALL_CATEGORY } from "./settingsRegistry";
@@ -75,9 +76,9 @@
 		>
 			<header class="header">
 				<h2 class="title">Настройки</h2>
-				<button class="close" aria-label="Закрыть" onclick={close}
-					>✕</button
-				>
+				<button class="close" aria-label="Закрыть" onclick={close}>
+					<X size={22} />
+				</button>
 			</header>
 
 			<div class="controls">

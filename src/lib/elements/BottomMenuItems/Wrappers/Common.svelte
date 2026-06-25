@@ -6,7 +6,8 @@
 	<div class="top">
 		<h3 class="top-header">
 			{#if icon}
-				<div class="item-icon">{icon}</div>
+				{@const Icon = icon}
+				<div class="item-icon"><Icon size={22} /></div>
 			{/if}
 			{#if title}
 				<p class="top-title">{title}</p>

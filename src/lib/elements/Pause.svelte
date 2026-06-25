@@ -10,6 +10,7 @@
 	import { timerDisplay } from "$lib/components/utils/TimerUtils";
 	import ExtraButtons from "./General/ExtraButtons.svelte";
 	import TimerButton from "./Timer/TimerButton.svelte";
+	import { RotateCcw, X } from "lucide-svelte";
 	import { isPaused } from "$lib/components/Pause";
 	import { onMount } from "svelte";
 
@@ -53,9 +54,9 @@
 				/>
 				{#if extraButtonsPauseOn}
 					<ExtraButtonsWrapper>
-						<ExtraButtons icon="🔃" onClick={resetUpTimer} />
+						<ExtraButtons icon={RotateCcw} onClick={resetUpTimer} />
 						<ExtraButtons
-							icon="❌"
+							icon={X}
 							onClick={() => {
 								isPaused.set(false);
 							}}

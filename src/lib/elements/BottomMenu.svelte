@@ -5,6 +5,7 @@
 	import { timeAdd, timeSubtract, toMs, timeMs } from "$lib/stores/timerDown";
 	import { mmssToSeconds, timerDisplay } from "$lib/components/utils/TimerUtils";
 	import { setPause } from "$lib/components/Pause";
+	import { Clock } from "lucide-svelte";
 	import Pause from "./Pause.svelte";
 
 	let triggerRef = $state();
@@ -60,7 +61,7 @@
 	aria-expanded={$isPanelOpen}
 	onclick={toggle}
 >
-	🕒
+	<Clock size={28} />
 </button>
 
 <div
@@ -81,7 +82,7 @@
 		</div>
 
 		<BottomMenuInput
-			icon="🕒"
+			icon={Clock}
 			title="Установить конкретное время"
 			description="Время на таймере заменится на введённое"
 			value={GlobalConfig.get("setTime")}
@@ -96,7 +97,7 @@
 		/>
 
 		<BottomMenuAdjust
-			icon="🕒"
+			icon={Clock}
 			title="Добавить/убавить время"
 			description="Нажимайте + или − для добавления/уменьшения времени"
 			value={GlobalConfig.get("timeAddSubStep")}

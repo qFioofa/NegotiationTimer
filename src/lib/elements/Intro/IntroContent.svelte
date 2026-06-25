@@ -1,10 +1,14 @@
+<script>
+	import { Package, Settings, FileText, MapPin, Hand } from "lucide-svelte";
+</script>
+
 <div class="intro-content">
 	<h3>NegotiationTimer</h3>
 	<p>
 		<b>Таймер для проведения соревнований по переговорам и конфликтам.</b>
 	</p>
 
-	<h4>📦 Функционал</h4>
+	<h4><Package size={20} /> Функционал</h4>
 	<ul>
 		<li>Жеребьёвка</li>
 		<li>Установка конкретного времени</li>
@@ -12,7 +16,7 @@
 		<li>Пауза</li>
 	</ul>
 
-	<h4>⚙️ Основные функции</h4>
+	<h4><Settings size={20} /> Основные функции</h4>
 	<ul>
 		<li><b>Автопауза: меню / панель</b></li>
 		<li><b>Черный экран</b> при завершении таймера</li>
@@ -24,7 +28,7 @@
 		<li><b>Тема оформления</b></li>
 	</ul>
 
-	<h4>🧾 Стандартные настройки</h4>
+	<h4><FileText size={20} /> Стандартные настройки</h4>
 	<ul>
 		<li><b>Стандартное время:</b> <code>60</code> секунд</li>
 		<li><b>Установленное время:</b> <code>'01:00'</code></li>
@@ -45,13 +49,13 @@
 		<li><b>Фоновое изображение:</b> <i>не задано</i></li>
 	</ul>
 
-	<h4>📍 Советы и примечания</h4>
+	<h4><MapPin size={20} /> Советы и примечания</h4>
 	<ul>
 		<li>Используйте горячие клавиши для ускоренного управления</li>
 		<li>Настройки сохраняются автоматически</li>
 		<li>Фон и звуки требуют перезагрузки для применения</li>
 	</ul>
-	<p>Хорошей игры 👊</p>
+	<p class="closing">Хорошей игры <Hand size={18} /></p>
 </div>
 
 <style>
@@ -72,9 +76,18 @@
 	}
 
 	.intro-content h4 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		margin-top: 1.2rem;
 		font-size: 1.2rem;
 		color: var(--accent-light);
+	}
+
+	.intro-content .closing {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 	}
 
 	.intro-content ul {

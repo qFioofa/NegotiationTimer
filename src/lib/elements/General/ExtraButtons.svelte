@@ -35,7 +35,8 @@
 			{#if image}
 				<img class="item-image" src={image} alt={tooltip ?? ""} />
 			{:else}
-				{icon}
+				{@const Icon = icon}
+				<Icon size={30} />
 			{/if}
 		</button>
 
@@ -69,6 +70,7 @@
 		border-radius: var(--spacing-extra);
 		border: 2px solid var(--accent);
 		box-shadow: 2px 2px 0 var(--accent-dark);
+		color: var(--accent-light);
 		text-align: center;
 	}
 

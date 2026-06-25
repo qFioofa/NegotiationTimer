@@ -1,4 +1,6 @@
 <script>
+	import { Search, X } from "lucide-svelte";
+
 	let { query = $bindable("") } = $props();
 	let inputRef;
 
@@ -8,7 +10,7 @@
 </script>
 
 <div class="search">
-	<span class="search-icon" aria-hidden="true">🔍</span>
+	<span class="search-icon" aria-hidden="true"><Search size={20} /></span>
 	<input
 		bind:this={inputRef}
 		bind:value={query}
@@ -26,7 +28,7 @@
 				inputRef?.focus();
 			}}
 		>
-			✕
+			<X size={18} />
 		</button>
 	{/if}
 </div>

@@ -1,6 +1,7 @@
 <script>
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import { setPause } from "$lib/components/Pause";
+	import { Settings } from "lucide-svelte";
 	import SettingsModal from "./SettingsModal.svelte";
 
 	let isOpen = $state(false);
@@ -25,7 +26,7 @@
 	aria-expanded={isOpen}
 	onclick={open}
 >
-	⚙️
+	<Settings size={28} />
 </button>
 
 <SettingsModal

@@ -1,4 +1,6 @@
 <script>
+	import { FolderOpen } from "lucide-svelte";
+
 	let { supportedTypes = [], onChange = async () => {} } = $props();
 </script>
 
@@ -11,7 +13,7 @@
 			onchange={onChange}
 		/>
 		<div class="media-upload-button">
-			<span class="upload-icon">📁</span>
+			<span class="upload-icon"><FolderOpen size={22} /></span>
 			<span class="upload-text">Выберите файл</span>
 		</div>
 	</label>

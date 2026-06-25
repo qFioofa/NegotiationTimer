@@ -12,7 +12,8 @@
 	<div class="col col-func">
 		<div class="func-head">
 			{#if icon}
-				<div class="item-icon">{icon}</div>
+				{@const Icon = icon}
+				<div class="item-icon"><Icon size={24} /></div>
 			{/if}
 			{#if title}
 				<div class="item-title">{title}</div>
