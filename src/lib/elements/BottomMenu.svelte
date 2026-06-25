@@ -275,6 +275,7 @@
 		gap: 1rem;
 		padding: 1rem 1.4rem;
 		border-radius: var(--radius-lg);
+		border: 2px solid var(--accent);
 		background: var(--bg-card);
 	}
 

@@ -67,8 +67,8 @@ export default class Encoder {
 			}
 			return value;
 		});
-
 		const registry = globalThis as unknown as Record<
+
 			string,
 			{ prototype: object }
 		>;
