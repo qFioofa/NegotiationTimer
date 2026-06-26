@@ -1,131 +1,115 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
-	import { Socket, Presence } from "phoenix";
-	import { Users, ArrowLeft, LogOut } from "lucide-svelte";
+	import { onMount } from "svelte";
+	import QRCode from "qrcode";
+	import { Copy, Check, Link as LinkIcon, LogOut, Timer } from "lucide-svelte";
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
+	import {
+		joined,
+		roomCode,
+		roomError,
+		connectRoom,
+		createRoom,
+		leaveRoom,
+		roomLink,
+	} from "$lib/stores/room";
+	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 
-	function wsUrl(): string {
-		if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
-		const proto = location.protocol === "https:" ? "wss:" : "ws:";
-		return `${proto}//${location.hostname}:4000/socket`;
-	}
+	let input = $state("");
+	let qr = $state("");
+	let copied = $state<"code" | "link" | "">("");
 
-	function clientId(): string {
-		let id = localStorage.getItem("server_client_id");
-		if (!id) {
-			id = crypto.randomUUID();
-			localStorage.setItem("server_client_id", id);
+	async function copy(kind: "code" | "link", text: string) {
+		try {
+			await navigator.clipboard.writeText(text);
+			copied = kind;
+			setTimeout(() => (copied = ""), 1500);
+		} catch {
+			/* буфер недоступен — игнорируем */
 		}
-		return id;
-	}
-
-	let code = $state("");
-	let joined = $state(false);
-	let error = $state("");
-	let online = $state(0);
-
-	let socket: Socket | null = null;
-	let channel: ReturnType<Socket["channel"]> | null = null;
-
-	function randomCode(): string {
-		return Math.random().toString(36).slice(2, 8).toUpperCase();
-	}
-
-	function connect(roomCode: string) {
-		error = "";
-		const trimmed = roomCode.trim().toUpperCase();
-		if (!trimmed) {
-			error = "Введите код комнаты";
-			return;
-		}
-
-		socket = new Socket(wsUrl());
-		socket.connect();
-
-		channel = socket.channel(`room:${trimmed}`, { client_id: clientId() });
-		const presence = new Presence(channel);
-		presence.onSync(() => {
-			online = presence.list().length;
-		});
-
-		channel
-			.join()
-			.receive("ok", () => {
-				code = trimmed;
-				joined = true;
-			})
-			.receive("error", (resp: { reason?: string }) => {
-				error = resp?.reason ?? "Не удалось подключиться";
-				cleanup();
-			});
-	}
-
-	function create() {
-		connect(randomCode());
-	}
-
-	function cleanup() {
-		channel?.leave();
-		socket?.disconnect();
-		channel = null;
-		socket = null;
-	}
-
-	function leave() {
-		cleanup();
-		joined = false;
-		online = 0;
-		code = "";
 	}
 
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
 		themeManager.setAccent(GlobalConfig.get("accentColor"));
+
+		const room = new URLSearchParams(location.search).get("room");
+		if (room && !$joined) connectRoom(room);
 	});
 
-	onDestroy(cleanup);
+	// Держим ?room= в адресной строке (она сама становится shareable) и рисуем QR.
+	$effect(() => {
+		if ($joined && $roomCode) {
+			const u = new URL(location.href);
+			if (u.searchParams.get("room") !== $roomCode) {
+				u.searchParams.set("room", $roomCode);
+				history.replaceState(null, "", u);
+			}
+			QRCode.toDataURL(roomLink($roomCode), { margin: 1, width: 220 })
+				.then((d) => (qr = d))
+				.catch(() => (qr = ""));
+		} else {
+			qr = "";
+		}
+	});
 </script>
 
-<a class="back" href="/" aria-label="Вернуться назад">
-	<ArrowLeft size={28} />
+<a class="trigger corner" href="/" aria-label="К таймеру">
+	<Timer size={28} />
 </a>
 
-{#if joined}
-	<button class="exit" onclick={leave} aria-label="Выйти из комнаты">
+{#if $joined}
+	<button class="trigger exit" onclick={leaveRoom} aria-label="Выйти из комнаты">
 		<LogOut size={28} />
 	</button>
-
-	<div class="badge" title="Уникальных пользователей в комнате">
-		<Users size={20} />
-		<span class="badge-count">{online}</span>
-		<span class="badge-label">в сети</span>
-	</div>
 {/if}
 
+<OnlineBadge />
+
 <div class="page">
-	{#if joined}
-		<div class="card room">
+	{#if $joined}
+		<div class="card">
 			<p class="eyebrow">Комната</p>
-			<h1 class="code">{code}</h1>
-			<p class="hint">Поделитесь кодом, чтобы пригласить других.</p>
+			<h1 class="code">{$roomCode}</h1>
+
+			<div class="actions">
+				<button class="btn" onclick={() => copy("code", $roomCode)}>
+					{#if copied === "code"}<Check size={18} />Скопировано{:else}<Copy
+							size={18}
+						/>Код{/if}
+				</button>
+				<button
+					class="btn"
+					onclick={() => copy("link", roomLink($roomCode))}
+				>
+					{#if copied === "link"}<Check size={18} />Скопировано{:else}<LinkIcon
+							size={18}
+						/>Ссылка{/if}
+				</button>
+			</div>
+
+			{#if qr}
+				<img class="qr" src={qr} alt="QR код для входа в комнату" />
+			{/if}
+
+			<p class="hint">Покажи QR или дай ссылку — подключатся сразу.</p>
 		</div>
 	{:else}
-		<div class="card lobby">
+		<div class="card">
 			<h1 class="title">Сервер</h1>
 
-			<button class="btn primary" onclick={create}>Создать комнату</button>
+			<button class="btn primary" onclick={createRoom}>Создать комнату</button>
 
 			<div class="divider"><span>или</span></div>
 
 			<form
 				onsubmit={(e) => {
 					e.preventDefault();
-					connect(code);
+					connectRoom(input);
 				}}
 			>
 				<input
-					bind:value={code}
+					bind:value={input}
 					placeholder="КОД КОМНАТЫ"
 					autocomplete="off"
 					maxlength="6"
@@ -133,7 +117,7 @@
 				<button class="btn primary" type="submit">Присоединиться</button>
 			</form>
 
-			{#if error}<p class="error">{error}</p>{/if}
+			{#if $roomError}<p class="error">{$roomError}</p>{/if}
 		</div>
 	{/if}
 </div>
@@ -150,10 +134,9 @@
 		font-family: inherit;
 	}
 
-	.back {
+	.trigger {
 		position: fixed;
 		top: var(--trigger-edge);
-		right: var(--trigger-edge);
 		z-index: 1001;
 		display: flex;
 		align-items: center;
@@ -173,110 +156,22 @@
 			box-shadow 0.3s ease;
 	}
 
-	.back:hover {
+	.trigger:hover {
 		transform: scale(1.08);
 		box-shadow: 6px 6px 0 var(--accent-dark);
 	}
 
-	.back:active {
+	.trigger:active {
 		transform: scale(0.95);
 		box-shadow: 2px 2px 0 var(--accent-dark);
+	}
+
+	.corner {
+		right: var(--trigger-edge);
 	}
 
 	.exit {
-		position: fixed;
-		top: var(--trigger-edge);
 		right: calc(var(--trigger-edge) + var(--trigger-size) + var(--trigger-gap));
-		z-index: 1001;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: var(--trigger-size);
-		height: var(--trigger-size);
-		border-radius: var(--radius-xxl);
-		border: 2px solid var(--accent);
-		box-shadow: 4px 4px 0 var(--accent-dark);
-		background: var(--bg-overlay);
-		color: var(--accent-light);
-		backdrop-filter: blur(14px);
-		cursor: pointer;
-		user-select: none;
-		transition:
-			transform 0.3s ease,
-			box-shadow 0.3s ease;
-	}
-
-	.exit:hover {
-		transform: scale(1.08);
-		box-shadow: 6px 6px 0 var(--accent-dark);
-	}
-
-	.exit:active {
-		transform: scale(0.95);
-		box-shadow: 2px 2px 0 var(--accent-dark);
-	}
-
-	.badge {
-		position: fixed;
-		top: var(--trigger-edge);
-		right: calc(
-			var(--trigger-edge) + 2 * (var(--trigger-size) + var(--trigger-gap))
-		);
-		z-index: 1001;
-		display: flex;
-		align-items: center;
-		gap: 0.55rem;
-		height: var(--trigger-size);
-		padding: 0 1.1rem;
-		border-radius: var(--radius-xxl);
-		border: 2px solid var(--accent);
-		box-shadow: 4px 4px 0 var(--accent-dark);
-		background: var(--bg-overlay);
-		color: var(--accent-light);
-		backdrop-filter: blur(14px);
-		font-weight: 700;
-		user-select: none;
-	}
-
-	.badge-count {
-		font-size: 1.25rem;
-		line-height: 1;
-		color: var(--fg-heading);
-		font-variant-numeric: tabular-nums;
-		position: relative;
-		padding-right: 0.55rem;
-	}
-
-	.badge-count::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 50%;
-		background: var(--accent-light);
-		box-shadow: 0 0 8px var(--accent-light);
-		animation: pulse 1.8s ease-in-out infinite;
-	}
-
-	.badge-label {
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--fg-muted);
-		letter-spacing: 0.02em;
-	}
-
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-			transform: scale(1);
-		}
-		50% {
-			opacity: 0.45;
-			transform: scale(0.7);
-		}
 	}
 
 	.card {
@@ -315,6 +210,25 @@
 		font-weight: 800;
 		letter-spacing: 0.3rem;
 		color: var(--accent-light);
+	}
+
+	.actions {
+		display: flex;
+		gap: 0.6rem;
+		width: 100%;
+	}
+
+	.actions .btn {
+		flex: 1;
+	}
+
+	.qr {
+		width: 220px;
+		height: 220px;
+		border-radius: var(--radius-lg);
+		border: 4px solid #fff;
+		background: #fff;
+		image-rendering: pixelated;
 	}
 
 	.hint {
@@ -356,11 +270,17 @@
 	.btn {
 		font-family: inherit;
 		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
 		font-size: 1.05rem;
 		font-weight: 700;
 		border-radius: var(--radius-lg);
-		padding: 0.75rem 1.6rem;
+		padding: 0.7rem 1.2rem;
 		border: 2px solid var(--accent);
+		background: transparent;
+		color: var(--accent-light);
 		transition:
 			transform 0.2s ease,
 			box-shadow 0.2s ease;
@@ -402,12 +322,9 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.back,
-		.exit,
-		.btn,
-		.badge-count::after {
+		.trigger,
+		.btn {
 			transition: none;
-			animation: none;
 		}
 	}
 </style>

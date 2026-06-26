@@ -9,6 +9,7 @@
 	import Timer from "$lib/elements/Timer.svelte";
 	import SettingsTrigger from "$lib/elements/Settings/SettingsTrigger.svelte";
 	import ServerTrigger from "$lib/elements/Settings/ServerTrigger.svelte";
+	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import { registerBinds } from "$lib/elements/Settings/settingsRegistry";
 	import { onMount } from "svelte";
 
@@ -56,3 +57,4 @@
 
 <SettingsTrigger />
 <ServerTrigger />
+<OnlineBadge />
