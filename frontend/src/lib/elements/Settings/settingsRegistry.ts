@@ -42,7 +42,6 @@ import { setBindListener } from "$lib/components/utils/BindUtils";
 import { mmssToSeconds } from "$lib/components/utils/TimerUtils";
 import { get } from "svelte/store";
 
-// Действия биндов — перенесены из BottomMenu.svelte дословно.
 async function handleShuffle() {
 	const shuffle = await get(ShuffleFunction);
 	if (shuffle) await shuffle();
@@ -56,12 +55,10 @@ function anyTimerToggle() {
 	toggleTimer();
 }
 
-// Шаг ±времени берётся из той же настройки, что и кнопки в плашке (timeAddSubStep).
 function stepSeconds(): number {
 	return mmssToSeconds(GlobalConfig.get("timeAddSubStep") as string);
 }
 
-// Категории из ТЗ. `all` — виртуальная: показывает всё, выделяется отдельным фоном.
 export const ALL_CATEGORY = "all";
 
 export const categories = [
@@ -76,9 +73,6 @@ export const categories = [
 	{ id: "other", label: "Другое", icon: Sparkles },
 ];
 
-// Единый источник правды. Каждый дескриптор: метаданные для поиска/категорий +
-// `type` (диспетчеризуется в SettingCard) + специфичные поля контрола.
-// Колбэки с сайд-эффектами перенесены дословно из Menu.svelte.
 export const settings = [
 	{
 		id: "timerBlackOut",

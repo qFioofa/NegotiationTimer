@@ -8,13 +8,12 @@
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import Timer from "$lib/elements/Timer.svelte";
 	import SettingsTrigger from "$lib/elements/Settings/SettingsTrigger.svelte";
+	import ServerTrigger from "$lib/elements/Settings/ServerTrigger.svelte";
 	import { registerBinds } from "$lib/elements/Settings/settingsRegistry";
 	import { onMount } from "svelte";
 
 	let hideUI = GlobalConfig.get("hideAllUI");
 
-	// Портретный телефон получает отдельный интерфейс (MobileApp), а не сжатый
-	// десктоп. matchMedia реактивно переключает дерево при повороте/ресайзе.
 	let isMobile = false;
 
 	onMount(() => {
@@ -29,7 +28,10 @@
 		sync();
 		mq.addEventListener("change", sync);
 
-		const offHide = GlobalConfig.subscribe("hideAllUI", (v) => (hideUI = v));
+		const offHide = GlobalConfig.subscribe(
+			"hideAllUI",
+			(v) => (hideUI = v),
+		);
 		return () => {
 			mq.removeEventListener("change", sync);
 			offHide();
@@ -53,3 +55,4 @@
 {/if}
 
 <SettingsTrigger />
+<ServerTrigger />
