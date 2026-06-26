@@ -5,7 +5,11 @@
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
 
-	const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:4000/socket";
+	function wsUrl(): string {
+		if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
+		const proto = location.protocol === "https:" ? "wss:" : "ws:";
+		return `${proto}//${location.hostname}:4000/socket`;
+	}
 
 	function clientId(): string {
 		let id = localStorage.getItem("server_client_id");
@@ -36,7 +40,7 @@
 			return;
 		}
 
-		socket = new Socket(WS_URL);
+		socket = new Socket(wsUrl());
 		socket.connect();
 
 		channel = socket.channel(`room:${trimmed}`, { client_id: clientId() });
