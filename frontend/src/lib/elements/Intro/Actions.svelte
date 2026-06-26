@@ -52,4 +52,17 @@
 		background: var(--bg-secondary);
 		color: var(--fg);
 	}
+
+	/* На узких экранах кнопки делят ширину поровну и не разъезжаются по высоте. */
+	@media (max-width: 480px) {
+		.intro-actions {
+			gap: 0.6rem;
+		}
+		.forget-intro,
+		.close-intro {
+			flex: 1;
+			padding: 0.6rem 0.5rem;
+			font-size: 0.85rem;
+		}
+	}
 </style>

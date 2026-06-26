@@ -114,7 +114,9 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: calc(66.6% + 6rem);
+		/* На высоких экранах — нижняя треть (как задумано); на низких/landscape
+		   окнах min() не даёт таймеру уехать за нижний край. */
+		top: min(calc(66.6% + 6rem), calc(100vh - 13rem));
 		display: flex;
 		justify-content: center;
 		align-items: center;

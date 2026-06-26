@@ -50,7 +50,7 @@
 	onMount(setBackgroundSrc);
 </script>
 
-{#if isBackgroundLoading}
+{#if isBackgroundLoading && usingBackroundImage}
 	<div class="loading-overlay">
 		<div class="loading-content">
 			<div class="loading-text">Задний фон загружается...</div>
@@ -79,10 +79,7 @@
 <style>
 	.loading-overlay {
 		position: fixed;
-		top: 0;
-		left: 0;
-		width: 97.5%;
-		height: 100%;
+		inset: 0;
 		display: flex;
 		justify-content: center;
 		align-items: center;

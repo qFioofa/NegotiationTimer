@@ -68,4 +68,12 @@
 		font-size: 2rem;
 		margin: 0;
 	}
+
+	@media (max-width: 480px) {
+		.intro-modal {
+			padding: 1.5rem;
+			max-height: 90vh;
+			gap: 1.2rem;
+		}
+	}
 </style>
