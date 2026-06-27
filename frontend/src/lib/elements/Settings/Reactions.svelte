@@ -22,17 +22,36 @@
 		p.replace("/static", ""),
 	);
 
+	// Цифры — стикеры zero/one/two/three × R/G/B; всё остальное в папке = мемы.
+	const NUM_RE = /\/(zero|one|two|three)[RGB]\.webm$/i;
+	const NUM_ORDER = ["zero", "one", "two", "three"];
+	const numKey = (s: string) => {
+		const m = s.match(/\/(zero|one|two|three)([RGB])\./i)!;
+		return NUM_ORDER.indexOf(m[1].toLowerCase()) * 3 + "RGB".indexOf(m[2]);
+	};
+	const numbers = stickers.filter((s) => NUM_RE.test(s)).sort((a, b) => numKey(a) - numKey(b));
+	const memes = stickers.filter((s) => !NUM_RE.test(s));
+
 	// Строка = unicode-эмодзи, путь/URL картинки/гифки или видео (.webm/.mp4).
-	const EMOJIS = ["👍", "🔥", "😂", "😮", "❤️", "👎", ...stickers];
+	const TABS = [
+		{ id: "regular", label: "Обычные", items: ["👍", "🔥", "😂", "😮", "❤️", "👎"] },
+		{ id: "numbers", label: "Цифры", items: numbers },
+		{ id: "memes", label: "Мемы", items: memes },
+	];
+	let tab = $state("regular");
+
+	// Скорость воспроизведения видео-стикеров. >1 = живее.
+	const STICKER_SPEED = 2.5;
 
 	const isVideo = (s: string) => /\.(webm|mp4)$/i.test(s);
 	const isImage = (s: string) =>
-		/^(https?:|\/)/.test(s) || /\.(png|gif|webp|svg|jpe?g)$/i.test(s);
+		/\.(png|gif|webp|svg|jpe?g)$/i.test(s) || /^(https?:|\/)/.test(s);
 
 	// Svelte не выставляет свойство muted из атрибута → autoplay блокируется, кадр не рисуется.
 	// Ставим muted как свойство и стартуем play(), когда данные готовы (иначе play() реджектится).
 	function playMuted(node: HTMLVideoElement) {
 		node.muted = true;
+		node.playbackRate = STICKER_SPEED;
 		const tryPlay = () => node.play().catch(() => {});
 		if (node.readyState >= 2) tryPlay();
 		else node.addEventListener("loadeddata", tryPlay, { once: true });
@@ -67,9 +86,10 @@
 			id: r.id,
 			emoji: r.emoji,
 			side: r.side,
-			// Снос всегда внутрь экрана; случайная величина даёт конус при спаме.
-			dx: inward * (10 + Math.random() * 150),
-			rise: 180 + Math.random() * 120,
+			// Снос/подъём масштабируются от размера окна, чтобы стикер мог
+			// долететь до центра экрана; случайная величина даёт разброс.
+			dx: inward * Math.random() * window.innerWidth * 0.3,
+			rise: 200 + Math.random() * window.innerHeight * 0.6,
 			es: 0.8 + Math.random() * 0.5,
 			rot: (Math.random() * 2 - 1) * 25,
 		};
@@ -110,11 +130,22 @@
 
 			{#if open === side}
 				<div class="panel">
-					{#each EMOJIS as e (e)}
-						<button onclick={() => send(e, side)} aria-label="Реакция">
-							{@render glyph(e)}
-						</button>
-					{/each}
+					<div class="tabs">
+						{#each TABS as t (t.id)}
+							<button
+								class="tab"
+								class:active={tab === t.id}
+								onclick={() => (tab = t.id)}>{t.label}</button
+							>
+						{/each}
+					</div>
+					<div class="grid">
+						{#each TABS.find((t) => t.id === tab)?.items ?? [] as e (e)}
+							<button onclick={() => send(e, side)} aria-label="Реакция">
+								{@render glyph(e)}
+							</button>
+						{/each}
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -137,16 +168,18 @@
 		z-index: 1001;
 		display: flex;
 		flex-direction: column-reverse;
-		align-items: center;
 		gap: 0.4rem;
 	}
 
+	/* Тоггл прижат к своему углу — иначе при открытии широкой панели ✕ уезжает к центру. */
 	.dock.left {
 		left: var(--trigger-edge);
+		align-items: flex-start;
 	}
 
 	.dock.right {
 		right: var(--trigger-edge);
+		align-items: flex-end;
 	}
 
 	.toggle {
@@ -175,13 +208,11 @@
 	}
 
 	.panel {
-		display: grid;
-		grid-template-columns: repeat(7, 2.6rem);
+		display: flex;
+		flex-direction: column;
 		gap: 0.4rem;
 		padding: 0.5rem;
 		max-width: 92vw;
-		max-height: 60vh;
-		overflow: auto;
 		border-radius: var(--radius-xxl);
 		border: 2px solid var(--accent);
 		box-shadow: 4px 4px 0 var(--accent-dark);
@@ -189,7 +220,38 @@
 		backdrop-filter: blur(14px);
 	}
 
-	.panel button {
+	.tabs {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.tab {
+		flex: 1;
+		font-family: inherit;
+		font-size: 0.8rem;
+		font-weight: 700;
+		padding: 0.3rem 0.4rem;
+		border-radius: var(--radius-lg);
+		border: 2px solid var(--accent);
+		background: transparent;
+		color: var(--accent-light);
+		cursor: pointer;
+	}
+
+	.tab.active {
+		background: var(--accent);
+		color: var(--bg);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(7, 2.6rem);
+		gap: 0.4rem;
+		max-height: 50vh;
+		overflow: auto;
+	}
+
+	.grid button {
 		font-size: 1.5rem;
 		line-height: 1;
 		width: 2.6rem;
@@ -200,14 +262,17 @@
 		border: none;
 		border-radius: var(--radius-lg);
 		background: transparent;
+		box-shadow: none;
 		cursor: pointer;
 		transition: transform 0.15s ease;
 	}
 
-	.panel button:hover {
+	.grid button:hover {
 		transform: scale(1.25);
+		background: transparent;
+		box-shadow: none;
 	}
-	.panel button:active {
+	.grid button:active {
 		transform: scale(0.9);
 	}
 
@@ -247,7 +312,7 @@
 		}
 		12% {
 			opacity: 1;
-			transform: translate(calc(var(--dx) * 0.12), -10px) scale(1.3);
+			transform: translate(calc(var(--dx) * 0.08), calc(var(--rise) * -0.15)) scale(1.3);
 		}
 		100% {
 			opacity: 0;

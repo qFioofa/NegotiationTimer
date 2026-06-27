@@ -8,9 +8,19 @@
 	import SettingsSearch from "./SettingsSearch.svelte";
 	import SettingsList from "./SettingsList.svelte";
 
-	let { isOpen = $bindable(false), triggerEl, onClose = () => {} } = $props();
+	// items/categoriesList/allCategory/title не заданы → обычные настройки.
+	// Заданы → та же полноэкранная плашка, но с другим реестром (например, комната).
+	let {
+		isOpen = $bindable(false),
+		triggerEl,
+		onClose = () => {},
+		items = undefined,
+		categoriesList = undefined,
+		allCategory = ALL_CATEGORY,
+		title = "Настройки",
+	} = $props();
 
-	let category = $state(ALL_CATEGORY);
+	let category = $state(allCategory);
 	let query = $state("");
 	let searchRef = $state();
 	let panelRef = $state();
@@ -75,7 +85,7 @@
 			onkeydown={onKeydown}
 		>
 			<header class="header">
-				<h2 class="title">Настройки</h2>
+				<h2 class="title">{title}</h2>
 				<button class="close" aria-label="Закрыть" onclick={close}>
 					<X size={22} />
 				</button>
@@ -83,11 +93,11 @@
 
 			<div class="controls">
 				<SettingsSearch bind:this={searchRef} bind:query />
-				<SettingsCategories bind:selected={category} />
+				<SettingsCategories bind:selected={category} cats={categoriesList} />
 			</div>
 
 			<div class="content">
-				<SettingsList {category} {query} />
+				<SettingsList {category} {query} {items} />
 			</div>
 		</div>
 	</div>

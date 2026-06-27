@@ -82,6 +82,13 @@
 		resizeRaf = requestAnimationFrame(updateWidth);
 	}
 
+	// Имя может прийти извне (синхронизация комнаты) — подгоняем ширину под него,
+	// а не только на ручной ввод.
+	$effect(() => {
+		playerName;
+		updateWidth();
+	});
+
 	onMount(() => {
 		updateWidth();
 		window.addEventListener("resize", onResize);

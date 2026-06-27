@@ -142,6 +142,32 @@ export default class TimerLogic {
 		return this.time;
 	}
 
+	// Применить состояние таймера, пришедшее от другого участника комнаты.
+	// ponytail: дрейф считаем по Date.now() обеих сторон — точность ± задержка сети
+	// и расхождение часов; для переговорного таймера достаточно. Нужна точность —
+	// перейти на серверную метку времени.
+	syncFrom(snap: { time: number; isRunning: boolean; ts: number }): void {
+		const drift = snap.isRunning ? Math.max(0, Date.now() - snap.ts) : 0;
+		this.time = this.isInverted
+			? Math.min(snap.time + drift, MAX_TIME_MS)
+			: Math.max(0, snap.time - drift);
+
+		if (snap.isRunning) {
+			this.isRunning = true;
+			this.anchor();
+			if (this.intervalId === null) {
+				this.intervalId = setInterval(() => this.tick(), TICK_MS);
+			}
+		} else {
+			if (this.intervalId !== null) clearInterval(this.intervalId);
+			this.intervalId = null;
+			this.isRunning = false;
+		}
+
+		this.notifyUpdate();
+		this.notifyRunningChange();
+	}
+
 	destroy(): void {
 		this.pause();
 		this.updateCallbacks = [];

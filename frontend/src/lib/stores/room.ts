@@ -9,6 +9,10 @@ export const roomError = writable("");
 export const reaction = writable<{ emoji: string; side: "left" | "right"; id: number } | null>(null);
 let reactionId = 0;
 
+// Общая шина синхронизации комнаты: настройки, таймер, имена. Каждое входящее
+// сообщение — {key, value}; фичи подписываются на incomingSync и применяют своё.
+export const incomingSync = writable<{ key: string; value: unknown } | null>(null);
+
 let socket: Socket | null = null;
 let channel: ReturnType<Socket["channel"]> | null = null;
 let currentCode = "";
@@ -56,6 +60,10 @@ export function connectRoom(code: string): void {
 		reaction.set({ emoji: p.emoji, side: p.side, id: ++reactionId }),
 	);
 
+	channel.on("sync", (p: { key: string; value: unknown }) =>
+		incomingSync.set({ key: p.key, value: p.value }),
+	);
+
 	channel
 		.join()
 		.receive("ok", () => {
@@ -70,6 +78,12 @@ export function connectRoom(code: string): void {
 
 export function sendReaction(emoji: string, side: "left" | "right"): void {
 	channel?.push("reaction", { emoji, side });
+}
+
+// Разослать значение по комнате. No-op, если не подключены — тогда состояние
+// просто остаётся локальным.
+export function pushSync(key: string, value: unknown): void {
+	channel?.push("sync", { key, value });
 }
 
 export function createRoom(): void {

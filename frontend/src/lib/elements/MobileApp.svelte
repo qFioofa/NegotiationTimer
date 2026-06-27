@@ -27,6 +27,7 @@
 	import { RotateCcw, Pause, Shuffle, Play } from "lucide-svelte";
 	import RollingCounter from "./Timer/RollingCounter.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
+	import { nameA, nameB } from "$lib/stores/players";
 	import BlackOut from "./BlackOut.svelte";
 	import { onMount } from "svelte";
 
@@ -109,12 +110,12 @@
 	<section class="players">
 		<div class="player">
 			<div class="badge" bind:this={number1}>1</div>
-			<NameInput defaultText="Игрок 1" />
+			<NameInput defaultText="Игрок 1" bind:playerName={$nameA} />
 		</div>
 		<div class="vs">VS</div>
 		<div class="player">
 			<div class="badge" bind:this={number2}>2</div>
-			<NameInput defaultText="Игрок 2" />
+			<NameInput defaultText="Игрок 2" bind:playerName={$nameB} />
 		</div>
 	</section>
 

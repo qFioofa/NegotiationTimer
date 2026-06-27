@@ -1,17 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import QRCode from "qrcode";
-	import {
-		Copy,
-		Check,
-		Link as LinkIcon,
-		LogOut,
-		Timer,
-		Info,
-		Settings,
-		Camera,
-		MoreHorizontal,
-	} from "lucide-svelte";
+	import { Copy, Check, Link as LinkIcon, LogOut, Timer } from "lucide-svelte";
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import {
@@ -29,21 +19,14 @@
 	import {
 		roomCategories,
 		roomSettings,
-		ROOM_ALL_CATEGORY,
 	} from "$lib/elements/Settings/roomSettingsRegistry";
 
 	let input = $state("");
 	let qr = $state("");
 	let copied = $state<"code" | "link" | "">("");
 
-	const TABS = [
-		{ id: "info", label: "Информация", icon: Info },
-		{ id: "settings", label: "Настройки", icon: Settings },
-		{ id: "camera", label: "Камера", icon: Camera },
-		{ id: "other", label: "Другое", icon: MoreHorizontal },
-	] as const;
-	let tab = $state<(typeof TABS)[number]["id"]>("info");
-	let roomCat = $state(ROOM_ALL_CATEGORY);
+	// Категории настроек комнаты — главная навигация: всё взаимодействие идёт через них.
+	let section = $state("info");
 
 	async function copy(kind: "code" | "link", text: string) {
 		try {
@@ -96,26 +79,18 @@
 
 <div class="page">
 	{#if $joined}
-		<div class="card wide">
-			<nav class="tabs">
-				{#each TABS as t (t.id)}
-					{@const Icon = t.icon}
-					<button
-						class="tab"
-						class:active={tab === t.id}
-						onclick={() => (tab = t.id)}
-					>
-						<Icon size={16} />
-						<span>{t.label}</span>
-					</button>
-				{/each}
+		<div class="room-panel">
+			<header class="room-head">
+				<p class="eyebrow">Комната</p>
+				<h1 class="code">{$roomCode}</h1>
+			</header>
+
+			<nav class="nav">
+				<SettingsCategories bind:selected={section} cats={roomCategories} />
 			</nav>
 
-			<div class="tab-body">
-				{#if tab === "info"}
-					<p class="eyebrow">Комната</p>
-					<h1 class="code">{$roomCode}</h1>
-
+			<div class="panel-body">
+				{#if section === "info"}
 					<div class="actions">
 						<button
 							class="btn"
@@ -148,20 +123,14 @@
 					<p class="hint">
 						Покажи QR или дай ссылку — подключатся сразу.
 					</p>
-				{:else if tab === "settings"}
-					<div class="room-settings">
-						<SettingsCategories
-							bind:selected={roomCat}
-							cats={roomCategories}
-						/>
-						<div class="room-settings-list">
-							<SettingsList
-								category={roomCat}
-								items={roomSettings}
-							/>
-						</div>
+				{:else if section === "reactions"}
+					<p class="hint">
+						Изменения применяются у всех участников комнаты сразу.
+					</p>
+					<div class="settings-wrap">
+						<SettingsList items={roomSettings} category="reactions" />
 					</div>
-				{:else if tab === "camera"}
+				{:else if section === "camera"}
 					<p class="eyebrow">Камера</p>
 					<p class="hint">Раздел в разработке.</p>
 				{:else}
@@ -270,84 +239,48 @@
 		backdrop-filter: blur(14px);
 	}
 
-	.wide {
-		width: min(92vw, 480px);
-	}
-
-	.tabs {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		width: 100%;
-		justify-content: center;
-		padding-bottom: 0.6rem;
-		border-bottom: 1px solid var(--divider);
-	}
-
-	.tab {
-		font-family: inherit;
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.9rem;
-		font-weight: 700;
-		padding: 0.45rem 0.7rem;
-		border-radius: var(--radius-lg);
-		border: 2px solid transparent;
-		background: transparent;
-		color: var(--fg-muted);
-		transition:
-			color 0.2s ease,
-			border-color 0.2s ease;
-	}
-
-	.tab:hover {
-		color: var(--accent-light);
-	}
-
-	.tab.active {
-		color: var(--accent-light);
-		border-color: var(--accent);
-	}
-
-	/* Фиксированная подложка: высота не прыгает при переключении вкладок. */
-	.tab-body {
+	/* Главный элемент комнаты: крупная панель на весь экран, навигация = категории. */
+	.room-panel {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 		gap: 1.1rem;
-		width: 100%;
-		min-height: 380px;
+		width: min(96vw, 720px);
+		height: min(90dvh, 860px);
+		padding: 1.6rem;
+		border-radius: var(--radius-xxl);
+		border: 2px solid var(--accent);
+		box-shadow: 6px 6px 0 var(--accent-dark);
+		background: var(--bg-overlay);
+		backdrop-filter: blur(14px);
 	}
 
-	/* Настройки комнаты переиспользуют обычный реестр настроек; список скроллится
-	   внутри подложки, чтобы карточка не росла и не прыгала между вкладками. */
-	.room-settings {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-md);
+	.room-head {
+		text-align: center;
+	}
+
+	.settings-wrap {
 		width: 100%;
 		text-align: left;
 	}
 
-	.room-settings-list {
-		height: 320px;
+	.nav {
+		border-bottom: 1px solid var(--divider);
+		padding-bottom: 0.6rem;
+	}
+
+	/* Тело прокручивается; шапка и навигация остаются на месте. */
+	.panel-body {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.1rem;
+		width: 100%;
+		flex: 1;
 		overflow-y: auto;
 		overflow-x: hidden;
-		padding-right: 0.3rem;
+		text-align: center;
 		scrollbar-width: thin;
 		scrollbar-color: var(--accent-light) transparent;
-	}
-
-	.room-settings-list::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.room-settings-list::-webkit-scrollbar-thumb {
-		background-color: var(--accent-light);
-		border-radius: var(--radius-sm);
 	}
 
 	.title {

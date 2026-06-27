@@ -22,6 +22,12 @@ defmodule BackendWeb.RoomChannel do
       })
 
     push(socket, "presence_state", Presence.list(socket))
+
+    # Отдаём новому участнику актуальное состояние комнаты (настройки/таймер/имена).
+    for {key, value} <- Backend.RoomState.all(socket.topic) do
+      push(socket, "sync", %{"key" => key, "value" => value})
+    end
+
     {:noreply, socket}
   end
 
@@ -29,6 +35,14 @@ defmodule BackendWeb.RoomChannel do
   def handle_in("reaction", %{"emoji" => emoji, "side" => side}, socket)
       when is_binary(emoji) and side in ["left", "right"] do
     broadcast(socket, "reaction", %{emoji: emoji, side: side})
+    {:noreply, socket}
+  end
+
+  # Общий канал синхронизации: любая настройка/таймер/текст. Сохраняем последнее
+  # значение (для поздних участников) и рассылаем остальным, кроме отправителя.
+  def handle_in("sync", %{"key" => key, "value" => value}, socket) when is_binary(key) do
+    Backend.RoomState.put(socket.topic, key, value)
+    broadcast_from(socket, "sync", %{"key" => key, "value" => value})
     {:noreply, socket}
   end
 end

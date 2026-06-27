@@ -3,6 +3,7 @@
 	import PlayerNumber from "./Players/Wrappers/PlayerNumber.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
 	import { shuffleMap } from "$lib/components/Shuffle";
+	import { nameA, nameB } from "$lib/stores/players";
 	import { onMount } from "svelte";
 
 	let number1, number2;
@@ -46,10 +47,10 @@
 			<PlayerNumber text="2" bind:ref={number2} />
 		</div>
 		<div class="grid-item">
-			<NameInput />
+			<NameInput bind:playerName={$nameA} />
 		</div>
 		<div class="grid-item">
-			<NameInput />
+			<NameInput bind:playerName={$nameB} />
 		</div>
 	</div>
 </div>

@@ -1,14 +1,14 @@
-import { LayoutGrid, Smile, Timer, Hand } from "lucide-svelte";
+import { Info, Smile, Camera, MoreHorizontal, Timer, Hand } from "lucide-svelte";
 
-// Настройки комнаты переиспользуют тот же интерфейс и элементы, что и обычные
-// настройки (SettingsCategories / SettingsList / SettingCard) — отличается только
-// содержимое. Пока единственная фича комнаты — реакции, разложенная на карточки.
-
-export const ROOM_ALL_CATEGORY = "all";
+// Настройки комнаты — главный элемент страницы server: через эти категории идёт
+// всё взаимодействие. Переиспользуют те же элементы, что обычные настройки
+// (SettingsCategories / SettingsList / SettingCard); часть разделов — заглушки.
 
 export const roomCategories = [
-	{ id: ROOM_ALL_CATEGORY, label: "Все", icon: LayoutGrid },
+	{ id: "info", label: "Информация", icon: Info },
 	{ id: "reactions", label: "Реакции", icon: Smile },
+	{ id: "camera", label: "Камера", icon: Camera },
+	{ id: "other", label: "Другое", icon: MoreHorizontal },
 ];
 
 export const roomSettings = [

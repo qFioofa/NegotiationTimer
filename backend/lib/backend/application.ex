@@ -9,6 +9,7 @@ defmodule Backend.Application do
       BackendWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:backend, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Backend.PubSub},
+      Backend.RoomState,
       BackendWeb.Presence,
       BackendWeb.Endpoint
     ]
