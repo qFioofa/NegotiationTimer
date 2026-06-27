@@ -26,6 +26,12 @@ export type AppConfig = {
 	playerBackground: boolean;
 	usingBackroundImage: boolean;
 	backgroundImage: string | null;
+	/** Реакции в комнате: показывать док с реакциями и принимать чужие. */
+	reactionsEnabled: boolean;
+	/** Время жизни летящего стикера, секунды (строка-лейбл из optionList). */
+	reactionLifetime: string;
+	/** Антиспам: минимум между своими отправками, секунды (строка-лейбл). */
+	reactionCooldown: string;
 };
 
 export const dConfig: AppConfig = {
@@ -54,4 +60,7 @@ export const dConfig: AppConfig = {
 	playerBackground: true,
 	usingBackroundImage: false,
 	backgroundImage: null,
+	reactionsEnabled: true,
+	reactionLifetime: "5 сек",
+	reactionCooldown: "0.4 сек",
 };

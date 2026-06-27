@@ -1,10 +1,18 @@
 <script>
 	import { Users } from "lucide-svelte";
+	import { page } from "$app/stores";
 	import { joined, online } from "$lib/stores/room";
+
+	// На таймере → ведём в комнату, в комнате → обратно на таймер.
+	$: onServer = $page.url.pathname.startsWith("/server");
 </script>
 
 {#if $joined}
-	<a class="badge" href="/server" title="Открыть меню комнаты">
+	<a
+		class="badge"
+		href={onServer ? "/" : "/server"}
+		title={onServer ? "К таймеру" : "Открыть меню комнаты"}
+	>
 		<Users size={18} />
 		<span class="count">{$online}</span>
 		<span class="label">в сети</span>

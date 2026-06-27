@@ -1,7 +1,17 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import QRCode from "qrcode";
-	import { Copy, Check, Link as LinkIcon, LogOut, Timer } from "lucide-svelte";
+	import {
+		Copy,
+		Check,
+		Link as LinkIcon,
+		LogOut,
+		Timer,
+		Info,
+		Settings,
+		Camera,
+		MoreHorizontal,
+	} from "lucide-svelte";
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import {
@@ -14,19 +24,33 @@
 		roomLink,
 	} from "$lib/stores/room";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
+	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
+	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
+	import {
+		roomCategories,
+		roomSettings,
+		ROOM_ALL_CATEGORY,
+	} from "$lib/elements/Settings/roomSettingsRegistry";
 
 	let input = $state("");
 	let qr = $state("");
 	let copied = $state<"code" | "link" | "">("");
+
+	const TABS = [
+		{ id: "info", label: "Информация", icon: Info },
+		{ id: "settings", label: "Настройки", icon: Settings },
+		{ id: "camera", label: "Камера", icon: Camera },
+		{ id: "other", label: "Другое", icon: MoreHorizontal },
+	] as const;
+	let tab = $state<(typeof TABS)[number]["id"]>("info");
+	let roomCat = $state(ROOM_ALL_CATEGORY);
 
 	async function copy(kind: "code" | "link", text: string) {
 		try {
 			await navigator.clipboard.writeText(text);
 			copied = kind;
 			setTimeout(() => (copied = ""), 1500);
-		} catch {
-			/* буфер недоступен — игнорируем */
-		}
+		} catch {}
 	}
 
 	onMount(() => {
@@ -59,7 +83,11 @@
 </a>
 
 {#if $joined}
-	<button class="trigger exit" onclick={leaveRoom} aria-label="Выйти из комнаты">
+	<button
+		class="trigger exit"
+		onclick={leaveRoom}
+		aria-label="Выйти из комнаты"
+	>
 		<LogOut size={28} />
 	</button>
 {/if}
@@ -68,37 +96,87 @@
 
 <div class="page">
 	{#if $joined}
-		<div class="card">
-			<p class="eyebrow">Комната</p>
-			<h1 class="code">{$roomCode}</h1>
+		<div class="card wide">
+			<nav class="tabs">
+				{#each TABS as t (t.id)}
+					{@const Icon = t.icon}
+					<button
+						class="tab"
+						class:active={tab === t.id}
+						onclick={() => (tab = t.id)}
+					>
+						<Icon size={16} />
+						<span>{t.label}</span>
+					</button>
+				{/each}
+			</nav>
 
-			<div class="actions">
-				<button class="btn" onclick={() => copy("code", $roomCode)}>
-					{#if copied === "code"}<Check size={18} />Скопировано{:else}<Copy
-							size={18}
-						/>Код{/if}
-				</button>
-				<button
-					class="btn"
-					onclick={() => copy("link", roomLink($roomCode))}
-				>
-					{#if copied === "link"}<Check size={18} />Скопировано{:else}<LinkIcon
-							size={18}
-						/>Ссылка{/if}
-				</button>
+			<div class="tab-body">
+				{#if tab === "info"}
+					<p class="eyebrow">Комната</p>
+					<h1 class="code">{$roomCode}</h1>
+
+					<div class="actions">
+						<button
+							class="btn"
+							onclick={() => copy("code", $roomCode)}
+						>
+							{#if copied === "code"}<Check
+									size={18}
+								/>Скопировано{:else}<Copy size={18} />Код{/if}
+						</button>
+						<button
+							class="btn"
+							onclick={() => copy("link", roomLink($roomCode))}
+						>
+							{#if copied === "link"}<Check
+									size={18}
+								/>Скопировано{:else}<LinkIcon
+									size={18}
+								/>Ссылка{/if}
+						</button>
+					</div>
+
+					{#if qr}
+						<img
+							class="qr"
+							src={qr}
+							alt="QR код для входа в комнату"
+						/>
+					{/if}
+
+					<p class="hint">
+						Покажи QR или дай ссылку — подключатся сразу.
+					</p>
+				{:else if tab === "settings"}
+					<div class="room-settings">
+						<SettingsCategories
+							bind:selected={roomCat}
+							cats={roomCategories}
+						/>
+						<div class="room-settings-list">
+							<SettingsList
+								category={roomCat}
+								items={roomSettings}
+							/>
+						</div>
+					</div>
+				{:else if tab === "camera"}
+					<p class="eyebrow">Камера</p>
+					<p class="hint">Раздел в разработке.</p>
+				{:else}
+					<p class="eyebrow">Другое</p>
+					<p class="hint">Раздел в разработке.</p>
+				{/if}
 			</div>
-
-			{#if qr}
-				<img class="qr" src={qr} alt="QR код для входа в комнату" />
-			{/if}
-
-			<p class="hint">Покажи QR или дай ссылку — подключатся сразу.</p>
 		</div>
 	{:else}
 		<div class="card">
 			<h1 class="title">Сервер</h1>
 
-			<button class="btn primary" onclick={createRoom}>Создать комнату</button>
+			<button class="btn primary" onclick={createRoom}
+				>Создать комнату</button
+			>
 
 			<div class="divider"><span>или</span></div>
 
@@ -114,7 +192,8 @@
 					autocomplete="off"
 					maxlength="6"
 				/>
-				<button class="btn primary" type="submit">Присоединиться</button>
+				<button class="btn primary" type="submit">Присоединиться</button
+				>
 			</form>
 
 			{#if $roomError}<p class="error">{$roomError}</p>{/if}
@@ -171,7 +250,9 @@
 	}
 
 	.exit {
-		right: calc(var(--trigger-edge) + var(--trigger-size) + var(--trigger-gap));
+		right: calc(
+			var(--trigger-edge) + var(--trigger-size) + var(--trigger-gap)
+		);
 	}
 
 	.card {
@@ -187,6 +268,86 @@
 		box-shadow: 6px 6px 0 var(--accent-dark);
 		background: var(--bg-overlay);
 		backdrop-filter: blur(14px);
+	}
+
+	.wide {
+		width: min(92vw, 480px);
+	}
+
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		width: 100%;
+		justify-content: center;
+		padding-bottom: 0.6rem;
+		border-bottom: 1px solid var(--divider);
+	}
+
+	.tab {
+		font-family: inherit;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.9rem;
+		font-weight: 700;
+		padding: 0.45rem 0.7rem;
+		border-radius: var(--radius-lg);
+		border: 2px solid transparent;
+		background: transparent;
+		color: var(--fg-muted);
+		transition:
+			color 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.tab:hover {
+		color: var(--accent-light);
+	}
+
+	.tab.active {
+		color: var(--accent-light);
+		border-color: var(--accent);
+	}
+
+	/* Фиксированная подложка: высота не прыгает при переключении вкладок. */
+	.tab-body {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1.1rem;
+		width: 100%;
+		min-height: 380px;
+	}
+
+	/* Настройки комнаты переиспользуют обычный реестр настроек; список скроллится
+	   внутри подложки, чтобы карточка не росла и не прыгала между вкладками. */
+	.room-settings {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+		width: 100%;
+		text-align: left;
+	}
+
+	.room-settings-list {
+		height: 320px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding-right: 0.3rem;
+		scrollbar-width: thin;
+		scrollbar-color: var(--accent-light) transparent;
+	}
+
+	.room-settings-list::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.room-settings-list::-webkit-scrollbar-thumb {
+		background-color: var(--accent-light);
+		border-radius: var(--radius-sm);
 	}
 
 	.title {

@@ -24,4 +24,11 @@ defmodule BackendWeb.RoomChannel do
     push(socket, "presence_state", Presence.list(socket))
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_in("reaction", %{"emoji" => emoji, "side" => side}, socket)
+      when is_binary(emoji) and side in ["left", "right"] do
+    broadcast(socket, "reaction", %{emoji: emoji, side: side})
+    {:noreply, socket}
+  end
 end

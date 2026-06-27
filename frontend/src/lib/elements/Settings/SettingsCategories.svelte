@@ -1,21 +1,22 @@
 <script>
-	import { categories } from "./settingsRegistry";
+	import { categories as defaultCategories } from "./settingsRegistry";
 
-	let { selected = $bindable() } = $props();
+	// cats по умолчанию — обычные категории; комната передаёт свой набор.
+	let { selected = $bindable(), cats = defaultCategories } = $props();
 
 	// Стрелки влево/вправо перемещают по вкладкам (доступность).
 	function onKeydown(e, index) {
 		if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
 		e.preventDefault();
 		const dir = e.key === "ArrowRight" ? 1 : -1;
-		const next = (index + dir + categories.length) % categories.length;
-		selected = categories[next].id;
-		document.getElementById(`cat-${categories[next].id}`)?.focus();
+		const next = (index + dir + cats.length) % cats.length;
+		selected = cats[next].id;
+		document.getElementById(`cat-${cats[next].id}`)?.focus();
 	}
 </script>
 
 <div class="categories" role="tablist" aria-label="Категории настроек">
-	{#each categories as cat, i}
+	{#each cats as cat, i}
 		{@const Icon = cat.icon}
 		<button
 			id="cat-{cat.id}"

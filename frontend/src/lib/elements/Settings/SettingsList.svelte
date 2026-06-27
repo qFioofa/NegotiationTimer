@@ -3,14 +3,15 @@
 	import { settingScore } from "./fuzzy";
 	import SettingCard from "./SettingCard.svelte";
 
-	let { category, query = "" } = $props();
+	// items по умолчанию — обычные настройки; комната передаёт свой реестр.
+	let { category, query = "", items = settings } = $props();
 
 	// Поиск только внутри выбранной категории; в «Все» — глобально (ТЗ).
 	let visible = $derived.by(() => {
 		const inCategory =
 			category === ALL_CATEGORY
-				? settings
-				: settings.filter((s) => s.category === category);
+				? items
+				: items.filter((s) => s.category === category);
 
 		const q = query.trim();
 		if (!q) return inCategory.map((s) => ({ s, score: 0 }));

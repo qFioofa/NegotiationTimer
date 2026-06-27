@@ -5,6 +5,9 @@ export const roomCode = writable("");
 export const joined = writable(false);
 export const online = writable(0);
 export const roomError = writable("");
+// Последняя пришедшая реакция; id уникален, чтобы каждый раз триггерить анимацию.
+export const reaction = writable<{ emoji: string; side: "left" | "right"; id: number } | null>(null);
+let reactionId = 0;
 
 let socket: Socket | null = null;
 let channel: ReturnType<Socket["channel"]> | null = null;
@@ -49,6 +52,10 @@ export function connectRoom(code: string): void {
 	const presence = new Presence(channel);
 	presence.onSync(() => online.set(presence.list().length));
 
+	channel.on("reaction", (p: { emoji: string; side: "left" | "right" }) =>
+		reaction.set({ emoji: p.emoji, side: p.side, id: ++reactionId }),
+	);
+
 	channel
 		.join()
 		.receive("ok", () => {
@@ -59,6 +66,10 @@ export function connectRoom(code: string): void {
 			roomError.set(resp?.reason ?? "Не удалось подключиться");
 			leaveRoom();
 		});
+}
+
+export function sendReaction(emoji: string, side: "left" | "right"): void {
+	channel?.push("reaction", { emoji, side });
 }
 
 export function createRoom(): void {

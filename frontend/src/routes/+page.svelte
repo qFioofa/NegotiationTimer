@@ -10,6 +10,7 @@
 	import SettingsTrigger from "$lib/elements/Settings/SettingsTrigger.svelte";
 	import ServerTrigger from "$lib/elements/Settings/ServerTrigger.svelte";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
+	import Reactions from "$lib/elements/Settings/Reactions.svelte";
 	import { registerBinds } from "$lib/elements/Settings/settingsRegistry";
 	import { onMount } from "svelte";
 
@@ -58,3 +59,4 @@
 <SettingsTrigger />
 <ServerTrigger />
 <OnlineBadge />
+<Reactions />
