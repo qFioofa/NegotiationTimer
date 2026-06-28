@@ -17,11 +17,13 @@
 		lastRoom,
 	} from "$lib/stores/room";
 	import { hostStyle, applyHostStyle } from "$lib/stores/roomSync";
+	import BackgroundHandler from "$lib/elements/BackgroundHandler.svelte";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
 	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
 	import SettingCard from "$lib/elements/Settings/SettingCard.svelte";
 	import RoomMembers from "$lib/elements/Settings/RoomMembers.svelte";
+	import CameraSettings from "$lib/elements/Settings/CameraSettings.svelte";
 	import {
 		roomCategories,
 		roomSettings,
@@ -77,6 +79,8 @@
 		}
 	});
 </script>
+
+<BackgroundHandler />
 
 <a class="trigger corner" href="/" aria-label="К таймеру">
 	<Timer size={28} />
@@ -151,7 +155,7 @@
 					</div>
 				{:else if section === "camera"}
 					<p class="eyebrow">Камера</p>
-					<p class="hint">Раздел в разработке.</p>
+					<CameraSettings />
 				{:else if section === "profile"}
 					<p class="eyebrow">Профиль</p>
 					{#if $isHost}

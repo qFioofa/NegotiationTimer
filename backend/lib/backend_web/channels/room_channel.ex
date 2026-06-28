@@ -88,6 +88,11 @@ defmodule BackendWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("webrtc", payload, socket) when is_map(payload) do
+    broadcast_from(socket, "webrtc", Map.put(payload, "from", socket.assigns.client_id))
+    {:noreply, socket}
+  end
+
   def handle_in("set_nick", %{"nick" => nick}, socket) when is_binary(nick) do
     taken = taken_nicks(socket) -- [current_nick(socket)]
     resolved = resolve_nick(nick, taken)
@@ -106,6 +111,8 @@ defmodule BackendWeb.RoomChannel do
     if host?(socket), do: broadcast(socket, "rename", %{client_id: id, nick: nick})
     {:noreply, socket}
   end
+
+  defp authorized_sync?(socket, "camera:" <> id), do: id == socket.assigns.client_id
 
   defp authorized_sync?(socket, key) do
     flags = sender_flags(socket)

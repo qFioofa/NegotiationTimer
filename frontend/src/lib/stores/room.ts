@@ -1,5 +1,13 @@
 import { writable, get, derived } from "svelte/store";
 import { Socket, Presence } from "phoenix";
+import { initWebrtc, teardownWebrtc, handleSignal } from "./webrtc";
+
+type WebrtcSignal = {
+	to: string;
+	from?: string;
+	description?: RTCSessionDescriptionInit;
+	candidate?: RTCIceCandidateInit;
+};
 
 export const roomCode = writable("");
 export const joined = writable(false);
@@ -150,11 +158,16 @@ export function connectRoom(code: string, asHost = false): void {
 		incomingSync.set({ key: p.key, value: p.value }),
 	);
 
+	channel.on("webrtc", (msg: WebrtcSignal) => {
+		if (msg.to === clientId()) void handleSignal(msg);
+	});
+
 	channel
 		.join()
 		.receive("ok", () => {
 			roomCode.set(trimmed);
 			joined.set(true);
+			initWebrtc();
 			if (typeof localStorage !== "undefined")
 				localStorage.setItem(LAST_ROOM_KEY, trimmed);
 		})
@@ -170,6 +183,10 @@ export function sendReaction(emoji: string, side: "left" | "right"): void {
 
 export function pushSync(key: string, value: unknown): void {
 	channel?.push("sync", { key, value });
+}
+
+export function pushWebrtc(payload: WebrtcSignal): void {
+	channel?.push("webrtc", payload);
 }
 
 export function setMemberFlag(id: string, patch: MemberFlags): void {
@@ -198,6 +215,7 @@ export function createRoom(): void {
 }
 
 export function leaveRoom(forget = true): void {
+	teardownWebrtc();
 	notifyReady = false;
 	notifications.set([]);
 	channel?.leave();

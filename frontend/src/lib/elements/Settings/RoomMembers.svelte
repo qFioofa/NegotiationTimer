@@ -1,5 +1,15 @@
 <script lang="ts">
-	import { Crown, Shield, Ban, Timer, UserX, Check, X } from "lucide-svelte";
+	import {
+		Crown,
+		Shield,
+		Ban,
+		Timer,
+		UserX,
+		UserMinus,
+		Check,
+		X,
+	} from "lucide-svelte";
+	import { get } from "svelte/store";
 	import {
 		members,
 		memberFlags,
@@ -10,7 +20,36 @@
 		kickMember,
 		renameMember,
 	} from "$lib/stores/room";
-	import { nameA, nameB } from "$lib/stores/players";
+	import { nameA, nameB, slot1, slot2 } from "$lib/stores/players";
+
+	function assignSlot(slot: 1 | 2, id: string, nick: string) {
+		if (slot === 1) {
+			if (get(slot2) === id) {
+				nameB.set("");
+				slot2.set("");
+			}
+			nameA.set(nick);
+			slot1.set(id);
+		} else {
+			if (get(slot1) === id) {
+				nameA.set("");
+				slot1.set("");
+			}
+			nameB.set(nick);
+			slot2.set(id);
+		}
+	}
+
+	function removeFromPlayers(id: string) {
+		if (get(slot1) === id) {
+			nameA.set("");
+			slot1.set("");
+		}
+		if (get(slot2) === id) {
+			nameB.set("");
+			slot2.set("");
+		}
+	}
 
 	let selected = $state<string | null>(null);
 	let editNick = $state("");
@@ -81,14 +120,26 @@
 			</button>
 		</div>
 
+		<div class="grid">
+			<button
+				class="btn"
+				class:on={$slot1 === sel.id}
+				onclick={() => assignSlot(1, sel.id, sel.nick)}>Игрок 1</button
+			>
+			<button
+				class="btn"
+				class:on={$slot2 === sel.id}
+				onclick={() => assignSlot(2, sel.id, sel.nick)}>Игрок 2</button
+			>
+			{#if $slot1 === sel.id || $slot2 === sel.id}
+				<button class="btn" onclick={() => removeFromPlayers(sel.id)}>
+					<UserMinus size={16} />Убрать из игроков
+				</button>
+			{/if}
+		</div>
+
 		{#if sel.id !== me}
 			<div class="grid">
-				<button class="btn" onclick={() => nameA.set(sel.nick)}
-					>Игрок 1</button
-				>
-				<button class="btn" onclick={() => nameB.set(sel.nick)}
-					>Игрок 2</button
-				>
 				<button
 					class="btn"
 					class:on={flags.canEditTimer}

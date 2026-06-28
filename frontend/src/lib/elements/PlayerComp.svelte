@@ -3,10 +3,34 @@
 	import PlayerNumber from "./Players/Wrappers/PlayerNumber.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
 	import { shuffleMap } from "$lib/components/Shuffle";
-	import { nameA, nameB } from "$lib/stores/players";
+	import { nameA, nameB, slot1, slot2 } from "$lib/stores/players";
+	import { cameraStream, cameraOn, cameraStates } from "$lib/stores/camera";
+	import { remoteStreams } from "$lib/stores/webrtc";
+	import { myId } from "$lib/stores/room";
 	import { onMount } from "svelte";
 
+	function streamFor(slot, local, on, states, remotes) {
+		if (!slot) return null;
+		if (slot === myId()) return on ? local : null;
+		return states[slot]?.on ? (remotes[slot] ?? null) : null;
+	}
+
+	$: cam1 = streamFor($slot1, $cameraStream, $cameraOn, $cameraStates, $remoteStreams);
+	$: cam2 = streamFor($slot2, $cameraStream, $cameraOn, $cameraStates, $remoteStreams);
+	$: mirror1 = $slot1 === myId();
+	$: mirror2 = $slot2 === myId();
+
+	function srcObject(node, stream) {
+		node.srcObject = stream;
+		return {
+			update(s) {
+				node.srcObject = s;
+			},
+		};
+	}
+
 	let number1, number2;
+	let cam1El, cam2El;
 	let input1Ref, input2Ref;
 	let ghost1Ref, ghost2Ref;
 	let wrapperRef;
@@ -24,8 +48,10 @@
 			return;
 		}
 
+		const el1 = cam1 && cam1El ? cam1El : number1;
+		const el2 = cam2 && cam2El ? cam2El : number2;
 		const _f = shuffleMap.get(GlobalConfig.get("shuffleAnimation"));
-		if (_f) await _f(number1, number2);
+		if (_f) await _f(el1, el2);
 	}
 
 	onMount(() => {
@@ -40,11 +66,33 @@
 
 <div class="players-wrapper {playerBackground ? '' : 'transparent'}">
 	<div class="grid-container">
-		<div class="grid-item">
+		<div class="grid-item" class:has-cam={cam1}>
 			<PlayerNumber text="1" bind:ref={number1} />
+			{#if cam1}
+				<video
+					class="cam"
+					class:mirror={mirror1}
+					bind:this={cam1El}
+					use:srcObject={cam1}
+					autoplay
+					muted
+					playsinline
+				></video>
+			{/if}
 		</div>
-		<div class="grid-item">
+		<div class="grid-item" class:has-cam={cam2}>
 			<PlayerNumber text="2" bind:ref={number2} />
+			{#if cam2}
+				<video
+					class="cam"
+					class:mirror={mirror2}
+					bind:this={cam2El}
+					use:srcObject={cam2}
+					autoplay
+					muted
+					playsinline
+				></video>
+			{/if}
 		</div>
 		<div class="grid-item">
 			<NameInput bind:playerName={$nameA} />
@@ -89,6 +137,32 @@
 		width: 100%;
 		justify-items: center;
 		align-items: center;
+	}
+
+	.grid-item {
+		position: relative;
+	}
+
+	.grid-item.has-cam :global(.number) {
+		visibility: hidden;
+	}
+
+	.cam {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: calc(15px - clamp(1rem, 2vw, 2rem));
+		margin-inline: auto;
+		width: clamp(9rem, 24vw, 20rem);
+		height: clamp(9rem, 24vw, 20rem);
+		object-fit: cover;
+		border-radius: 50%;
+		background: transparent;
+		pointer-events: none;
+	}
+
+	.cam.mirror {
+		transform: scaleX(-1);
 	}
 
 	.grid-item:nth-child(1) {

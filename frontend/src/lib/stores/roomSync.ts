@@ -16,7 +16,8 @@ import {
 	setTimerActionHook,
 	applyRemoteTimer,
 } from "./timerDown";
-import { nameA, nameB } from "./players";
+import { nameA, nameB, slot1, slot2 } from "./players";
+import { cameraStates } from "./camera";
 import { isPaused } from "$lib/components/Pause";
 import { isBlackout } from "./parameters";
 import { roomSettings } from "$lib/elements/Settings/roomSettingsRegistry";
@@ -109,6 +110,12 @@ export function initRoomSync(): void {
 	nameB.subscribe((v) => {
 		if (!applying) pushSync("name:b", v);
 	});
+	slot1.subscribe((v) => {
+		if (!applying) pushSync("slot:1", v);
+	});
+	slot2.subscribe((v) => {
+		if (!applying) pushSync("slot:2", v);
+	});
 	setTimerActionHook(() => {
 		if (!applying) pushSync("timer", timerSnap());
 	});
@@ -170,6 +177,16 @@ export function initRoomSync(): void {
 				nameA.set(value as string);
 			} else if (key === "name:b") {
 				nameB.set(value as string);
+			} else if (key === "slot:1") {
+				slot1.set(value as string);
+			} else if (key === "slot:2") {
+				slot2.set(value as string);
+			} else if (key.startsWith("camera:")) {
+				const id = key.slice(7);
+				cameraStates.update((m) => ({
+					...m,
+					[id]: value as { on: boolean },
+				}));
 			}
 		} finally {
 			applying = false;
