@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-bash scripts/run_docker.sh
+docker compose up -d --build
