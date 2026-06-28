@@ -14,6 +14,7 @@
 		createRoom,
 		leaveRoom,
 		roomLink,
+		lastRoom,
 	} from "$lib/stores/room";
 	import { hostStyle, applyHostStyle } from "$lib/stores/roomSync";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
@@ -57,7 +58,7 @@
 		themeManager.setTheme(GlobalConfig.get("theme"));
 		themeManager.setAccent(GlobalConfig.get("accentColor"));
 
-		const room = new URLSearchParams(location.search).get("room");
+		const room = new URLSearchParams(location.search).get("room") || lastRoom();
 		if (room && !$joined) connectRoom(room);
 	});
 
@@ -84,7 +85,7 @@
 {#if $joined}
 	<button
 		class="trigger exit"
-		onclick={leaveRoom}
+		onclick={() => leaveRoom()}
 		aria-label="Выйти из комнаты"
 	>
 		<LogOut size={28} />

@@ -3,14 +3,15 @@
 	import "$lib/cssStyles/themes.css";
 	import { onMount } from "svelte";
 	import { initRoomSync } from "$lib/stores/roomSync";
+	import Notifications from "$lib/elements/Notifications.svelte";
 
 	let { children } = $props();
 
-	// Подключаем шину синхронизации комнаты один раз на всё приложение.
 	onMount(initRoomSync);
 </script>
 
 {@render children()}
+<Notifications />
 
 <svelte:head>
 	<link

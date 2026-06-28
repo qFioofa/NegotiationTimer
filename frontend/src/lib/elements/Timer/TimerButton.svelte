@@ -1,10 +1,10 @@
 <script>
 	import RollingCounter from "./RollingCounter.svelte";
 
-	let { displayTime, onClick = () => {} } = $props();
+	let { displayTime, onClick = () => {}, disabled = false } = $props();
 </script>
 
-<button class="timer" onclick={onClick}>
+<button class="timer" {disabled} onclick={onClick}>
 	<RollingCounter value={displayTime} />
 </button>
 
@@ -46,6 +46,16 @@
 	.timer:active {
 		transform: scale(0.95);
 		box-shadow: 2px 2px 0 var(--accent-dark);
+	}
+
+	.timer:disabled {
+		cursor: default;
+		opacity: 0.65;
+	}
+
+	.timer:disabled:hover {
+		transform: none;
+		box-shadow: 6px 6px 0 var(--accent-dark);
 	}
 
 	@media (max-width: 768px) {

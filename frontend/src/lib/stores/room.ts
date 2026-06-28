@@ -1,4 +1,4 @@
-import { writable, get } from "svelte/store";
+import { writable, get, derived } from "svelte/store";
 import { Socket, Presence } from "phoenix";
 
 export const roomCode = writable("");
@@ -9,6 +9,11 @@ export const roomError = writable("");
 
 export const HOST_NICK = "хост";
 const NICK_KEY = "server_nick";
+const LAST_ROOM_KEY = "server_last_room";
+const HOST_GRACE_MS = 5 * 60 * 1000;
+
+export const lastRoom = (): string =>
+	(typeof localStorage !== "undefined" && localStorage.getItem(LAST_ROOM_KEY)) || "";
 const loadNick = () =>
 	(typeof localStorage !== "undefined" && localStorage.getItem(NICK_KEY)) || "";
 export const myNick = writable(loadNick());
@@ -26,8 +31,68 @@ export type MemberFlags = {
 };
 export const memberFlags = writable<Record<string, MemberFlags>>({});
 
+export type Notification = { id: number; text: string };
+export const notifications = writable<Notification[]>([]);
+let notifId = 0;
+let notifyReady = false;
+
+// Гейт против тостов на реплее состояния при входе: сервер шлёт "synced" после
+// дослыки RoomState, и только тогда тосты включаются.
+export function notify(text: string): void {
+	if (!notifyReady) return;
+	const id = ++notifId;
+	notifications.update((n) => [...n, { id, text }]);
+	setTimeout(
+		() => notifications.update((n) => n.filter((x) => x.id !== id)),
+		5000,
+	);
+}
+
 export function myId(): string {
 	return clientId();
+}
+
+export const canEditTimer = derived(
+	[joined, isHost, memberFlags],
+	([$joined, $isHost, $flags]) => {
+		if (!$joined) return true;
+		if ($isHost) return true;
+		const f = $flags[clientId()] ?? {};
+		return f.role === "host" || f.role === "rights" || !!f.canEditTimer;
+	},
+);
+
+function hostIdOf(flags: Record<string, MemberFlags>): string | null {
+	for (const [id, f] of Object.entries(flags)) if (f.role === "host") return id;
+	return null;
+}
+
+let hostTimer: ReturnType<typeof setTimeout> | null = null;
+function clearHostTimer(): void {
+	if (hostTimer) clearTimeout(hostTimer);
+	hostTimer = null;
+}
+
+// Миграция хоста: если хост ушёл из presence дольше грейса, наименьший по
+// client_id из оставшихся claim'ит хоста. Сервер арбитрирует гонку.
+function evalHostMigration(): void {
+	if (!get(joined)) return clearHostTimer();
+	const hid = hostIdOf(get(memberFlags));
+	const online = get(members).some((m) => m.id === hid);
+	if (!hid || online || hid === clientId()) return clearHostTimer();
+	if (hostTimer) return;
+	hostTimer = setTimeout(() => {
+		hostTimer = null;
+		const h = hostIdOf(get(memberFlags));
+		const present = get(members).map((m) => m.id);
+		if (!h || present.includes(h)) return;
+		if (present.sort()[0] === clientId()) channel?.push("claim_host", {});
+	}, HOST_GRACE_MS);
+}
+
+if (typeof window !== "undefined") {
+	members.subscribe(evalHostMigration);
+	memberFlags.subscribe(evalHostMigration);
 }
 
 export const reaction = writable<{ emoji: string; side: "left" | "right"; id: number } | null>(null);
@@ -45,11 +110,19 @@ function wsUrl(): string {
 	return `${proto}//${location.hostname}:4000/socket`;
 }
 
+function newId(): string {
+	// crypto.randomUUID есть только в secure context (https/localhost); по http
+	// его нет. client_id — просто стабильный непрозрачный токен, точный UUID не нужен.
+	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+		return crypto.randomUUID();
+	return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
 function clientId(): string {
 	if (typeof localStorage === "undefined") return "";
 	let id = localStorage.getItem("server_client_id");
 	if (!id) {
-		id = crypto.randomUUID();
+		id = newId();
 		localStorage.setItem("server_client_id", id);
 	}
 	return id;
@@ -69,7 +142,7 @@ export function connectRoom(code: string, asHost = false): void {
 	}
 	if (trimmed === currentCode && socket) return;
 
-	leaveRoom();
+	leaveRoom(false);
 	currentCode = trimmed;
 
 	socket = new Socket(wsUrl());
@@ -99,6 +172,14 @@ export function connectRoom(code: string, asHost = false): void {
 		if (p.client_id === clientId()) setMyNick(p.nick);
 	});
 
+	channel.on("host_changed", (p: { client_id: string }) => {
+		isHost.set(p.client_id === clientId());
+	});
+
+	channel.on("synced", () => {
+		notifyReady = true;
+	});
+
 	channel.on("reaction", (p: { emoji: string; side: "left" | "right" }) =>
 		reaction.set({ emoji: p.emoji, side: p.side, id: ++reactionId }),
 	);
@@ -112,6 +193,8 @@ export function connectRoom(code: string, asHost = false): void {
 		.receive("ok", () => {
 			roomCode.set(trimmed);
 			joined.set(true);
+			if (typeof localStorage !== "undefined")
+				localStorage.setItem(LAST_ROOM_KEY, trimmed);
 		})
 		.receive("error", (resp: { reason?: string }) => {
 			roomError.set(resp?.reason ?? "Не удалось подключиться");
@@ -152,7 +235,10 @@ export function createRoom(): void {
 	connectRoom(Math.random().toString(36).slice(2, 8).toUpperCase(), true);
 }
 
-export function leaveRoom(): void {
+export function leaveRoom(forget = true): void {
+	clearHostTimer();
+	notifyReady = false;
+	notifications.set([]);
 	channel?.leave();
 	socket?.disconnect();
 	channel = null;
@@ -164,4 +250,6 @@ export function leaveRoom(): void {
 	members.set([]);
 	memberFlags.set({});
 	roomCode.set("");
+	if (forget && typeof localStorage !== "undefined")
+		localStorage.removeItem(LAST_ROOM_KEY);
 }

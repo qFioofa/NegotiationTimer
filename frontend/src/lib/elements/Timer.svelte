@@ -6,6 +6,7 @@
 	import TimerButton from "./Timer/TimerButton.svelte";
 	import { RotateCcw, Pause, Shuffle } from "lucide-svelte";
 	import { isPaused } from "$lib/components/Pause";
+	import { canEditTimer } from "$lib/stores/room";
 	import BlackOut from "./BlackOut.svelte";
 	import { get } from "svelte/store";
 	import { onMount } from "svelte";
@@ -78,8 +79,12 @@
 
 <div class="timer-wrapper">
 	<div class="timer-container">
-		<TimerButton {displayTime} onClick={toggleTimer} />
-		{#if extraButtonsOn}
+		<TimerButton
+			{displayTime}
+			disabled={!$canEditTimer}
+			onClick={$canEditTimer ? toggleTimer : () => {}}
+		/>
+		{#if extraButtonsOn && $canEditTimer}
 			<ExtraButtonsWrapper>
 				<ExtraButtons
 					icon={RotateCcw}

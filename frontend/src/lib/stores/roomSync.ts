@@ -7,6 +7,7 @@ import {
 	isHost,
 	memberFlags,
 	myId,
+	notify,
 	type MemberFlags,
 } from "./room";
 import {
@@ -149,9 +150,16 @@ export function initRoomSync(): void {
 			} else if (key.startsWith("member:")) {
 				const id = key.slice(7);
 				const flags = value as MemberFlags;
+				const prev = get(memberFlags)[id]?.role;
 				memberFlags.update((m) => ({ ...m, [id]: flags }));
-				if (id === myId() && flags.role !== undefined)
-					isHost.set(flags.role === "host");
+				if (id === myId()) {
+					if (flags.role !== undefined)
+						isHost.set(flags.role === "host");
+					if (flags.role === "host" && prev !== "host")
+						notify("Вы назначены хостом");
+					else if (flags.role === "rights" && prev !== "rights")
+						notify("Вам выданы права хоста");
+				}
 			} else if (key.startsWith("cfg:")) {
 				GlobalConfig.set(key.slice(4), value);
 			} else if (key === "timer") {
