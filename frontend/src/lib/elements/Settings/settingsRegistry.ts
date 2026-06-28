@@ -17,6 +17,7 @@ import {
 	Play,
 	Layers,
 	EyeOff,
+	Eye,
 	Pipette,
 	Package,
 	Shuffle,
@@ -148,6 +149,24 @@ export const settings = [
 		tooltip: "Автоматически ставить на паузу, когда меню открыто",
 		keywords: ["пауза", "меню", "авто"],
 		configKey: "menuAutoPause",
+	},
+	{
+		id: "proximityTabs",
+		category: "interaction",
+		type: "multiOption",
+		icon: Eye,
+		title: "Проявление при наведении",
+		description:
+			"Выбранные кнопки в правом верхнем углу прячутся и плавно проявляются, когда курсор приближается к ним. Это освобождает экран — кнопки не мешают, но всегда под рукой.",
+		tooltip: "Скрывать выбранные верхние кнопки до приближения курсора",
+		keywords: ["проявление", "наведение", "hover", "кнопки", "угол", "скрыть"],
+		configKey: "proximityTabs",
+		getOptions: () => [
+			{ value: "settings", label: "Настройки" },
+			{ value: "timer", label: "Таймер" },
+			{ value: "server", label: "Сервер" },
+			{ value: "online", label: "В сети" },
+		],
 	},
 	{
 		id: "playerBackground",

@@ -11,10 +11,12 @@
 	import ServerTrigger from "$lib/elements/Settings/ServerTrigger.svelte";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import Reactions from "$lib/elements/Settings/Reactions.svelte";
+	import ProximityReveal from "$lib/elements/ProximityReveal.svelte";
 	import { registerBinds } from "$lib/elements/Settings/settingsRegistry";
 	import { onMount } from "svelte";
 
 	let hideUI = GlobalConfig.get("hideAllUI");
+	let proxTabs = GlobalConfig.get("proximityTabs") || [];
 
 	let isMobile = false;
 
@@ -34,9 +36,14 @@
 			"hideAllUI",
 			(v) => (hideUI = v),
 		);
+		const offProx = GlobalConfig.subscribe(
+			"proximityTabs",
+			(v) => (proxTabs = v || []),
+		);
 		return () => {
 			mq.removeEventListener("change", sync);
 			offHide();
+			offProx();
 		};
 	});
 </script>
@@ -56,7 +63,13 @@
 	{/if}
 {/if}
 
-<SettingsTrigger />
-<ServerTrigger />
-<OnlineBadge />
+<ProximityReveal enabled={proxTabs.includes("settings")}>
+	<SettingsTrigger />
+</ProximityReveal>
+<ProximityReveal enabled={proxTabs.includes("server")}>
+	<ServerTrigger />
+</ProximityReveal>
+<ProximityReveal enabled={proxTabs.includes("online")}>
+	<OnlineBadge />
+</ProximityReveal>
 <Reactions />

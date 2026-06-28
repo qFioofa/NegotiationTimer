@@ -7,9 +7,20 @@
 	import { setPause } from "$lib/components/Pause";
 	import { Clock } from "lucide-svelte";
 	import Pause from "./Pause.svelte";
+	import ProximityReveal from "./ProximityReveal.svelte";
 
 	let triggerRef = $state();
 	let plateRef = $state();
+
+	let proxOn = $state(
+		(GlobalConfig.get("proximityTabs") || []).includes("timer"),
+	);
+	$effect(() =>
+		GlobalConfig.subscribe(
+			"proximityTabs",
+			(v) => (proxOn = (v || []).includes("timer")),
+		),
+	);
 
 	// Быстрые пресеты ±времени — самое частое действие во время сессии.
 	const presets = [
@@ -52,17 +63,19 @@
 
 <Pause />
 
-<button
-	bind:this={triggerRef}
-	class="panel-trigger"
-	class:active={$isPanelOpen}
-	aria-label="Время"
-	aria-haspopup="true"
-	aria-expanded={$isPanelOpen}
-	onclick={toggle}
->
-	<Clock size={28} />
-</button>
+<ProximityReveal enabled={proxOn}>
+	<button
+		bind:this={triggerRef}
+		class="panel-trigger"
+		class:active={$isPanelOpen}
+		aria-label="Время"
+		aria-haspopup="true"
+		aria-expanded={$isPanelOpen}
+		onclick={toggle}
+	>
+		<Clock size={28} />
+	</button>
+</ProximityReveal>
 
 <div
 	bind:this={plateRef}

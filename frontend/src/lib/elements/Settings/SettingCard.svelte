@@ -2,6 +2,7 @@
 	import { GlobalConfig } from "$lib/stores/parameters";
 
 	import MenuOptionList from "../MenuItems/MenuOptionList.svelte";
+	import MenuMultiOption from "../MenuItems/MenuMultiOption.svelte";
 	import MenuDecoder from "../MenuItems/MenuDecoder.svelte";
 	import MenuToggle from "../MenuItems/MenuToggle.svelte";
 	import MenuCoder from "../MenuItems/MenuCoder.svelte";
@@ -52,6 +53,23 @@
 			onOptionSelect={(opt) => {
 				if (setting.configKey) set(setting.configKey, opt);
 				setting.onSelect?.(opt);
+				flash();
+			}}
+		/>
+	{:else if setting.type === "multiOption"}
+		<MenuMultiOption
+			icon={setting.icon}
+			title={setting.title}
+			description={setting.description}
+			tooltipText={setting.tooltip}
+			options={setting.getOptions?.() ?? []}
+			selected={get(setting.configKey) ?? []}
+			onToggle={(v) => {
+				const cur = get(setting.configKey) ?? [];
+				const next = cur.includes(v)
+					? cur.filter((x) => x !== v)
+					: [...cur, v];
+				set(setting.configKey, next);
 				flash();
 			}}
 		/>

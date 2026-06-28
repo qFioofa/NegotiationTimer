@@ -40,6 +40,8 @@ export type AppConfig = {
 	reactionMemesOn: boolean;
 	autoSyncHost: boolean;
 	syncTimerActions: boolean;
+	/** Верхние-правые кнопки, которые скрыты и проявляются при приближении курсора. */
+	proximityTabs: string[];
 };
 
 export const dConfig: AppConfig = {
@@ -76,4 +78,5 @@ export const dConfig: AppConfig = {
 	reactionMemesOn: true,
 	autoSyncHost: false,
 	syncTimerActions: true,
+	proximityTabs: [],
 };

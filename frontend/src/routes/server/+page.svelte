@@ -18,6 +18,7 @@
 	} from "$lib/stores/room";
 	import { hostStyle, applyHostStyle } from "$lib/stores/roomSync";
 	import BackgroundHandler from "$lib/elements/BackgroundHandler.svelte";
+	import ProximityReveal from "$lib/elements/ProximityReveal.svelte";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
 	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
@@ -47,6 +48,14 @@
 	}
 
 	let section = $state("info");
+
+	let proxTabs = $state<string[]>(GlobalConfig.get("proximityTabs") || []);
+	$effect(() =>
+		GlobalConfig.subscribe(
+			"proximityTabs",
+			(v) => (proxTabs = (v as string[]) || []),
+		),
+	);
 
 	async function copy(kind: "code" | "link", text: string) {
 		try {
@@ -96,7 +105,9 @@
 	</button>
 {/if}
 
-<OnlineBadge />
+<ProximityReveal enabled={proxTabs.includes("online")}>
+	<OnlineBadge />
+</ProximityReveal>
 
 <div class="page">
 	{#if $joined}
