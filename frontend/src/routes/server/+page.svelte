@@ -7,6 +7,7 @@
 	import {
 		joined,
 		isHost,
+		myNick,
 		roomCode,
 		roomError,
 		connectRoom,
@@ -19,6 +20,7 @@
 	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
 	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
 	import SettingCard from "$lib/elements/Settings/SettingCard.svelte";
+	import RoomMembers from "$lib/elements/Settings/RoomMembers.svelte";
 	import {
 		roomCategories,
 		roomSettings,
@@ -137,6 +139,8 @@
 					<p class="hint">
 						Покажи QR или дай ссылку — подключатся сразу.
 					</p>
+				{:else if section === "members"}
+					<RoomMembers />
 				{:else if section === "reactions"}
 					<p class="hint">
 						Изменения применяются у всех участников комнаты сразу.
@@ -188,6 +192,14 @@
 	{:else}
 		<div class="card">
 			<h1 class="title">Сервер</h1>
+
+			<input
+				class="nick"
+				bind:value={$myNick}
+				placeholder="ТВОЙ НИК"
+				autocomplete="off"
+				maxlength="20"
+			/>
 
 			<button class="btn primary" onclick={createRoom}
 				>Создать комнату</button
@@ -433,6 +445,12 @@
 	input:focus {
 		outline: none;
 		box-shadow: 0 0 0 3px var(--accent-muted);
+	}
+
+	.nick {
+		width: 100%;
+		text-transform: none;
+		letter-spacing: 0.05rem;
 	}
 
 	.btn {

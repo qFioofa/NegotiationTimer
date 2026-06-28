@@ -16,6 +16,14 @@ defmodule Backend.RoomState do
   @doc "Сохранить значение ключа для комнаты."
   def put(topic, key, value), do: :ets.insert(@table, {{topic, key}, value})
 
+  @doc "Значение одного ключа комнаты (или nil)."
+  def get(topic, key) do
+    case :ets.lookup(@table, {topic, key}) do
+      [{_, value}] -> value
+      [] -> nil
+    end
+  end
+
   @doc "Все {key, value} комнаты — для отправки новому участнику."
   def all(topic) do
     :ets.match_object(@table, {{topic, :_}, :_})

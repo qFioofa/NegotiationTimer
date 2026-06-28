@@ -9,12 +9,14 @@ import {
 	Hash,
 	Image,
 	UserRound,
+	Users,
 	RefreshCw,
 	Pause,
 } from "lucide-svelte";
 
 export const roomCategories = [
 	{ id: "info", label: "Информация", icon: Info },
+	{ id: "members", label: "Участники", icon: Users },
 	{ id: "reactions", label: "Реакции", icon: Smile },
 	{ id: "camera", label: "Камера", icon: Camera },
 	{ id: "profile", label: "Профиль", icon: UserRound },

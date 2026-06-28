@@ -1,6 +1,14 @@
 import { get, writable } from "svelte/store";
 import { GlobalConfig } from "./parameters";
-import { incomingSync, pushSync, joined, isHost } from "./room";
+import {
+	incomingSync,
+	pushSync,
+	joined,
+	isHost,
+	memberFlags,
+	myId,
+	type MemberFlags,
+} from "./room";
 import {
 	isRunning,
 	timerInstance,
@@ -138,6 +146,12 @@ export function initRoomSync(): void {
 			} else if (key === "blackout") {
 				if (GlobalConfig.get("syncTimerActions"))
 					isBlackout.set(value as boolean);
+			} else if (key.startsWith("member:")) {
+				const id = key.slice(7);
+				const flags = value as MemberFlags;
+				memberFlags.update((m) => ({ ...m, [id]: flags }));
+				if (id === myId() && flags.role !== undefined)
+					isHost.set(flags.role === "host");
 			} else if (key.startsWith("cfg:")) {
 				GlobalConfig.set(key.slice(4), value);
 			} else if (key === "timer") {

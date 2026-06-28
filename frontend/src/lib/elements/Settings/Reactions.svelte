@@ -1,7 +1,19 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
-	import { joined, reaction, sendReaction } from "$lib/stores/room";
+	import {
+		joined,
+		reaction,
+		sendReaction,
+		memberFlags,
+		myId,
+	} from "$lib/stores/room";
 	import { GlobalConfig } from "$lib/stores/parameters";
+
+	let banned = $state(false);
+	const banUnsub = memberFlags.subscribe(
+		(m) => (banned = !!m[myId()]?.bannedReactions),
+	);
+	onDestroy(banUnsub);
 
 	const secs = (v: unknown) => parseFloat(String(v)) * 1000;
 	const SIZE_FACTOR: Record<string, number> = { Маленькие: 0.7, Средние: 1, Большие: 1.5 };
@@ -69,6 +81,7 @@
 
 	let lastSent = 0;
 	function send(emoji: string, side: "left" | "right") {
+		if (banned) return;
 		const now = Date.now();
 		if (now - lastSent < cooldownMs) return;
 		lastSent = now;
@@ -122,8 +135,9 @@
 {/snippet}
 
 {#if $joined && enabled}
-	{#each ["left", "right"] as const as side (side)}
-		<div class="dock {side}">
+	{#if !banned}
+		{#each ["left", "right"] as const as side (side)}
+			<div class="dock {side}">
 			<button
 				class="toggle"
 				aria-label="Реакции"
@@ -155,6 +169,7 @@
 			{/if}
 		</div>
 	{/each}
+	{/if}
 
 	{#each flyers as f (f.id)}
 		<span
