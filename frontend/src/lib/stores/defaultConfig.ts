@@ -38,6 +38,8 @@ export type AppConfig = {
 	reactionNumbersOn: boolean;
 	/** Показывать вкладку «Мемы» в пикере реакций. */
 	reactionMemesOn: boolean;
+	autoSyncHost: boolean;
+	syncTimerActions: boolean;
 };
 
 export const dConfig: AppConfig = {
@@ -72,4 +74,6 @@ export const dConfig: AppConfig = {
 	reactionSize: "Средние",
 	reactionNumbersOn: true,
 	reactionMemesOn: true,
+	autoSyncHost: false,
+	syncTimerActions: true,
 };

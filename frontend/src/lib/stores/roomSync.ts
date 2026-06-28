@@ -8,6 +8,8 @@ import {
 	applyRemoteTimer,
 } from "./timerDown";
 import { nameA, nameB } from "./players";
+import { isPaused } from "$lib/components/Pause";
+import { isBlackout } from "./parameters";
 import { roomSettings } from "$lib/elements/Settings/roomSettingsRegistry";
 
 const CFG_KEYS = roomSettings
@@ -111,6 +113,17 @@ export function initRoomSync(): void {
 		});
 	}
 
+	GlobalConfig.subscribe("autoSyncHost", (v) => {
+		if (v && get(hostStyle)) void applyHostStyle();
+	});
+	isPaused.subscribe((v) => {
+		if (!applying && GlobalConfig.get("syncTimerActions")) pushSync("paused", v);
+	});
+	isBlackout.subscribe((v) => {
+		if (!applying && GlobalConfig.get("syncTimerActions"))
+			pushSync("blackout", v);
+	});
+
 	incomingSync.subscribe((msg) => {
 		if (!msg) return;
 		applying = true;
@@ -118,6 +131,13 @@ export function initRoomSync(): void {
 			const { key, value } = msg;
 			if (key === "style") {
 				hostStyle.set(value as StyleBundle);
+				if (GlobalConfig.get("autoSyncHost")) void applyHostStyle();
+			} else if (key === "paused") {
+				if (GlobalConfig.get("syncTimerActions"))
+					isPaused.set(value as boolean);
+			} else if (key === "blackout") {
+				if (GlobalConfig.get("syncTimerActions"))
+					isBlackout.set(value as boolean);
 			} else if (key.startsWith("cfg:")) {
 				GlobalConfig.set(key.slice(4), value);
 			} else if (key === "timer") {

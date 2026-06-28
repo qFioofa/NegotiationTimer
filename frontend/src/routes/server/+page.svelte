@@ -18,9 +18,12 @@
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
 	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
+	import SettingCard from "$lib/elements/Settings/SettingCard.svelte";
 	import {
 		roomCategories,
 		roomSettings,
+		profileAutoSync,
+		profileTimerSync,
 	} from "$lib/elements/Settings/roomSettingsRegistry";
 
 	let input = $state("");
@@ -151,19 +154,20 @@
 							Ты хост — твоё оформление и есть профиль комнаты.
 							Участники могут синхронизировать его со своим.
 						</p>
+						<div class="settings-wrap">
+							<SettingCard setting={profileTimerSync} />
+						</div>
 					{:else}
-						<p class="hint">
-							Синхронизируй своё оформление с хостом: тему, цвет,
-							задний фон и звук конца таймера. Остальные твои
-							настройки не тронутся.
-						</p>
+						<div class="settings-wrap">
+							<SettingCard setting={profileAutoSync} />
+						</div>
 						<div class="actions">
 							<button
 								class="btn primary"
 								disabled={!$hostStyle}
 								onclick={() => (confirmStyle = true)}
 							>
-								<Download size={18} />Синхронизировать профиль
+								<Download size={18} />Синхронизировать одноразово
 							</button>
 						</div>
 						{#if cfgStatus}
@@ -171,6 +175,9 @@
 						{:else if !$hostStyle}
 							<p class="hint">Хост ещё не задал стиль комнаты.</p>
 						{/if}
+						<div class="settings-wrap">
+							<SettingCard setting={profileTimerSync} />
+						</div>
 					{/if}
 				{:else}
 					<p class="eyebrow">Другое</p>

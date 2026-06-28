@@ -9,6 +9,8 @@ import {
 	Hash,
 	Image,
 	UserRound,
+	RefreshCw,
+	Pause,
 } from "lucide-svelte";
 
 export const roomCategories = [
@@ -96,3 +98,27 @@ export const roomSettings = [
 		configKey: "reactionMemesOn",
 	},
 ];
+
+export const profileAutoSync = {
+	id: "autoSyncHost",
+	category: "profile",
+	type: "toggle",
+	icon: RefreshCw,
+	title: "Синхронизировать с хостом",
+	description:
+		"Когда хост меняет оформление комнаты — тему, цвет, фон или звук — изменения подтянутся к тебе автоматически. Остальные твои настройки не тронутся.",
+	tooltip: "Авто-применение стиля хоста",
+	configKey: "autoSyncHost",
+};
+
+export const profileTimerSync = {
+	id: "syncTimerActions",
+	category: "profile",
+	type: "toggle",
+	icon: Pause,
+	title: "Синхронизировать паузу и финиш",
+	description:
+		"Пауза и экран «Время вышло!» синхронизируются со всей комнатой: поставил на паузу или закрыл финиш — то же случится у остальных.",
+	tooltip: "Синхронизация паузы и завершения таймера",
+	configKey: "syncTimerActions",
+};
