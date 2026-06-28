@@ -27,13 +27,22 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || System.get_env("RAILWAY_PUBLIC_DOMAIN") || "example.com"
+  host =
+    System.get_env("HOST_NAME") || System.get_env("PHX_HOST") ||
+      System.get_env("RAILWAY_PUBLIC_DOMAIN") || "example.com"
+
+  check_origin =
+    case System.get_env("HOST_NAME") do
+      nil -> false
+      "" -> false
+      name -> ["https://#{name}", "http://#{name}"]
+    end
 
   config :backend, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :backend, BackendWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
-    check_origin: :conn,
+    check_origin: check_origin,
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}],
     secret_key_base: secret_key_base
 end
