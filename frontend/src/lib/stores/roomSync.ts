@@ -1,6 +1,6 @@
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { GlobalConfig } from "./parameters";
-import { incomingSync, pushSync } from "./room";
+import { incomingSync, pushSync, joined, isHost } from "./room";
 import {
 	isRunning,
 	timerInstance,
@@ -16,6 +16,64 @@ const CFG_KEYS = roomSettings
 
 let applying = false;
 let inited = false;
+
+const STYLE_CFG_KEYS = [
+	"theme",
+	"accentColor",
+	"playerBackground",
+	"usingBackroundImage",
+	"backgroundImage",
+	"timerEndSound",
+	"afterSound",
+	"audioTimerEnd",
+];
+const STYLE_MEDIA_KEYS = ["backgroundImage", "audioTimerEnd"];
+
+type StyleBundle = {
+	cfg: Record<string, unknown>;
+	media: Record<string, string>;
+};
+
+export const hostStyle = writable<StyleBundle | null>(null);
+
+const blobToDataUrl = (b: Blob): Promise<string> =>
+	new Promise((res, rej) => {
+		const r = new FileReader();
+		r.onload = () => res(r.result as string);
+		r.onerror = () => rej(r.error);
+		r.readAsDataURL(b);
+	});
+const dataUrlToBlob = (d: string): Promise<Blob> => fetch(d).then((r) => r.blob());
+
+async function buildStyleBundle(): Promise<StyleBundle> {
+	const cfg: Record<string, unknown> = {};
+	for (const k of STYLE_CFG_KEYS) cfg[k] = GlobalConfig.get(k);
+	const media: Record<string, string> = {};
+	for (const k of STYLE_MEDIA_KEYS) {
+		const blob = await GlobalConfig.getMedia(k);
+		if (blob) media[k] = await blobToDataUrl(blob);
+	}
+	return { cfg, media };
+}
+
+async function publishStyle(): Promise<void> {
+	if (!get(isHost)) return;
+	pushSync("style", await buildStyleBundle());
+}
+
+export async function applyHostStyle(): Promise<void> {
+	const b = get(hostStyle);
+	if (!b) return;
+	applying = true;
+	try {
+		for (const [k, v] of Object.entries(b.cfg)) GlobalConfig.set(k, v);
+		for (const [k, d] of Object.entries(b.media)) {
+			await GlobalConfig.setMedia(k, await dataUrlToBlob(d));
+		}
+	} finally {
+		applying = false;
+	}
+}
 
 function timerSnap() {
 	return {
@@ -44,12 +102,23 @@ export function initRoomSync(): void {
 		if (!applying) pushSync("timer", timerSnap());
 	});
 
+	joined.subscribe((j) => {
+		if (j && get(isHost)) void publishStyle();
+	});
+	for (const key of STYLE_CFG_KEYS) {
+		GlobalConfig.subscribe(key, () => {
+			if (!applying && get(isHost)) void publishStyle();
+		});
+	}
+
 	incomingSync.subscribe((msg) => {
 		if (!msg) return;
 		applying = true;
 		try {
 			const { key, value } = msg;
-			if (key.startsWith("cfg:")) {
+			if (key === "style") {
+				hostStyle.set(value as StyleBundle);
+			} else if (key.startsWith("cfg:")) {
 				GlobalConfig.set(key.slice(4), value);
 			} else if (key === "timer") {
 				applyRemoteTimer(

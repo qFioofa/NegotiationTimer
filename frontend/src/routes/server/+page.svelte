@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import QRCode from "qrcode";
-	import { Copy, Check, Link as LinkIcon, LogOut, Timer } from "lucide-svelte";
+	import { Copy, Check, Link as LinkIcon, LogOut, Timer, Download, TriangleAlert } from "lucide-svelte";
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
 	import {
 		joined,
+		isHost,
 		roomCode,
 		roomError,
 		connectRoom,
@@ -13,6 +14,7 @@
 		leaveRoom,
 		roomLink,
 	} from "$lib/stores/room";
+	import { hostStyle, applyHostStyle } from "$lib/stores/roomSync";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
 	import SettingsCategories from "$lib/elements/Settings/SettingsCategories.svelte";
 	import SettingsList from "$lib/elements/Settings/SettingsList.svelte";
@@ -24,8 +26,18 @@
 	let input = $state("");
 	let qr = $state("");
 	let copied = $state<"code" | "link" | "">("");
+	let cfgStatus = $state("");
+	let confirmStyle = $state(false);
+	function flashCfg(text: string) {
+		cfgStatus = text;
+		setTimeout(() => (cfgStatus = ""), 1800);
+	}
+	async function applyStyle() {
+		confirmStyle = false;
+		await applyHostStyle();
+		flashCfg("Профиль синхронизирован");
+	}
 
-	// Категории настроек комнаты — главная навигация: всё взаимодействие идёт через них.
 	let section = $state("info");
 
 	async function copy(kind: "code" | "link", text: string) {
@@ -44,7 +56,6 @@
 		if (room && !$joined) connectRoom(room);
 	});
 
-	// Держим ?room= в адресной строке (она сама становится shareable) и рисуем QR.
 	$effect(() => {
 		if ($joined && $roomCode) {
 			const u = new URL(location.href);
@@ -133,6 +144,34 @@
 				{:else if section === "camera"}
 					<p class="eyebrow">Камера</p>
 					<p class="hint">Раздел в разработке.</p>
+				{:else if section === "profile"}
+					<p class="eyebrow">Профиль</p>
+					{#if $isHost}
+						<p class="hint">
+							Ты хост — твоё оформление и есть профиль комнаты.
+							Участники могут синхронизировать его со своим.
+						</p>
+					{:else}
+						<p class="hint">
+							Синхронизируй своё оформление с хостом: тему, цвет,
+							задний фон и звук конца таймера. Остальные твои
+							настройки не тронутся.
+						</p>
+						<div class="actions">
+							<button
+								class="btn primary"
+								disabled={!$hostStyle}
+								onclick={() => (confirmStyle = true)}
+							>
+								<Download size={18} />Синхронизировать профиль
+							</button>
+						</div>
+						{#if cfgStatus}
+							<p class="hint">{cfgStatus}</p>
+						{:else if !$hostStyle}
+							<p class="hint">Хост ещё не задал стиль комнаты.</p>
+						{/if}
+					{/if}
 				{:else}
 					<p class="eyebrow">Другое</p>
 					<p class="hint">Раздел в разработке.</p>
@@ -166,6 +205,34 @@
 			</form>
 
 			{#if $roomError}<p class="error">{$roomError}</p>{/if}
+		</div>
+	{/if}
+
+	{#if confirmStyle}
+		<div
+			class="overlay"
+			role="button"
+			tabindex="0"
+			onclick={(e) =>
+				e.target === e.currentTarget && (confirmStyle = false)}
+			onkeydown={(e) => e.key === "Escape" && (confirmStyle = false)}
+		>
+			<div class="confirm" role="dialog" aria-modal="true" tabindex="-1">
+				<TriangleAlert size={32} class="warn-ic" />
+				<h2>Синхронизировать профиль?</h2>
+				<p>
+					Твоё текущее оформление будет стёрто и заменено стилем хоста:
+					тема, цвет, задний фон и звук. Это действие не отменить.
+				</p>
+				<div class="actions">
+					<button class="btn" onclick={() => (confirmStyle = false)}
+						>Отмена</button
+					>
+					<button class="btn primary" onclick={applyStyle}
+						>Синхронизировать</button
+					>
+				</div>
+			</div>
 		</div>
 	{/if}
 </div>
@@ -239,12 +306,11 @@
 		backdrop-filter: blur(14px);
 	}
 
-	/* Главный элемент комнаты: крупная панель на весь экран, навигация = категории. */
 	.room-panel {
 		display: flex;
 		flex-direction: column;
 		gap: 1.1rem;
-		width: min(96vw, 720px);
+		width: min(96vw, 940px);
 		height: min(90dvh, 860px);
 		padding: 1.6rem;
 		border-radius: var(--radius-xxl);
@@ -260,6 +326,7 @@
 
 	.settings-wrap {
 		width: 100%;
+		max-width: 640px;
 		text-align: left;
 	}
 
@@ -268,7 +335,6 @@
 		padding-bottom: 0.6rem;
 	}
 
-	/* Тело прокручивается; шапка и навигация остаются на месте. */
 	.panel-body {
 		display: flex;
 		flex-direction: column;
@@ -310,6 +376,7 @@
 		display: flex;
 		gap: 0.6rem;
 		width: 100%;
+		max-width: 640px;
 	}
 
 	.actions .btn {
@@ -413,6 +480,52 @@
 	.error {
 		margin: 0;
 		color: #ff6b6b;
+	}
+
+	.overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 2000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
+		background: rgba(0, 0, 0, 0.55);
+		backdrop-filter: blur(4px);
+	}
+
+	.confirm {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.8rem;
+		max-width: 24rem;
+		padding: 1.6rem;
+		text-align: center;
+		border-radius: var(--radius-xxl);
+		border: 2px solid var(--accent);
+		box-shadow: 4px 4px 0 var(--accent-dark);
+		background: var(--bg-overlay);
+	}
+
+	.confirm :global(.warn-ic) {
+		color: #ffb020;
+	}
+
+	.confirm h2 {
+		margin: 0;
+		font-size: 1.2rem;
+	}
+
+	.confirm p {
+		margin: 0;
+		color: var(--fg-muted);
+		font-size: 0.9rem;
+		line-height: 1.4;
+	}
+
+	.confirm .actions {
+		margin-top: 0.4rem;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

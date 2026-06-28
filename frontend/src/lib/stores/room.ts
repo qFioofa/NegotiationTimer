@@ -3,14 +3,12 @@ import { Socket, Presence } from "phoenix";
 
 export const roomCode = writable("");
 export const joined = writable(false);
+export const isHost = writable(false);
 export const online = writable(0);
 export const roomError = writable("");
-// Последняя пришедшая реакция; id уникален, чтобы каждый раз триггерить анимацию.
 export const reaction = writable<{ emoji: string; side: "left" | "right"; id: number } | null>(null);
 let reactionId = 0;
 
-// Общая шина синхронизации комнаты: настройки, таймер, имена. Каждое входящее
-// сообщение — {key, value}; фичи подписываются на incomingSync и применяют своё.
 export const incomingSync = writable<{ key: string; value: unknown } | null>(null);
 
 let socket: Socket | null = null;
@@ -36,14 +34,14 @@ export function roomLink(code: string): string {
 	return `${location.origin}/server?room=${encodeURIComponent(code)}`;
 }
 
-export function connectRoom(code: string): void {
+export function connectRoom(code: string, asHost = false): void {
 	const trimmed = code.trim().toUpperCase();
 	roomError.set("");
+	isHost.set(asHost);
 	if (!trimmed) {
 		roomError.set("Введите код комнаты");
 		return;
 	}
-	// Уже в этой комнате — не пересоздаём соединение (важно для авто-join по ссылке).
 	if (trimmed === currentCode && socket) return;
 
 	leaveRoom();
@@ -80,14 +78,12 @@ export function sendReaction(emoji: string, side: "left" | "right"): void {
 	channel?.push("reaction", { emoji, side });
 }
 
-// Разослать значение по комнате. No-op, если не подключены — тогда состояние
-// просто остаётся локальным.
 export function pushSync(key: string, value: unknown): void {
 	channel?.push("sync", { key, value });
 }
 
 export function createRoom(): void {
-	connectRoom(Math.random().toString(36).slice(2, 8).toUpperCase());
+	connectRoom(Math.random().toString(36).slice(2, 8).toUpperCase(), true);
 }
 
 export function leaveRoom(): void {
@@ -97,6 +93,7 @@ export function leaveRoom(): void {
 	socket = null;
 	currentCode = "";
 	joined.set(false);
+	isHost.set(false);
 	online.set(0);
 	roomCode.set("");
 }

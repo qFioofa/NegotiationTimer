@@ -32,6 +32,12 @@ export type AppConfig = {
 	reactionLifetime: string;
 	/** Антиспам: минимум между своими отправками, секунды (строка-лейбл). */
 	reactionCooldown: string;
+	/** Размер летящих стикеров (строка-лейбл из optionList). */
+	reactionSize: string;
+	/** Показывать вкладку «Цифры» в пикере реакций. */
+	reactionNumbersOn: boolean;
+	/** Показывать вкладку «Мемы» в пикере реакций. */
+	reactionMemesOn: boolean;
 };
 
 export const dConfig: AppConfig = {
@@ -63,4 +69,7 @@ export const dConfig: AppConfig = {
 	reactionsEnabled: true,
 	reactionLifetime: "5 сек",
 	reactionCooldown: "0.4 сек",
+	reactionSize: "Средние",
+	reactionNumbersOn: true,
+	reactionMemesOn: true,
 };

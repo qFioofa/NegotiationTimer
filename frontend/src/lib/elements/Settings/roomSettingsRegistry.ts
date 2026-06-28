@@ -1,13 +1,21 @@
-import { Info, Smile, Camera, MoreHorizontal, Timer, Hand } from "lucide-svelte";
-
-// Настройки комнаты — главный элемент страницы server: через эти категории идёт
-// всё взаимодействие. Переиспользуют те же элементы, что обычные настройки
-// (SettingsCategories / SettingsList / SettingCard); часть разделов — заглушки.
+import {
+	Info,
+	Smile,
+	Camera,
+	MoreHorizontal,
+	Timer,
+	Hand,
+	Maximize2,
+	Hash,
+	Image,
+	UserRound,
+} from "lucide-svelte";
 
 export const roomCategories = [
 	{ id: "info", label: "Информация", icon: Info },
 	{ id: "reactions", label: "Реакции", icon: Smile },
 	{ id: "camera", label: "Камера", icon: Camera },
+	{ id: "profile", label: "Профиль", icon: UserRound },
 	{ id: "other", label: "Другое", icon: MoreHorizontal },
 ];
 
@@ -49,5 +57,42 @@ export const roomSettings = [
 		keywords: ["задержка", "антиспам", "кулдаун", "cooldown"],
 		configKey: "reactionCooldown",
 		getOptions: () => ["0.2 сек", "0.4 сек", "1 сек", "2 сек"],
+	},
+	{
+		id: "reactionSize",
+		category: "reactions",
+		type: "optionList",
+		icon: Maximize2,
+		title: "Размер стикеров",
+		description:
+			"Насколько крупными летят стикеры и эмодзи у всех в комнате. Больше — заметнее на проекторе, но и сильнее перекрывают экран при спаме.",
+		tooltip: "Масштаб летящих реакций",
+		keywords: ["размер", "масштаб", "крупные", "size"],
+		configKey: "reactionSize",
+		getOptions: () => ["Маленькие", "Средние", "Большие"],
+	},
+	{
+		id: "reactionNumbersOn",
+		category: "reactions",
+		type: "toggle",
+		icon: Hash,
+		title: "Раздел «Цифры»",
+		description:
+			"Показывать ли вкладку с цифрами в пикере реакций. Если выключено, вкладка скрыта у всех участников.",
+		tooltip: "Вкладка цифр в пикере реакций",
+		keywords: ["цифры", "числа", "раздел", "вкладка"],
+		configKey: "reactionNumbersOn",
+	},
+	{
+		id: "reactionMemesOn",
+		category: "reactions",
+		type: "toggle",
+		icon: Image,
+		title: "Раздел «Мемы»",
+		description:
+			"Показывать ли вкладку с мем-стикерами в пикере реакций. Удобно отключить на серьёзной встрече.",
+		tooltip: "Вкладка мемов в пикере реакций",
+		keywords: ["мемы", "стикеры", "раздел", "вкладка"],
+		configKey: "reactionMemesOn",
 	},
 ];

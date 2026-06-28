@@ -3,26 +3,29 @@
 	import { joined, reaction, sendReaction } from "$lib/stores/room";
 	import { GlobalConfig } from "$lib/stores/parameters";
 
-	// Параметры реакций живут в настройках комнаты (тот же реестр-движок настроек).
 	const secs = (v: unknown) => parseFloat(String(v)) * 1000;
+	const SIZE_FACTOR: Record<string, number> = { Маленькие: 0.7, Средние: 1, Большие: 1.5 };
+	const sizeOf = (v: unknown) => SIZE_FACTOR[String(v)] ?? 1;
 	let enabled = $state(GlobalConfig.get<boolean>("reactionsEnabled"));
 	let lifeMs = $state(secs(GlobalConfig.get("reactionLifetime")));
 	let cooldownMs = $state(secs(GlobalConfig.get("reactionCooldown")));
+	let sizeFactor = $state(sizeOf(GlobalConfig.get("reactionSize")));
+	let numbersOn = $state(GlobalConfig.get<boolean>("reactionNumbersOn"));
+	let memesOn = $state(GlobalConfig.get<boolean>("reactionMemesOn"));
 	const cfgUnsubs = [
 		GlobalConfig.subscribe("reactionsEnabled", (v) => (enabled = v as boolean)),
 		GlobalConfig.subscribe("reactionLifetime", (v) => (lifeMs = secs(v))),
 		GlobalConfig.subscribe("reactionCooldown", (v) => (cooldownMs = secs(v))),
+		GlobalConfig.subscribe("reactionSize", (v) => (sizeFactor = sizeOf(v))),
+		GlobalConfig.subscribe("reactionNumbersOn", (v) => (numbersOn = v as boolean)),
+		GlobalConfig.subscribe("reactionMemesOn", (v) => (memesOn = v as boolean)),
 	];
 	onDestroy(() => cfgUnsubs.forEach((u) => u()));
 
-	// Стикеры из static/stickers. Глоб нужен только чтобы собрать имена на этапе
-	// сборки; URL строим сами — SvelteKit отдаёт static/ напрямую с верным MIME.
-	// (Импорт через ?url из publicDir ломал video/webm: контент-тип не video/*.)
 	const stickers = Object.keys(import.meta.glob("/static/stickers/*")).map((p) =>
 		p.replace("/static", ""),
 	);
 
-	// Цифры — стикеры zero/one/two/three × R/G/B; всё остальное в папке = мемы.
 	const NUM_RE = /\/(zero|one|two|three)[RGB]\.webm$/i;
 	const NUM_ORDER = ["zero", "one", "two", "three"];
 	const numKey = (s: string) => {
@@ -32,23 +35,28 @@
 	const numbers = stickers.filter((s) => NUM_RE.test(s)).sort((a, b) => numKey(a) - numKey(b));
 	const memes = stickers.filter((s) => !NUM_RE.test(s));
 
-	// Строка = unicode-эмодзи, путь/URL картинки/гифки или видео (.webm/.mp4).
-	const TABS = [
+	const ALL_TABS = [
 		{ id: "regular", label: "Обычные", items: ["👍", "🔥", "😂", "😮", "❤️", "👎"] },
 		{ id: "numbers", label: "Цифры", items: numbers },
 		{ id: "memes", label: "Мемы", items: memes },
 	];
+	const tabs = $derived(
+		ALL_TABS.filter(
+			(t) =>
+				(t.id !== "numbers" || numbersOn) && (t.id !== "memes" || memesOn),
+		),
+	);
 	let tab = $state("regular");
+	$effect(() => {
+		if (!tabs.some((t) => t.id === tab)) tab = "regular";
+	});
 
-	// Скорость воспроизведения видео-стикеров. >1 = живее.
 	const STICKER_SPEED = 2.5;
 
 	const isVideo = (s: string) => /\.(webm|mp4)$/i.test(s);
 	const isImage = (s: string) =>
 		/\.(png|gif|webp|svg|jpe?g)$/i.test(s) || /^(https?:|\/)/.test(s);
 
-	// Svelte не выставляет свойство muted из атрибута → autoplay блокируется, кадр не рисуется.
-	// Ставим muted как свойство и стартуем play(), когда данные готовы (иначе play() реджектится).
 	function playMuted(node: HTMLVideoElement) {
 		node.muted = true;
 		node.playbackRate = STICKER_SPEED;
@@ -59,7 +67,6 @@
 
 	let open = $state<"left" | "right" | null>(null);
 
-	// ponytail: клиентский анти-спам; интервал из настроек. Серверный лимит — если понадобится.
 	let lastSent = 0;
 	function send(emoji: string, side: "left" | "right") {
 		const now = Date.now();
@@ -72,10 +79,10 @@
 		id: number;
 		emoji: string;
 		side: "left" | "right";
-		dx: number; // горизонтальный снос на вершине, px (внутрь экрана)
-		rise: number; // высота подъёма, px
-		es: number; // конечный масштаб
-		rot: number; // конечный поворот, deg
+		dx: number;
+		rise: number;
+		es: number;
+		rot: number;
 	};
 	let flyers = $state<Flyer[]>([]);
 
@@ -86,8 +93,6 @@
 			id: r.id,
 			emoji: r.emoji,
 			side: r.side,
-			// Снос/подъём масштабируются от размера окна, чтобы стикер мог
-			// долететь до центра экрана; случайная величина даёт разброс.
 			dx: inward * Math.random() * window.innerWidth * 0.3,
 			rise: 200 + Math.random() * window.innerHeight * 0.6,
 			es: 0.8 + Math.random() * 0.5,
@@ -131,7 +136,7 @@
 			{#if open === side}
 				<div class="panel">
 					<div class="tabs">
-						{#each TABS as t (t.id)}
+						{#each tabs as t (t.id)}
 							<button
 								class="tab"
 								class:active={tab === t.id}
@@ -140,7 +145,7 @@
 						{/each}
 					</div>
 					<div class="grid">
-						{#each TABS.find((t) => t.id === tab)?.items ?? [] as e (e)}
+						{#each tabs.find((t) => t.id === tab)?.items ?? [] as e (e)}
 							<button onclick={() => send(e, side)} aria-label="Реакция">
 								{@render glyph(e)}
 							</button>
@@ -154,7 +159,7 @@
 	{#each flyers as f (f.id)}
 		<span
 			class="flyer {f.side}"
-			style="--dx: {f.dx}px; --rise: {f.rise}px; --es: {f.es}; --rot: {f.rot}deg; --life: {lifeMs}ms"
+			style="--dx: {f.dx}px; --rise: {f.rise}px; --es: {f.es}; --rot: {f.rot}deg; --life: {lifeMs}ms; --sz: {sizeFactor}"
 		>
 			{@render glyph(f.emoji)}
 		</span>
@@ -171,7 +176,6 @@
 		gap: 0.4rem;
 	}
 
-	/* Тоггл прижат к своему углу — иначе при открытии широкой панели ✕ уезжает к центру. */
 	.dock.left {
 		left: var(--trigger-edge);
 		align-items: flex-start;
@@ -286,14 +290,14 @@
 		position: fixed;
 		bottom: calc(var(--trigger-edge) + 3.4rem);
 		z-index: 1000;
-		font-size: 2.6rem;
+		font-size: calc(2.6rem * var(--sz, 1));
 		pointer-events: none;
 		animation: fly var(--life, 5s) ease-out forwards;
 	}
 
 	.flyer .glyph {
-		width: 2.6rem;
-		height: 2.6rem;
+		width: calc(2.6rem * var(--sz, 1));
+		height: calc(2.6rem * var(--sz, 1));
 	}
 
 	.flyer.left {
@@ -304,7 +308,6 @@
 		right: calc(var(--trigger-edge) + 0.5rem);
 	}
 
-	/* dx растёт от 0 у точки-кнопки до --dx на вершине → конус, расширяющийся вверх. */
 	@keyframes fly {
 		0% {
 			opacity: 0;
