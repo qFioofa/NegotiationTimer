@@ -31,6 +31,7 @@ defmodule BackendWeb.RoomChannel do
     push(socket, "presence_state", Presence.list(socket))
 
     maybe_initial_host(socket)
+    Backend.RoomServer.ensure(socket.topic)
 
     for {key, value} <- Backend.RoomState.all(socket.topic) do
       push(socket, "sync", %{"key" => key, "value" => value})
@@ -41,9 +42,6 @@ defmodule BackendWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  # Создатель комнаты (зашёл как «хост») становится хостом, только если хоста ещё
-  # не было. Дальше хост меняется лишь через make-host (host_action) или миграцию
-  # (claim_host) — самопровозглашение ником закрыто.
   defp maybe_initial_host(socket) do
     if socket.assigns.nick == @host_nick and host_member_ids(socket) == [] do
       put_member(socket, socket.assigns.client_id, %{"role" => "host"})
@@ -109,27 +107,6 @@ defmodule BackendWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  # Миграция хоста (Фаза 4). Грейс отсчитывает клиент; сервер лишь арбитрирует:
-  # промоут проходит только если ни один действующий хост сейчас не онлайн.
-  def handle_in("claim_host", _payload, socket) do
-    me = socket.assigns.client_id
-    present = Presence.list(socket) |> Map.keys() |> MapSet.new()
-    hosts = host_member_ids(socket)
-
-    if MapSet.member?(present, me) and not Enum.any?(hosts, &MapSet.member?(present, &1)) do
-      for id <- hosts, id != me do
-        put_member(socket, id, Map.put(member_flags_of(socket, id), "role", "guest"))
-      end
-
-      put_member(socket, me, Map.put(member_flags_of(socket, me), "role", "host"))
-      broadcast(socket, "host_changed", %{client_id: me})
-    end
-
-    {:noreply, socket}
-  end
-
-  # Авторизация sync-шины (Фаза 3). Источник правды о ролях — сервер:
-  # роль берём из member:<id> в RoomState, хоста — из ника в Presence.
   defp authorized_sync?(socket, key) do
     flags = sender_flags(socket)
 

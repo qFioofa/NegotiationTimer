@@ -30,6 +30,9 @@ defmodule Backend.RoomState do
     |> Enum.map(fn {{_topic, key}, value} -> {key, value} end)
   end
 
+  @doc "Удалить всё состояние комнаты (комната опустела)."
+  def clear(topic), do: :ets.match_delete(@table, {{topic, :_}, :_})
+
   @impl true
   def init(_) do
     :ets.new(@table, [:named_table, :public, :set, read_concurrency: true, write_concurrency: true])

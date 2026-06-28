@@ -108,27 +108,47 @@ defmodule BackendWeb.RoomChannelTest do
     assert Backend.RoomState.get("room:MIG2", "member:intruder") == nil
   end
 
-  test "claim_host migrates when host is absent" do
-    guest = join_room("MIG3", "guest_id")
+  test "room server migrates host when host is absent" do
+    join_room("MIG3", "guest_id")
     _ = :sys.get_state(Presence)
     Backend.RoomState.put("room:MIG3", "member:ghost", %{"role" => "host"})
 
-    push(guest, "claim_host", %{})
-    flush(guest)
+    pid = room_server("room:MIG3")
+    send(pid, :migrate)
+    _ = :sys.get_state(pid)
 
+    assert_broadcast "host_changed", %{client_id: "guest_id"}
     assert Backend.RoomState.get("room:MIG3", "member:guest_id")["role"] == "host"
     assert Backend.RoomState.get("room:MIG3", "member:ghost")["role"] == "guest"
   end
 
-  test "claim_host is rejected while a host is online" do
+  test "room server keeps host while host is online" do
     join_room("MIG4", "host_id", "хост")
-    guest = join_room("MIG4", "guest_id")
+    join_room("MIG4", "guest_id")
     _ = :sys.get_state(Presence)
 
-    push(guest, "claim_host", %{})
-    flush(guest)
+    pid = room_server("room:MIG4")
+    send(pid, :migrate)
+    _ = :sys.get_state(pid)
 
     assert Backend.RoomState.get("room:MIG4", "member:guest_id") == nil
     assert Backend.RoomState.get("room:MIG4", "member:host_id")["role"] == "host"
+  end
+
+  test "room server clears state only when empty" do
+    join_room("MIG5", "g")
+    _ = :sys.get_state(Presence)
+    Backend.RoomState.put("room:MIG5", "x", 1)
+
+    pid = room_server("room:MIG5")
+    send(pid, :cleanup)
+    _ = :sys.get_state(pid)
+
+    assert Backend.RoomState.get("room:MIG5", "x") == 1
+  end
+
+  defp room_server(topic) do
+    [{pid, _}] = Registry.lookup(Backend.RoomRegistry, topic)
+    pid
   end
 end

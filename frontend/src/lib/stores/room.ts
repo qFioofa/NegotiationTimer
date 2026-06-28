@@ -10,7 +10,6 @@ export const roomError = writable("");
 export const HOST_NICK = "хост";
 const NICK_KEY = "server_nick";
 const LAST_ROOM_KEY = "server_last_room";
-const HOST_GRACE_MS = 5 * 60 * 1000;
 
 export const lastRoom = (): string =>
 	(typeof localStorage !== "undefined" && localStorage.getItem(LAST_ROOM_KEY)) || "";
@@ -36,8 +35,6 @@ export const notifications = writable<Notification[]>([]);
 let notifId = 0;
 let notifyReady = false;
 
-// Гейт против тостов на реплее состояния при входе: сервер шлёт "synced" после
-// дослыки RoomState, и только тогда тосты включаются.
 export function notify(text: string): void {
 	if (!notifyReady) return;
 	const id = ++notifId;
@@ -62,39 +59,6 @@ export const canEditTimer = derived(
 	},
 );
 
-function hostIdOf(flags: Record<string, MemberFlags>): string | null {
-	for (const [id, f] of Object.entries(flags)) if (f.role === "host") return id;
-	return null;
-}
-
-let hostTimer: ReturnType<typeof setTimeout> | null = null;
-function clearHostTimer(): void {
-	if (hostTimer) clearTimeout(hostTimer);
-	hostTimer = null;
-}
-
-// Миграция хоста: если хост ушёл из presence дольше грейса, наименьший по
-// client_id из оставшихся claim'ит хоста. Сервер арбитрирует гонку.
-function evalHostMigration(): void {
-	if (!get(joined)) return clearHostTimer();
-	const hid = hostIdOf(get(memberFlags));
-	const online = get(members).some((m) => m.id === hid);
-	if (!hid || online || hid === clientId()) return clearHostTimer();
-	if (hostTimer) return;
-	hostTimer = setTimeout(() => {
-		hostTimer = null;
-		const h = hostIdOf(get(memberFlags));
-		const present = get(members).map((m) => m.id);
-		if (!h || present.includes(h)) return;
-		if (present.sort()[0] === clientId()) channel?.push("claim_host", {});
-	}, HOST_GRACE_MS);
-}
-
-if (typeof window !== "undefined") {
-	members.subscribe(evalHostMigration);
-	memberFlags.subscribe(evalHostMigration);
-}
-
 export const reaction = writable<{ emoji: string; side: "left" | "right"; id: number } | null>(null);
 let reactionId = 0;
 
@@ -111,8 +75,6 @@ function wsUrl(): string {
 }
 
 function newId(): string {
-	// crypto.randomUUID есть только в secure context (https/localhost); по http
-	// его нет. client_id — просто стабильный непрозрачный токен, точный UUID не нужен.
 	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
 		return crypto.randomUUID();
 	return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
@@ -236,7 +198,6 @@ export function createRoom(): void {
 }
 
 export function leaveRoom(forget = true): void {
-	clearHostTimer();
 	notifyReady = false;
 	notifications.set([]);
 	channel?.leave();

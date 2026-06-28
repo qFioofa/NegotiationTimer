@@ -10,6 +10,8 @@ defmodule Backend.Application do
       {DNSCluster, query: Application.get_env(:backend, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Backend.PubSub},
       Backend.RoomState,
+      {Registry, keys: :unique, name: Backend.RoomRegistry},
+      {DynamicSupervisor, name: Backend.RoomSupervisor, strategy: :one_for_one},
       BackendWeb.Presence,
       BackendWeb.Endpoint
     ]
