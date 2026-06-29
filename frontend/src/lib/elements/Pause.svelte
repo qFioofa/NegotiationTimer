@@ -11,7 +11,8 @@
 	import ExtraButtons from "./General/ExtraButtons.svelte";
 	import TimerButton from "./Timer/TimerButton.svelte";
 	import { RotateCcw, X } from "lucide-svelte";
-	import { isPaused } from "$lib/components/Pause";
+	import { isPaused, setPause } from "$lib/components/Pause";
+	import { canEditTimer } from "$lib/stores/room";
 	import { onMount } from "svelte";
 
 	let displayUpTime = $derived(timerDisplay($upTimeMs));
@@ -46,7 +47,7 @@
 		<div class="pause-title-wrapper">
 			<h1 class="pause-title">ПАУЗА</h1>
 		</div>
-		{#if !$isPanelOpen || ($isPanelOpen && !panelAutoOpen)}
+		{#if $canEditTimer && (!$isPanelOpen || ($isPanelOpen && !panelAutoOpen))}
 			<div class="pause-content">
 				<TimerButton
 					displayTime={displayUpTime}
@@ -58,7 +59,7 @@
 						<ExtraButtons
 							icon={X}
 							onClick={() => {
-								isPaused.set(false);
+								setPause(false);
 							}}
 						/>
 					</ExtraButtonsWrapper>

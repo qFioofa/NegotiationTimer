@@ -149,11 +149,11 @@ export function initRoomSync(): void {
 				hostStyle.set(value as StyleBundle);
 				if (GlobalConfig.get("autoSyncHost")) void applyHostStyle();
 			} else if (key === "paused") {
-				if (GlobalConfig.get("syncTimerActions"))
-					isPaused.set(value as boolean);
+				// Пришло из комнаты — следуем всегда. syncTimerActions решает лишь,
+				// рассылаем ли МЫ свои паузу/финиш (см. подписки в initRoomSync).
+				isPaused.set(value as boolean);
 			} else if (key === "blackout") {
-				if (GlobalConfig.get("syncTimerActions"))
-					isBlackout.set(value as boolean);
+				isBlackout.set(value as boolean);
 			} else if (key.startsWith("member:")) {
 				const id = key.slice(7);
 				const flags = value as MemberFlags;
