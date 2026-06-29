@@ -3,12 +3,13 @@ defmodule BackendWeb.RoomChannelTest do
 
   alias BackendWeb.{Presence, RoomChannel, UserSocket}
 
-  defp join_room(room, client_id, nick \\ "") do
+  defp join_room(room, client_id, nick \\ "", host \\ false) do
     {:ok, _, socket} =
       socket(UserSocket, nil, %{})
       |> subscribe_and_join(BackendWeb.RoomChannel, "room:#{room}", %{
         "client_id" => client_id,
-        "nick" => nick
+        "nick" => nick,
+        "host" => host
       })
 
     :sys.get_state(socket.channel_pid)
@@ -47,14 +48,14 @@ defmodule BackendWeb.RoomChannelTest do
   end
 
   test "host may sync any key" do
-    host = join_room("AUTH1", "h", "хост")
+    host = join_room("AUTH1", "h", "", true)
     join_room("AUTH1", "g")
     push(host, "sync", %{"key" => "style", "value" => %{"x" => 1}})
     assert_broadcast "sync", %{"key" => "style", "value" => %{"x" => 1}}
   end
 
   test "guest cannot sync host-only keys" do
-    join_room("AUTH2", "h", "хост")
+    join_room("AUTH2", "h", "", true)
     guest = join_room("AUTH2", "g")
     push(guest, "sync", %{"key" => "style", "value" => %{}})
     refute_broadcast "sync", %{"key" => "style"}
@@ -69,7 +70,7 @@ defmodule BackendWeb.RoomChannelTest do
   end
 
   test "guest with canEditTimer may sync timer keys but not names" do
-    host = join_room("AUTH4", "h", "хост")
+    host = join_room("AUTH4", "h", "", true)
     guest = join_room("AUTH4", "g")
     push(host, "sync", %{"key" => "member:g", "value" => %{"canEditTimer" => true}})
     flush(host)
@@ -82,7 +83,7 @@ defmodule BackendWeb.RoomChannelTest do
   end
 
   test "banned reactions are dropped" do
-    host = join_room("AUTH5", "h", "хост")
+    host = join_room("AUTH5", "h", "", true)
     guest = join_room("AUTH5", "g")
     push(host, "sync", %{"key" => "member:g", "value" => %{"bannedReactions" => true}})
     flush(host)
@@ -98,13 +99,13 @@ defmodule BackendWeb.RoomChannelTest do
   end
 
   test "creator establishes host on join" do
-    join_room("MIG1", "creator", "хост")
+    join_room("MIG1", "creator", "", true)
     assert Backend.RoomState.get("room:MIG1", "member:creator")["role"] == "host"
   end
 
-  test "joining as хост does not steal an existing host" do
-    join_room("MIG2", "creator", "хост")
-    join_room("MIG2", "intruder", "хост")
+  test "joining as host does not steal an existing host" do
+    join_room("MIG2", "creator", "", true)
+    join_room("MIG2", "intruder", "", true)
     assert Backend.RoomState.get("room:MIG2", "member:intruder") == nil
   end
 
@@ -123,7 +124,7 @@ defmodule BackendWeb.RoomChannelTest do
   end
 
   test "room server keeps host while host is online" do
-    join_room("MIG4", "host_id", "хост")
+    join_room("MIG4", "host_id", "", true)
     join_room("MIG4", "guest_id")
     _ = :sys.get_state(Presence)
 

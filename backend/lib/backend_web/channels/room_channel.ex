@@ -3,14 +3,19 @@ defmodule BackendWeb.RoomChannel do
 
   alias BackendWeb.Presence
 
-  @host_nick "хост"
   @timer_keys ["timer", "paused", "blackout"]
 
   @impl true
   def join("room:" <> _room_id, %{"client_id" => client_id} = params, socket)
       when is_binary(client_id) and client_id != "" do
     send(self(), :after_join)
-    {:ok, assign(socket, client_id: client_id, nick: Map.get(params, "nick", ""))}
+
+    {:ok,
+     assign(socket,
+       client_id: client_id,
+       nick: Map.get(params, "nick", ""),
+       host: Map.get(params, "host", false) == true
+     )}
   end
 
   def join("room:" <> _room_id, _params, _socket) do
@@ -43,7 +48,7 @@ defmodule BackendWeb.RoomChannel do
   end
 
   defp maybe_initial_host(socket) do
-    if socket.assigns.nick == @host_nick and host_member_ids(socket) == [] do
+    if socket.assigns.host and host_member_ids(socket) == [] do
       put_member(socket, socket.assigns.client_id, %{"role" => "host"})
     end
   end
@@ -155,7 +160,7 @@ defmodule BackendWeb.RoomChannel do
   defp sender_role(socket, flags) do
     case Map.get(flags, "role") do
       role when role in ["host", "rights", "guest"] -> role
-      _ -> if current_nick(socket) == @host_nick, do: "host", else: "guest"
+      _ -> if socket.assigns.host, do: "host", else: "guest"
     end
   end
 

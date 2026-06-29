@@ -35,7 +35,6 @@ import {
 	ShuffleFunction,
 } from "$lib/stores/parameters";
 import { getShuffleNames } from "$lib/components/Shuffle";
-import { dConfig } from "$lib/stores/defaultConfig";
 import { togglePause, isPaused } from "$lib/components/Pause";
 import { toggleTimer, timeAdd, timeSubtract } from "$lib/stores/timerDown";
 import { toggleUpTimer } from "$lib/stores/timerUp";
@@ -334,7 +333,9 @@ export const settings = [
 		keywords: ["сброс", "по умолчанию", "reset", "стандартные"],
 		holdDuration: 3000,
 		onHoldComplete: async () => {
-			await GlobalConfig.setConfig(dConfig);
+			// Пишем дефолты без notify — reload всё равно переинициализирует UI,
+			// поэтому реактивный каскад по каждому ключу был бы пустой работой.
+			GlobalConfig.default().save();
 			await GlobalConfig.deleteAllMedia();
 			location.reload();
 		},

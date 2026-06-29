@@ -118,8 +118,8 @@ export function connectRoom(code: string, asHost = false): void {
 	socket = new Socket(wsUrl());
 	socket.connect();
 
-	const nick = asHost ? HOST_NICK : get(myNick);
-	channel = socket.channel(`room:${trimmed}`, { client_id: clientId(), nick });
+	const nick = get(myNick);
+	channel = socket.channel(`room:${trimmed}`, { client_id: clientId(), nick, host: asHost });
 	const presence = new Presence(channel);
 	presence.onSync(() => {
 		const list = presence.list((id, { metas }) => ({
@@ -131,7 +131,7 @@ export function connectRoom(code: string, asHost = false): void {
 	});
 
 	channel.on("nick", (p: { nick: string }) => {
-		if (!asHost) myNick.set(p.nick);
+		myNick.set(p.nick);
 	});
 
 	channel.on("kick", (p: { client_id: string }) => {
