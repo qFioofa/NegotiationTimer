@@ -3,7 +3,9 @@ defmodule Backend.RoomServer do
 
   alias BackendWeb.{Endpoint, Presence}
 
-  @host_grace_ms 5 * 60 * 1000
+  # ponytail: 15s grace tolerates a host reload/reconnect; раздуть, если хост
+  # часто теряет роль на медленном соединении
+  @host_grace_ms 15 * 1000
   @empty_grace_ms 10 * 60 * 1000
 
   def ensure(topic) do

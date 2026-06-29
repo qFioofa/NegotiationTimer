@@ -168,6 +168,7 @@ export function connectRoom(code: string, asHost = false): void {
 			roomCode.set(trimmed);
 			joined.set(true);
 			initWebrtc();
+			void import("./camera").then((m) => m.resumeCamera());
 			if (typeof localStorage !== "undefined")
 				localStorage.setItem(LAST_ROOM_KEY, trimmed);
 		})

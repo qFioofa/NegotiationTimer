@@ -19,6 +19,13 @@ export const cameraStates = writable<Record<string, { on: boolean }>>({});
 let rawStream: MediaStream | null = null;
 let processing = false;
 
+const CAM_KEY = "server_camera_on";
+const rememberCam = (on: boolean) => {
+	if (typeof sessionStorage === "undefined") return;
+	if (on) sessionStorage.setItem(CAM_KEY, "1");
+	else sessionStorage.removeItem(CAM_KEY);
+};
+
 function stopRaw(): void {
 	if (processing) {
 		stopProcessing();
@@ -78,6 +85,7 @@ export async function startCamera(deviceId?: string): Promise<void> {
 		if (id) cameraDeviceId.set(id);
 
 		await applyBg(get(bgMode));
+		rememberCam(true);
 		pushSync(`camera:${myId()}`, { on: true });
 		await refreshDevices();
 	} catch {
@@ -88,6 +96,7 @@ export async function startCamera(deviceId?: string): Promise<void> {
 
 export function stopCamera(): void {
 	stopRaw();
+	rememberCam(false);
 	if (get(cameraOn)) {
 		cameraOn.set(false);
 		pushSync(`camera:${myId()}`, { on: false });
@@ -102,6 +111,12 @@ export async function refreshDevices(): Promise<void> {
 	} catch {
 		cameraDevices.set([]);
 	}
+}
+
+export function resumeCamera(): void {
+	if (typeof sessionStorage === "undefined") return;
+	if (!get(cameraOn) && sessionStorage.getItem(CAM_KEY) === "1")
+		void startCamera(get(cameraDeviceId) || undefined);
 }
 
 if (typeof window !== "undefined") {
