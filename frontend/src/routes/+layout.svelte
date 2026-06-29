@@ -3,11 +3,18 @@
 	import "$lib/cssStyles/themes.css";
 	import { onMount } from "svelte";
 	import { initRoomSync } from "$lib/stores/roomSync";
+	import { connectRoom, joined, lastRoom } from "$lib/stores/room";
+	import { get } from "svelte/store";
 	import Notifications from "$lib/elements/Notifications.svelte";
 
 	let { children } = $props();
 
-	onMount(initRoomSync);
+	onMount(() => {
+		initRoomSync();
+		const room =
+			new URLSearchParams(location.search).get("room") || lastRoom();
+		if (room && !get(joined)) connectRoom(room);
+	});
 </script>
 
 {@render children()}

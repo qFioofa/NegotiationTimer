@@ -14,7 +14,6 @@
 		createRoom,
 		leaveRoom,
 		roomLink,
-		lastRoom,
 	} from "$lib/stores/room";
 	import { hostStyle, applyHostStyle } from "$lib/stores/roomSync";
 	import BackgroundHandler from "$lib/elements/BackgroundHandler.svelte";
@@ -68,9 +67,6 @@
 	onMount(() => {
 		themeManager.setTheme(GlobalConfig.get("theme"));
 		themeManager.setAccent(GlobalConfig.get("accentColor"));
-
-		const room = new URLSearchParams(location.search).get("room") || lastRoom();
-		if (room && !$joined) connectRoom(room);
 	});
 
 	$effect(() => {
