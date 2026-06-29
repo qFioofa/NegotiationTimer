@@ -35,6 +35,7 @@ export type MemberFlags = {
 	role?: "host" | "rights" | "guest";
 	bannedReactions?: boolean;
 	canEditTimer?: boolean;
+	cameraBanned?: boolean;
 };
 export const memberFlags = writable<Record<string, MemberFlags>>({});
 

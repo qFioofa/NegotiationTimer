@@ -1,5 +1,5 @@
 import { writable, get } from "svelte/store";
-import { members, myId, pushWebrtc } from "./room";
+import { members, memberFlags, myId, pushWebrtc } from "./room";
 import { cameraStream } from "./camera";
 
 export const remoteStreams = writable<Record<string, MediaStream>>({});
@@ -13,6 +13,7 @@ type Peer = {
 	polite: boolean;
 	makingOffer: boolean;
 	ignoreOffer: boolean;
+	pendingCandidates: RTCIceCandidateInit[];
 };
 
 type Signal = {
@@ -31,7 +32,7 @@ function ensurePeer(id: string): Peer {
 	if (existing) return existing;
 
 	const pc = new RTCPeerConnection(RTC_CONFIG);
-	const peer: Peer = { pc, polite: myId() < id, makingOffer: false, ignoreOffer: false };
+	const peer: Peer = { pc, polite: myId() < id, makingOffer: false, ignoreOffer: false, pendingCandidates: [] };
 	peers.set(id, peer);
 
 	pc.onnegotiationneeded = async () => {
@@ -56,7 +57,9 @@ function ensurePeer(id: string): Peer {
 	};
 
 	pc.onconnectionstatechange = () => {
-		if (["failed", "closed", "disconnected"].includes(pc.connectionState)) dropStream(id);
+		// "disconnected" часто восстанавливается само — рвать поток только на терминальных
+		// состояниях, иначе камера исчезает на сетевой блип и не возвращается без перезагрузки.
+		if (["failed", "closed"].includes(pc.connectionState)) dropStream(id);
 	};
 
 	return peer;
@@ -79,8 +82,12 @@ function closePeer(id: string): void {
 }
 
 function syncLocalTracks(): void {
+	// Бан камеры применяется на источнике: перестаём слать трек пирам (replaceTrack
+	// мгновенный, без renegotiation), но локальный self-view не трогаем. На снятии бана
+	// трек возвращается тем же путём — поэтому всё применяется моментально, без перезагрузки.
+	const banned = !!get(memberFlags)[myId()]?.cameraBanned;
 	const local = get(cameraStream);
-	const track = local?.getVideoTracks()[0] ?? null;
+	const track = banned ? null : (local?.getVideoTracks()[0] ?? null);
 
 	for (const [, peer] of peers) {
 		const sender = peer.pc.getSenders().find((s) => s.track?.kind === "video" || s.track === null);
@@ -116,15 +123,31 @@ export async function handleSignal(msg: Signal): Promise<void> {
 			if (peer.ignoreOffer) return;
 
 			await pc.setRemoteDescription(msg.description);
+
+			// Кандидаты, пришедшие раньше описания, иначе терялись (addIceCandidate
+			// бросает без remoteDescription) — из-за этого камера иногда не появлялась.
+			for (const c of peer.pendingCandidates) {
+				try {
+					await pc.addIceCandidate(c);
+				} catch {
+					void 0;
+				}
+			}
+			peer.pendingCandidates = [];
+
 			if (msg.description.type === "offer") {
 				await pc.setLocalDescription();
 				pushWebrtc({ to: id, description: pc.localDescription ?? undefined });
 			}
 		} else if (msg.candidate) {
-			try {
-				await pc.addIceCandidate(msg.candidate);
-			} catch {
-				if (!peer.ignoreOffer) void 0;
+			if (!pc.remoteDescription) {
+				peer.pendingCandidates.push(msg.candidate);
+			} else {
+				try {
+					await pc.addIceCandidate(msg.candidate);
+				} catch {
+					if (!peer.ignoreOffer) void 0;
+				}
 			}
 		}
 	} catch {
@@ -138,6 +161,7 @@ export function initWebrtc(): void {
 	unsubs = [
 		members.subscribe((list) => syncPeers(list.map((m) => m.id))),
 		cameraStream.subscribe(() => active && syncLocalTracks()),
+		memberFlags.subscribe(() => active && syncLocalTracks()),
 	];
 }
 

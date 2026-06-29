@@ -6,17 +6,18 @@
 	import { nameA, nameB, slot1, slot2 } from "$lib/stores/players";
 	import { cameraStream, cameraOn, cameraStates } from "$lib/stores/camera";
 	import { remoteStreams } from "$lib/stores/webrtc";
-	import { myId } from "$lib/stores/room";
+	import { myId, memberFlags } from "$lib/stores/room";
 	import { onMount } from "svelte";
 
-	function streamFor(slot, local, on, states, remotes) {
+	function streamFor(slot, local, on, states, remotes, flags) {
 		if (!slot) return null;
 		if (slot === myId()) return on ? local : null;
+		if (flags[slot]?.cameraBanned) return null;
 		return states[slot]?.on ? (remotes[slot] ?? null) : null;
 	}
 
-	$: cam1 = streamFor($slot1, $cameraStream, $cameraOn, $cameraStates, $remoteStreams);
-	$: cam2 = streamFor($slot2, $cameraStream, $cameraOn, $cameraStates, $remoteStreams);
+	$: cam1 = streamFor($slot1, $cameraStream, $cameraOn, $cameraStates, $remoteStreams, $memberFlags);
+	$: cam2 = streamFor($slot2, $cameraStream, $cameraOn, $cameraStates, $remoteStreams, $memberFlags);
 	$: mirror1 = $slot1 === myId();
 	$: mirror2 = $slot2 === myId();
 
@@ -149,10 +150,9 @@
 
 	.cam {
 		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: calc(15px - clamp(1rem, 2vw, 2rem));
-		margin-inline: auto;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		width: clamp(9rem, 24vw, 20rem);
 		height: clamp(9rem, 24vw, 20rem);
 		object-fit: cover;
@@ -162,7 +162,7 @@
 	}
 
 	.cam.mirror {
-		transform: scaleX(-1);
+		transform: translate(-50%, -50%) scaleX(-1);
 	}
 
 	.grid-item:nth-child(1) {

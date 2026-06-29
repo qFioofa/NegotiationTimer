@@ -38,10 +38,6 @@
 <style>
 	/* Стиль кнопок таймера (TimerButton): рамка accent, blur, тень-сдвиг. */
 	.settings-trigger {
-		position: fixed;
-		top: var(--trigger-edge);
-		right: var(--trigger-edge);
-		z-index: 1001;
 		display: flex;
 		align-items: center;
 		justify-content: center;

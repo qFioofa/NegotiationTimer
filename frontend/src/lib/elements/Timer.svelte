@@ -17,15 +17,13 @@
 		isBlackout,
 	} from "$lib/stores/parameters";
 	import {
-		initTimer,
 		isRunning,
 		toggleTimer,
 		startTimer,
-		timeAdd,
-		timeSubtract,
 		timeMs,
-		toMs,
 		downTimerSnap,
+		timerExpired,
+		resetToStart,
 	} from "$lib/stores/timerDown";
 
 	async function handleShuffle() {
@@ -34,7 +32,6 @@
 	}
 
 	let wasRunningBeforePause = $state(false);
-	let wasStartedOnce = $state(false);
 
 	let displayTime = $derived(timerDisplay($timeMs));
 
@@ -53,15 +50,7 @@
 	});
 
 	$effect(() => {
-		if ($isRunning) {
-			wasStartedOnce = true;
-		}
-	});
-
-	$effect(() => {
-		if (wasStartedOnce && $timeMs === 0 && $isRunning === false) {
-			isBlackout.set(true);
-		}
+		if ($timerExpired) isBlackout.set(true);
 	});
 
 	let extraButtonsOn = $state(GlobalConfig.get("extraButtonsOn"));
@@ -90,8 +79,7 @@
 					icon={RotateCcw}
 					tooltip="Сбросить время к стартовому"
 					onClick={() => {
-						timeSubtract(toMs());
-						timeAdd($downTimerSnap);
+						resetToStart($downTimerSnap);
 						GlobalConfig.set("timerDuration", $downTimerSnap);
 					}}
 				/>

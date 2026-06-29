@@ -8,12 +8,6 @@
 
 <style>
 	.server-trigger {
-		position: fixed;
-		top: var(--trigger-edge);
-		right: calc(
-			var(--trigger-edge) + 2 * (var(--trigger-size) + var(--trigger-gap))
-		);
-		z-index: 1001;
 		display: flex;
 		align-items: center;
 		justify-content: center;

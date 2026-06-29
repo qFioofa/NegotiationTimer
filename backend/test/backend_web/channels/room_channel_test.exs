@@ -97,7 +97,6 @@ defmodule BackendWeb.RoomChannelTest do
     push(guest, "kick", %{"client_id" => "victim"})
     refute_broadcast "kick", %{}
   end
-
   test "creator establishes host on join" do
     join_room("MIG1", "creator", "", true)
     assert Backend.RoomState.get("room:MIG1", "member:creator")["role"] == "host"

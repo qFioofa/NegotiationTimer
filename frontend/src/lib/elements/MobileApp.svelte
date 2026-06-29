@@ -10,11 +10,10 @@
 		isRunning,
 		toggleTimer,
 		startTimer,
-		timeAdd,
-		timeSubtract,
 		timeMs,
-		toMs,
 		downTimerSnap,
+		timerExpired,
+		resetToStart as syncResetToStart,
 	} from "$lib/stores/timerDown";
 	import {
 		ShuffleFunction,
@@ -28,6 +27,7 @@
 	import RollingCounter from "./Timer/RollingCounter.svelte";
 	import NameInput from "./Players/Wrappers/NameInput.svelte";
 	import { nameA, nameB } from "$lib/stores/players";
+	import { canEditTimer } from "$lib/stores/room";
 	import BlackOut from "./BlackOut.svelte";
 	import { onMount } from "svelte";
 
@@ -51,7 +51,6 @@
 
 	// --- Таймер: пауза/возобновление и блэкаут — те же эффекты, что в Timer.svelte ---
 	let wasRunningBeforePause = $state(false);
-	let wasStartedOnce = $state(false);
 
 	$effect(() => {
 		if ($isPaused) {
@@ -66,20 +65,13 @@
 	});
 
 	$effect(() => {
-		if ($isRunning) wasStartedOnce = true;
-	});
-
-	$effect(() => {
-		if (wasStartedOnce && $timeMs === 0 && $isRunning === false) {
-			isBlackout.set(true);
-		}
+		if ($timerExpired) isBlackout.set(true);
 	});
 
 	// Точное изменение времени (±, задать) живёт во всплывающей плашке BottomMenu
 	// (иконка-часы вверху справа) — чтобы не занимать место на основном экране.
 	function resetToStart() {
-		timeSubtract(toMs());
-		timeAdd($downTimerSnap);
+		syncResetToStart($downTimerSnap);
 		GlobalConfig.set("timerDuration", $downTimerSnap);
 	}
 
@@ -124,6 +116,7 @@
 			class="timer-btn"
 			class:running={$isRunning}
 			onclick={toggleTimer}
+			disabled={!$canEditTimer}
 			aria-label={$isRunning ? "Пауза" : "Старт"}
 		>
 			<RollingCounter
@@ -141,10 +134,10 @@
 	</section>
 
 	<section class="actions">
-		<button class="action" onclick={resetToStart} aria-label="Сбросить к стартовому времени">
+		<button class="action" onclick={resetToStart} disabled={!$canEditTimer} aria-label="Сбросить к стартовому времени">
 			<RotateCcw size={24} />
 		</button>
-		<button class="action" onclick={() => isPaused.set(true)} aria-label="Пауза">
+		<button class="action" onclick={() => isPaused.set(true)} disabled={!$canEditTimer} aria-label="Пауза">
 			<Pause size={24} />
 		</button>
 		<button class="action accent" onclick={handleShuffle} aria-label="Жеребьёвка игроков">
@@ -284,6 +277,12 @@
 
 	.action:active {
 		transform: scale(0.94);
+	}
+
+	.action:disabled,
+	.timer-btn:disabled {
+		opacity: 0.4;
+		pointer-events: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

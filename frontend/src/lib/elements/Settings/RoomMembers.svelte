@@ -6,6 +6,7 @@
 		Timer,
 		UserX,
 		UserMinus,
+		VideoOff,
 		Check,
 		X,
 	} from "lucide-svelte";
@@ -57,12 +58,14 @@
 
 	const me = myId();
 
-	const sel = $derived($members.find((m) => m.id === selected) ?? null);
-	const flags = $derived(selected ? ($memberFlags[selected] ?? {}) : {});
 	const roleOf = (id: string, nick: string) =>
 		$memberFlags[id]?.role ?? (nick === HOST_NICK ? "host" : "guest");
 
 	function pick(id: string, nick: string) {
+		if (selected === id) {
+			selected = null;
+			return;
+		}
 		selected = id;
 		editNick = nick;
 		confirm = null;
@@ -99,118 +102,143 @@
 					{#if role === "host"}<Crown size={15} />{/if}
 					{#if role === "rights"}<Shield size={15} />{/if}
 					{#if f.canEditTimer}<Timer size={15} />{/if}
+					{#if f.cameraBanned}<VideoOff size={15} />{/if}
 					{#if f.bannedReactions}<Ban size={15} />{/if}
 				</span>
 			</button>
+
+			{#if $isHost && selected === m.id}
+				<div class="panel">
+					<div class="rename">
+						<input
+							bind:value={editNick}
+							maxlength="20"
+							placeholder="Ник"
+						/>
+						<button
+							class="btn"
+							disabled={!editNick.trim() || editNick === m.nick}
+							onclick={() => renameMember(m.id, editNick.trim())}
+						>
+							<Check size={16} />Переименовать
+						</button>
+					</div>
+
+					<div class="grid">
+						<button
+							class="btn"
+							class:on={$slot1 === m.id}
+							onclick={() => assignSlot(1, m.id, m.nick)}
+							>Игрок 1</button
+						>
+						<button
+							class="btn"
+							class:on={$slot2 === m.id}
+							onclick={() => assignSlot(2, m.id, m.nick)}
+							>Игрок 2</button
+						>
+						{#if $slot1 === m.id || $slot2 === m.id}
+							<button
+								class="btn"
+								onclick={() => removeFromPlayers(m.id)}
+							>
+								<UserMinus size={16} />Убрать из игроков
+							</button>
+						{/if}
+					</div>
+
+					{#if m.id !== me}
+						<div class="grid">
+							<button
+								class="btn"
+								class:on={f.canEditTimer}
+								onclick={() =>
+									setMemberFlag(m.id, {
+										canEditTimer: !f.canEditTimer,
+									})}
+							>
+								<Timer size={16} />Править таймер
+							</button>
+							<button
+								class="btn"
+								class:on={role === "rights"}
+								onclick={() =>
+									setMemberFlag(m.id, {
+										role:
+											role === "rights"
+												? "guest"
+												: "rights",
+									})}
+							>
+								<Shield size={16} />Права хоста
+							</button>
+							<button
+								class="btn"
+								class:on={f.cameraBanned}
+								onclick={() =>
+									setMemberFlag(m.id, {
+										cameraBanned: !f.cameraBanned,
+									})}
+							>
+								<VideoOff size={16} />Бан камеры
+							</button>
+							<button
+								class="btn"
+								class:on={f.bannedReactions}
+								onclick={() =>
+									setMemberFlag(m.id, {
+										bannedReactions: !f.bannedReactions,
+									})}
+							>
+								<Ban size={16} />Бан реакций
+							</button>
+						</div>
+
+						{#if confirm}
+							<div class="confirm">
+								<span
+									>{confirm === "kick"
+										? "Кикнуть участника?"
+										: "Передать ему статус хоста?"}</span
+								>
+								<button
+									class="btn primary"
+									onclick={() =>
+										confirm === "kick"
+											? kickMember(m.id)
+											: makeHost(m.id)}
+								>
+									<Check size={16} />Да
+								</button>
+								<button
+									class="btn"
+									onclick={() => (confirm = null)}
+								>
+									<X size={16} />Нет
+								</button>
+							</div>
+						{:else}
+							<div class="grid">
+								<button
+									class="btn"
+									onclick={() => (confirm = "host")}
+								>
+									<Crown size={16} />Сделать хостом
+								</button>
+								<button
+									class="btn danger"
+									onclick={() => (confirm = "kick")}
+								>
+									<UserX size={16} />Кикнуть
+								</button>
+							</div>
+						{/if}
+					{/if}
+				</div>
+			{/if}
 		</li>
 	{/each}
 </ul>
-
-{#if $isHost && sel}
-	{@const role = roleOf(sel.id, sel.nick)}
-	<div class="panel">
-		<div class="rename">
-			<input bind:value={editNick} maxlength="20" placeholder="Ник" />
-			<button
-				class="btn"
-				disabled={!editNick.trim() || editNick === sel.nick}
-				onclick={() => renameMember(sel.id, editNick.trim())}
-			>
-				<Check size={16} />Переименовать
-			</button>
-		</div>
-
-		<div class="grid">
-			<button
-				class="btn"
-				class:on={$slot1 === sel.id}
-				onclick={() => assignSlot(1, sel.id, sel.nick)}>Игрок 1</button
-			>
-			<button
-				class="btn"
-				class:on={$slot2 === sel.id}
-				onclick={() => assignSlot(2, sel.id, sel.nick)}>Игрок 2</button
-			>
-			{#if $slot1 === sel.id || $slot2 === sel.id}
-				<button class="btn" onclick={() => removeFromPlayers(sel.id)}>
-					<UserMinus size={16} />Убрать из игроков
-				</button>
-			{/if}
-		</div>
-
-		{#if sel.id !== me}
-			<div class="grid">
-				<button
-					class="btn"
-					class:on={flags.canEditTimer}
-					onclick={() =>
-						setMemberFlag(sel.id, {
-							canEditTimer: !flags.canEditTimer,
-						})}
-				>
-					<Timer size={16} />Править таймер
-				</button>
-				<button
-					class="btn"
-					class:on={role === "rights"}
-					onclick={() =>
-						setMemberFlag(sel.id, {
-							role: role === "rights" ? "guest" : "rights",
-						})}
-				>
-					<Shield size={16} />Права хоста
-				</button>
-				<button
-					class="btn"
-					class:on={flags.bannedReactions}
-					onclick={() =>
-						setMemberFlag(sel.id, {
-							bannedReactions: !flags.bannedReactions,
-						})}
-				>
-					<Ban size={16} />Бан реакций
-				</button>
-			</div>
-
-			{#if confirm}
-				<div class="confirm">
-					<span
-						>{confirm === "kick"
-							? "Кикнуть участника?"
-							: "Передать ему статус хоста?"}</span
-					>
-					<button
-						class="btn primary"
-						onclick={() =>
-							confirm === "kick"
-								? kickMember(sel.id)
-								: makeHost(sel.id)}
-					>
-						<Check size={16} />Да
-					</button>
-					<button class="btn" onclick={() => (confirm = null)}>
-						<X size={16} />Нет
-					</button>
-				</div>
-			{:else}
-				<div class="grid">
-					<button
-						class="btn"
-						onclick={() => (confirm = "host")}
-					>
-						<Crown size={16} />Сделать хостом
-					</button>
-					<button
-						class="btn danger"
-						onclick={() => (confirm = "kick")}
-					>
-						<UserX size={16} />Кикнуть
-					</button>
-				</div>
-			{/if}
-		{/if}
-	</div>
-{/if}
 
 <style>
 	.hint {

@@ -38,6 +38,7 @@ import { getShuffleNames } from "$lib/components/Shuffle";
 import { togglePause, isPaused } from "$lib/components/Pause";
 import { toggleTimer, timeAdd, timeSubtract } from "$lib/stores/timerDown";
 import { toggleUpTimer } from "$lib/stores/timerUp";
+import { canEditTimer } from "$lib/stores/room";
 import { setBindListener } from "$lib/components/utils/BindUtils";
 import { mmssToSeconds } from "$lib/components/utils/TimerUtils";
 import { get } from "svelte/store";
@@ -48,6 +49,7 @@ async function handleShuffle() {
 }
 
 function anyTimerToggle() {
+	if (!get(canEditTimer)) return;
 	if (get(isPaused)) {
 		toggleUpTimer();
 		return;
@@ -403,7 +405,7 @@ export const settings = [
 		tooltip: "Назначьте клавишу для добавления шага времени",
 		keywords: ["время", "бинд", "клавиша", "добавить", "плюс", "хоткей"],
 		configKey: "addTimeKey",
-		action: () => timeAdd(stepSeconds()),
+		action: () => get(canEditTimer) && timeAdd(stepSeconds()),
 	},
 	{
 		id: "subTimeKey",
@@ -416,7 +418,7 @@ export const settings = [
 		tooltip: "Назначьте клавишу для вычитания шага времени",
 		keywords: ["время", "бинд", "клавиша", "убавить", "минус", "хоткей"],
 		configKey: "subTimeKey",
-		action: () => timeSubtract(stepSeconds()),
+		action: () => get(canEditTimer) && timeSubtract(stepSeconds()),
 	},
 ];
 

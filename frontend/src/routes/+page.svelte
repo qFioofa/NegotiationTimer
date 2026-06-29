@@ -1,12 +1,15 @@
 <script>
 	import BackgroundHandler from "$lib/elements/BackgroundHandler.svelte";
 	import BottomMenu from "$lib/elements/BottomMenu.svelte";
+	import Pause from "$lib/elements/Pause.svelte";
 	import IntroGuide from "$lib/elements/IntroGuide.svelte";
 	import PlayerComp from "$lib/elements/PlayerComp.svelte";
 	import MobileApp from "$lib/elements/MobileApp.svelte";
 	import { themeManager } from "$lib/cssStyles/themeHanager";
 	import { GlobalConfig } from "$lib/stores/parameters";
+	import { canEditTimer } from "$lib/stores/room";
 	import Timer from "$lib/elements/Timer.svelte";
+	import TriggerBar from "$lib/elements/Controls/TriggerBar.svelte";
 	import SettingsTrigger from "$lib/elements/Settings/SettingsTrigger.svelte";
 	import ServerTrigger from "$lib/elements/Settings/ServerTrigger.svelte";
 	import OnlineBadge from "$lib/elements/Settings/OnlineBadge.svelte";
@@ -55,20 +58,27 @@
 {#if !hideUI}
 	{#if isMobile}
 		<MobileApp />
-		<BottomMenu />
 	{:else}
 		<PlayerComp />
 		<Timer />
-		<BottomMenu />
 	{/if}
+	<Pause />
 {/if}
 
-<ProximityReveal enabled={proxTabs.includes("settings")}>
-	<SettingsTrigger />
-</ProximityReveal>
-<ProximityReveal enabled={proxTabs.includes("server")}>
-	<ServerTrigger />
-</ProximityReveal>
+<TriggerBar>
+	<ProximityReveal enabled={proxTabs.includes("server")}>
+		<ServerTrigger />
+	</ProximityReveal>
+	{#if $canEditTimer && !hideUI}
+		<ProximityReveal enabled={proxTabs.includes("timer")}>
+			<BottomMenu />
+		</ProximityReveal>
+	{/if}
+	<ProximityReveal enabled={proxTabs.includes("settings")}>
+		<SettingsTrigger />
+	</ProximityReveal>
+</TriggerBar>
+
 <ProximityReveal enabled={proxTabs.includes("online")}>
 	<OnlineBadge />
 </ProximityReveal>

@@ -6,21 +6,9 @@
 	import { mmssToSeconds, timerDisplay } from "$lib/components/utils/TimerUtils";
 	import { setPause } from "$lib/components/Pause";
 	import { Clock } from "lucide-svelte";
-	import Pause from "./Pause.svelte";
-	import ProximityReveal from "./ProximityReveal.svelte";
 
 	let triggerRef = $state();
 	let plateRef = $state();
-
-	let proxOn = $state(
-		(GlobalConfig.get("proximityTabs") || []).includes("timer"),
-	);
-	$effect(() =>
-		GlobalConfig.subscribe(
-			"proximityTabs",
-			(v) => (proxOn = (v || []).includes("timer")),
-		),
-	);
 
 	// Быстрые пресеты ±времени — самое частое действие во время сессии.
 	const presets = [
@@ -61,21 +49,17 @@
 
 <svelte:window onkeydown={onKeydown} onpointerdown={onPointerDown} />
 
-<Pause />
-
-<ProximityReveal enabled={proxOn}>
-	<button
-		bind:this={triggerRef}
-		class="panel-trigger"
-		class:active={$isPanelOpen}
-		aria-label="Время"
-		aria-haspopup="true"
-		aria-expanded={$isPanelOpen}
-		onclick={toggle}
-	>
-		<Clock size={28} />
-	</button>
-</ProximityReveal>
+<button
+	bind:this={triggerRef}
+	class="panel-trigger"
+	class:active={$isPanelOpen}
+	aria-label="Время"
+	aria-haspopup="true"
+	aria-expanded={$isPanelOpen}
+	onclick={toggle}
+>
+	<Clock size={28} />
+</button>
 
 <div
 	bind:this={plateRef}
@@ -136,15 +120,9 @@
 </div>
 
 <style>
-	/* Иконка-близнец кнопки настроек, слева от шестерёнки. Позиция и размер —
-	   из общих --trigger-* (см. global.css), чтобы не было магических чисел. */
+	/* Иконка-часы — обычный flex-элемент группы TriggerBar (без своей фиксированной
+	   позиции), поэтому при скрытии соседей группа красиво схлопывается без дыр. */
 	.panel-trigger {
-		position: fixed;
-		top: var(--trigger-edge);
-		right: calc(
-			var(--trigger-edge) + var(--trigger-size) + var(--trigger-gap)
-		);
-		z-index: 1001;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -208,24 +186,7 @@
 			transform 0.25s ease;
 	}
 
-	/* «Хвостик» от плашки к центру иконки-часам — смещение считается из --trigger-*. */
-	.panel-plate::before {
-		content: "";
-		position: absolute;
-		top: -8px;
-		right: calc(
-			var(--trigger-size) + var(--trigger-gap) + var(--trigger-size) / 2 -
-				7px
-		);
-		width: 14px;
-		height: 14px;
-		background: var(--bg);
-		border-left: 3px solid var(--accent);
-		border-top: 3px solid var(--accent);
-		transform: rotate(45deg);
-	}
-
-	/* Скролл — на внутреннем теле, чтобы не обрезать хвостик у плашки. */
+	/* Скролл — на внутреннем теле. */
 	.plate-body {
 		display: flex;
 		flex-direction: column;

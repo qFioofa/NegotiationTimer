@@ -11,6 +11,7 @@ export default class TimerLogic {
 	private intervalId: ReturnType<typeof setInterval> | null;
 	private updateCallbacks: TimeListener[];
 	private runningCallbacks: RunningListener[];
+	private expireCallbacks: (() => void)[];
 	private isInverted: boolean;
 	private timerSnap: TimeListener;
 	private anchorTimestamp: number;
@@ -22,6 +23,7 @@ export default class TimerLogic {
 		this.intervalId = null;
 		this.updateCallbacks = [];
 		this.runningCallbacks = [];
+		this.expireCallbacks = [];
 		this.isInverted = isInverted;
 		this.timerSnap = () => {};
 		this.anchorTimestamp = 0;
@@ -57,6 +59,18 @@ export default class TimerLogic {
 		this.timerSnap = callback;
 	}
 
+	// Срабатывает ТОЛЬКО когда отсчёт естественно дошёл до нуля (в tick).
+	// Сброс/ручное вычитание/синхронизация в ноль сюда НЕ попадают — поэтому
+	// «Время вышло!» не появляется фантомно при сбросе.
+	addExpireListener(callback: () => void): Unsubscribe {
+		this.expireCallbacks.push(callback);
+		return () => {
+			this.expireCallbacks = this.expireCallbacks.filter(
+				(cb) => cb !== callback,
+			);
+		};
+	}
+
 	notifyUpdate(): void {
 		this.updateCallbacks.forEach((cb) => cb(this.time));
 	}
@@ -83,7 +97,10 @@ export default class TimerLogic {
 		} else {
 			this.time = Math.max(0, this.anchorValue - elapsed);
 			this.notifyUpdate();
-			if (this.time <= 0) this.pause();
+			if (this.time <= 0) {
+				this.pause();
+				this.expireCallbacks.forEach((cb) => cb());
+			}
 		}
 	}
 
